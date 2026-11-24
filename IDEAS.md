@@ -1,226 +1,226 @@
-# Ideas to Dig
+# Идеи для проработки
 
-> Research topics for future guide improvements. Curated and validated.
+> Темы исследований для будущих улучшений руководства. Отобраны и проверены.
 
-## Done
+## Готово
 
-### MCP Security Hardening ✅
-Unified security research covering MCP vulnerabilities, prompt injection, and secret detection.
+### Усиление безопасности MCP ✅
+Единое исследование по безопасности, охватывающее уязвимости MCP, промпт-инъекции и обнаружение секретов.
 
-**Completed**: [Security Hardening Guide](./guide/security/security-hardening.md) covers:
-- CVE-2025-53109/53110, 54135, 54136 with mitigations
-- MCP vetting workflow with 5-minute audit checklist
-- MCP Safe List (community vetted)
-- Prompt injection evasion techniques (Unicode, ANSI, null bytes)
-- Secret detection tool comparison (Gitleaks, TruffleHog, GitGuardian)
-- Incident response procedures (secret exposed, MCP compromised)
-- 3 new hooks: `unicode-injection-scanner.sh`, `repo-integrity-scanner.sh`, `mcp-config-integrity.sh`
-
----
-
-## High Priority
-
-### gstack-inspired commands (deferred from 2026-03-26 audit)
-
-Audit of [gstack](https://github.com/garrytan/gstack) (Garry Tan's Claude Code sprint toolkit) identified these gaps. HIGH-priority items were already implemented (`/investigate`, `/qa`, `/canary`, `/land-and-deploy`, `/review-pr` updates). Remaining items deferred here.
-
-**`/autoplan`** — single command that chains CEO → Design → Eng review automatically with encoded decision principles. Classify decisions as Mechanical (auto-decide) vs Taste (surface to user). Prerequisite: our `/plan-ceo-review` and `/plan-eng-review` commands must be stable first. Source: `gstack/autoplan/SKILL.md`.
-
-**`/office-hours`** — YC-style product diagnostic with 6 forcing questions before any planning. Upstream of `/plan-ceo-review`. Writes a design brief to `~/.claude/projects/`. Source: `gstack/office-hours/SKILL.md`.
-
-**`/design-review`** — live-site visual audit + fix loop. Screenshots a URL, audits spacing/typography/color/contrast, detects AI slop patterns (purple gradients, 3-column grids, centered everything). Requires browser tooling standardization first. Source: `gstack/design-review/SKILL.md` + `design-checklist.md`.
-
-**`/benchmark`** — Core Web Vitals regression detection (TTFB, FCP, LCP, DOM load, bundle sizes). Baseline comparison with regression thresholds (>50% OR >500ms = regression). Source: `gstack/benchmark/SKILL.md`.
-
-**`/retro`** — weekly retrospective with git log analysis per contributor. Current vs prior window. Source: `gstack/retro/SKILL.md`.
-
-**`/freeze` + `/unfreeze`** — runtime directory edit lock via PreToolUse hook (hard deny, not warning). State file at `~/.claude/freeze-dir.txt`. Composable with `/careful` into a `/guard` command. Source: `gstack/freeze/SKILL.md`.
-
-**`/document-release`** — post-ship documentation updates. Reads diff since last release, updates README/ARCHITECTURE/CONTRIBUTING/CLAUDE.md, polishes CHANGELOG, cleans TODOS. Source: `gstack/document-release/SKILL.md`.
-
-**Effort compression tables** — add to skill templates: human time vs AI time per task type. Architecture decision for skill format — discuss before implementing across all skills.
-
-**Trigger to implement**: reader requests, or when we do a "workflow completeness" sprint.
+**Выполнено**: [Руководство по усилению безопасности](./guide/security/security-hardening.md) включает:
+- CVE-2025-53109/53110, 54135, 54136 с мерами защиты
+- Рабочий процесс проверки MCP с 5-минутным чек-листом аудита
+- Безопасный список MCP (проверенный сообществом)
+- Техники обхода защиты от промпт-инъекций (Unicode, ANSI, нулевые байты)
+- Сравнение инструментов обнаружения секретов (Gitleaks, TruffleHog, GitGuardian)
+- Процедуры реагирования на инциденты (утечка секрета, компрометация MCP)
+- 3 новых хука: `unicode-injection-scanner.sh`, `repo-integrity-scanner.sh`, `mcp-config-integrity.sh`
 
 ---
 
-### Agent Skills — Documentation Gaps (from agentskills.io official docs, 2026-05-14)
+## Высокий приоритет
 
-Six factual items confirmed missing from the guide's skills chapter after cross-referencing with the official agentskills.io specification and client implementation guide.
+### Команды по мотивам gstack (отложены после аудита от 2026-03-26)
 
-**[HIGH] Cross-client directory convention `.agents/skills/`** — The guide only documents `.claude/skills/` (Claude Code-specific). The open standard defines `.agents/skills/` (project) and `~/.agents/skills/` (user) as the cross-client paths. Skills placed there work across all 35+ compatible clients. This distinction directly affects portability claims. Add to the "Where Skills Live" section.
+Аудит [gstack](https://github.com/garrytan/gstack) (набора инструментов Гарри Тана для спринтов с Claude Code) выявил следующие пробелы. Пункты с приоритетом HIGH уже реализованы (`/investigate`, `/qa`, `/canary`, `/land-and-deploy`, обновления `/review-pr`). Оставшиеся пункты перенесены сюда.
 
-**[HIGH] 4-level skill loading priority** — The guide doesn't document the full hierarchy: Enterprise → Personal → Project → Plugins. Currently the guide implies only Personal vs Project. Enterprise (managed settings, highest priority) and Plugins (lowest) are missing. Add to the priority hierarchy section.
+**`/autoplan`** — единая команда, автоматически выстраивающая цепочку ревью CEO → Design → Eng с зашитыми принципами принятия решений. Классифицирует решения на механические (принимаются автоматически) и вкусовые (выносятся на усмотрение пользователя). Предусловие: сначала должны стабилизироваться наши команды `/plan-ceo-review` и `/plan-eng-review`. Источник: `gstack/autoplan/SKILL.md`.
 
-**[MEDIUM] Progressive disclosure token costs** — The spec gives concrete numbers: ~50-100 tokens/skill for catalog (name + description only), <5000 tokens recommended for full SKILL.md body, on-demand for resources. The guide explains the concept but never gives token figures. Useful for readers deciding how many skills to install.
+**`/office-hours`** — продуктовая диагностика в стиле YC с 6 наводящими вопросами до начала любого планирования. Идёт перед `/plan-ceo-review`. Записывает дизайн-бриф в `~/.claude/projects/`. Источник: `gstack/office-hours/SKILL.md`.
 
-**[MEDIUM] 500-line SKILL.md body limit** — The spec recommends keeping SKILL.md under 500 lines. Not documented anywhere in the guide. Add as a practical rule of thumb in the structure section.
+**`/design-review`** — визуальный аудит работающего сайта + цикл исправлений. Делает скриншот по URL, проверяет отступы, типографику, цвета и контрастность, выявляет паттерны «ИИ-халтуры» (AI slop: фиолетовые градиенты, трёхколоночные сетки, центрирование всего подряд). Требует предварительной стандартизации браузерных инструментов. Источник: `gstack/design-review/SKILL.md` + `design-checklist.md`.
 
-**[MEDIUM] `name` must match parent directory name** — The spec requires this as a structural constraint. The guide documents character/format rules for `name` but omits this requirement. A mismatch causes `skills-ref validate` to fail.
+**`/benchmark`** — обнаружение регрессий Core Web Vitals (TTFB, FCP, LCP, загрузка DOM, размеры бандлов). Сравнение с базовыми показателями и порогами регрессии (>50% ИЛИ >500ms = регрессия). Источник: `gstack/benchmark/SKILL.md`.
 
-**[LOW] Eval storage convention** — The spec defines a standard file layout: `evals/evals.json` inside the skill folder + `my-skill-workspace/iteration-N/with_skill|without_skill/` for eval runs. Not documented in the guide's evaluation section. Matters for cross-tool compatibility with the `skill-creator` meta-skill.
+**`/retro`** — еженедельная ретроспектива с анализом git log по каждому участнику. Сравнение текущего окна с предыдущим. Источник: `gstack/retro/SKILL.md`.
 
-**Source**: `claudedocs/anthropic-cert/01-agent-skills/agentskills-io-docs.md` (sections 2, 6, 8)
+**`/freeze` + `/unfreeze`** — блокировка редактирования каталога во время работы через хук `PreToolUse` (жёсткий запрет, а не предупреждение). Файл состояния по пути `~/.claude/freeze-dir.txt`. Можно скомбинировать с `/careful` в команду `/guard`. Источник: `gstack/freeze/SKILL.md`.
+
+**`/document-release`** — обновление документации после релиза. Читает diff с момента прошлого релиза, обновляет README/ARCHITECTURE/CONTRIBUTING/CLAUDE.md, доводит до ума CHANGELOG, чистит TODOS. Источник: `gstack/document-release/SKILL.md`.
+
+**Таблицы сжатия трудозатрат (effort compression)** — добавить в шаблоны скиллов: время человека против времени ИИ по типу задачи. Архитектурное решение для формата скиллов — обсудить перед внедрением во все скиллы.
+
+**Триггер для реализации**: запросы читателей или проведение спринта по «полноте рабочих процессов».
 
 ---
 
-## Medium Priority
+### Agent Skills — пробелы в документации (из официальной документации agentskills.io, 2026-05-14)
 
-### CI/CD Workflows Gallery ✅
+Шесть фактических пунктов, отсутствие которых в главе о скиллах руководства подтверждено после сверки с официальной спецификацией agentskills.io и руководством по реализации клиентов.
 
-**Completed**: [GitHub Actions Workflows](./guide/workflows/github-actions.md) — 5 patterns using `anthropics/claude-code-action` (PR review, auto-review, issue triage, security, scheduled maintenance). Includes cost control, fork safety, Bedrock/Vertex auth alternatives. Cross-linked from section 9.3 of the main guide.
+**[HIGH] Кросс-клиентское соглашение о каталогах `.agents/skills/`** — в руководстве описан только `.claude/skills/` (специфичный для Claude Code). Открытый стандарт определяет `.agents/skills/` (уровень проекта) и `~/.agents/skills/` (уровень пользователя) как кросс-клиентские пути. Размещённые там скиллы работают во всех 35+ совместимых клиентах. Это различие напрямую влияет на заявления о переносимости. Добавить в раздел «Где хранятся скиллы» («Where Skills Live»).
 
-### MCP Server Catalog
-Exhaustive list of MCP servers with real-world use cases.
+**[HIGH] 4-уровневый приоритет загрузки скиллов** — в руководстве не описана полная иерархия: Enterprise → Personal → Project → Plugins. Сейчас руководство подразумевает только Personal и Project. Отсутствуют Enterprise (управляемые настройки, наивысший приоритет) и Plugins (наименьший приоритет). Добавить в раздел об иерархии приоритетов.
 
-**Topics:**
-- Available servers by category (dev tools, databases, APIs)
-- Performance benchmarks vs native tools
-- Security trust levels per server
-- Custom server development patterns
+**[MEDIUM] Стоимость токенов при постепенном раскрытии (progressive disclosure)** — спецификация приводит конкретные цифры: ~50–100 токенов на скилл для каталога (только имя и описание), рекомендуется <5000 токенов для полного тела SKILL.md, и загрузка по требованию для ресурсов. Руководство объясняет саму концепцию, но нигде не приводит цифр по токенам. Полезно читателям, решающим, сколько скиллов установить.
 
-**Perplexity Query:**
+**[MEDIUM] Ограничение тела SKILL.md в 500 строк** — спецификация рекомендует держать SKILL.md в пределах 500 строк. Нигде в руководстве это не упомянуто. Добавить как практическое ориентировочное правило в раздел о структуре.
+
+**[MEDIUM] Поле `name` должно совпадать с именем родительского каталога** — спецификация требует этого как структурного ограничения. В руководстве описаны правила символов и формата для `name`, но это требование упущено. Несовпадение приводит к ошибке `skills-ref validate`.
+
+**[LOW] Соглашение о хранении оценок (eval)** — спецификация определяет стандартную структуру файлов: `evals/evals.json` внутри папки скилла + `my-skill-workspace/iteration-N/with_skill|without_skill/` для прогонов оценки. Не задокументировано в разделе руководства об оценке (eval). Важно для совместимости между инструментами с мета-скиллом `skill-creator`.
+
+**Источник**: `claudedocs/anthropic-cert/01-agent-skills/agentskills-io-docs.md` (разделы 2, 6, 8)
+
+---
+
+## Средний приоритет
+
+### Галерея CI/CD-воркфлоу ✅
+
+**Выполнено**: [Воркфлоу GitHub Actions](./guide/workflows/github-actions.md) — 5 паттернов с использованием `anthropics/claude-code-action` (ревью PR, авто-ревью, триаж задач, безопасность, плановое обслуживание). Включает контроль расходов, безопасность форков, альтернативные схемы аутентификации Bedrock/Vertex. Связано перекрёстными ссылками с разделом 9.3 основного руководства.
+
+### Каталог MCP-серверов
+Исчерпывающий список MCP-серверов с реальными сценариями применения.
+
+**Темы:**
+- Доступные серверы по категориям (инструменты разработки, базы данных, API)
+- Бенчмарки производительности в сравнении с нативными инструментами
+- Уровни доверия и безопасности для каждого сервера
+- Паттерны разработки собственных серверов
+
+**Запрос для Perplexity:**
 ```
-MCP Model Context Protocol servers catalog 2024-2025:
-- Most useful servers for developers
-- Performance comparison MCP vs native tools
-- How to build custom MCP servers
-```
-
----
-
-## Lower Priority
-
-### CLAUDE.md Patterns Library
-Stack-specific templates for common project types.
-
-**Topics:**
-- React/Next.js optimized configurations
-- Python/FastAPI patterns
-- Go project conventions
-- Monorepo configurations
-
-**Perplexity Query:**
-```
-CLAUDE.md configuration examples by framework:
-- React, Next.js, Vue patterns
-- Python, FastAPI, Django patterns
-- Best practices from GitHub repositories
+Каталог серверов MCP Model Context Protocol 2024–2025:
+- Самые полезные серверы для разработчиков
+- Сравнение производительности MCP и нативных инструментов
+- Как создавать собственные MCP-серверы
 ```
 
 ---
 
-## Watching (Waiting for Demand)
+## Низкий приоритет
 
-a### prompt-caching MCP Plugin
+### Библиотека паттернов CLAUDE.md
+Шаблоны под конкретные стеки для типовых проектов.
 
-MCP plugin that automates `cache_control` placement for developers building apps on the Anthropic SDK. Evaluated through a local installation connected to Claude Code.
+**Темы:**
+- Оптимизированные конфигурации для React/Next.js
+- Паттерны для Python/FastAPI
+- Соглашения для проектов на Go
+- Конфигурации для монорепозиториев
 
-**Status:** Testing in progress. Real usage data required before any documentation decision.
-
-**What we know:**
-- 29 stars, v1.3.0, solo maintainer — maintenance risk
-- Author-reported benchmarks (80-92% savings) — unverified, cannot cite
-- Fills a real gap: no other MCP tool does this; Spring AI / LiteLLM / Pydantic AI serve different audiences
-- Blog post (Mathieu Grenier) independently documents the same pain point + 5 antipatterns — score 3/5, worth integrating in "Strategy 6" regardless
-
-**Open questions:**
-- [ ] Do real sessions on this project actually hit the cache? (run `get_cache_stats` after 10+ turns)
-- [ ] Is the plugin stable enough to recommend? Any errors, memory leaks, session issues?
-- [ ] What are the real savings on a CLAUDE.md-heavy project like this guide?
-
-**If test results are positive (cache hits confirmed, no stability issues):**
-- Add to `guide/ecosystem/third-party-tools.md` with verified stats (not README claims)
-- Add to landing third-party tools section
-- Score upgrade: 3/5 → 4/5
-
-**If test results are inconclusive or plugin is unstable:**
-- Move to Discarded Ideas
-- Keep the Mathieu Grenier blog post integration (independent value)
-
-**Check again:** After 1 week of real usage
+**Запрос для Perplexity:**
+```
+Примеры конфигураций CLAUDE.md по фреймворкам:
+- Паттерны React, Next.js, Vue
+- Паттерны Python, FastAPI, Django
+- Лучшие практики из репозиториев на GitHub
+```
 
 ---
 
-### Multi-LLM Consultation Patterns
-Using external LLMs (Gemini, GPT-4) as "second opinion" from Claude Code.
+## В наблюдении (ожидание спроса)
 
-**Status:** No proven demand. Add if 3+ reader requests.
+### MCP-плагин prompt-caching
 
-**Research done (Jan 2026):**
-- Simple approach: Bash script calling Gemini API
-- Production approach: [Plano](https://github.com/katanemo/plano) (overkill for solo devs)
-- Community adoption: Near zero in Claude Code users
+MCP-плагин, автоматизирующий расстановку `cache_control` для разработчиков, создающих приложения на Anthropic SDK. Оценивался через локальную установку, подключённую к Claude Code.
 
-**If implementing:**
+**Статус:** Идёт тестирование. Перед принятием решения о добавлении в документацию нужны реальные данные использования.
+
+**Что известно:**
+- 29 звёзд, v1.3.0, один мейнтейнер — риск прекращения поддержки
+- Заявленные автором бенчмарки (экономия 80–92%) — не проверены, ссылаться нельзя
+- Закрывает реальный пробел: ни один другой MCP-инструмент этого не делает; Spring AI / LiteLLM / Pydantic AI рассчитаны на другую аудиторию
+- Статья в блоге (Mathieu Grenier) независимо документирует ту же проблему + 5 антипаттернов — оценка 3/5, стоит интегрировать в «Стратегию 6» независимо от исхода
+
+**Открытые вопросы:**
+- [ ] Попадают ли реальные сессии в этом проекте в кэш? (запустить `get_cache_stats` после 10+ ходов)
+- [ ] Достаточно ли стабилен плагин, чтобы его рекомендовать? Есть ли ошибки, утечки памяти, проблемы с сессиями?
+- [ ] Какова реальная экономия на проекте с большим объёмом CLAUDE.md, таком как это руководство?
+
+**Если результаты тестирования положительные (попадания в кэш подтверждены, проблем со стабильностью нет):**
+- Добавить в `guide/ecosystem/third-party-tools.md` с проверенной статистикой (а не заявлениями из README)
+- Добавить в раздел сторонних инструментов на лендинге
+- Повышение оценки: 3/5 → 4/5
+
+**Если результаты тестирования неубедительны или плагин нестабилен:**
+- Перенести в «Отклонённые идеи»
+- Сохранить интеграцию статьи из блога Mathieu Grenier (представляет самостоятельную ценность)
+
+**Проверить повторно:** Через 1 неделю реального использования
+
+---
+
+### Паттерны консультаций с несколькими LLM
+Использование внешних LLM (Gemini, GPT-4) в качестве «второго мнения» из Claude Code.
+
+**Статус:** Подтверждённого спроса нет. Добавить при наличии 3+ запросов от читателей.
+
+**Проведённое исследование (январь 2026):**
+- Простой подход: Bash-скрипт с вызовом Gemini API
+- Продакшен-подход: [Plano](https://github.com/katanemo/plano) (избыточно для одиночных разработчиков)
+- Распространённость в сообществе: почти нулевая среди пользователей Claude Code
+
+**Если будем реализовывать:**
 - `examples/scripts/gemini-second-opinion.sh`
 
-### Type-Driven API Design for AI Agent Efficiency
-Schema-first development impact on Claude Code token consumption.
+### Проектирование API на основе типов для эффективности ИИ-агентов
+Влияние разработки с приоритетом схем (schema-first) на потребление токенов в Claude Code.
 
-**Status:** Anecdotal only (no empirical data). Reevaluate if benchmarks emerge.
+**Статус:** Только разрозненные наблюдения (нет эмпирических данных). Пересмотреть при появлении бенчмарков.
 
-**Resource evaluated (Feb 2026):**
-- [ShipTypes](https://shiptypes.com/) by Boris Tane (Cloudflare)
-- **Score:** 2/5 (Marginal) — Claims "types → fewer tokens" unverified
-- **Full evaluation:** `docs/resource-evaluations/shiptypes-evaluation.md`
+**Оценённый ресурс (февраль 2026):**
+- [ShipTypes](https://shiptypes.com/) от Бориса Тане (Cloudflare)
+- **Оценка:** 2/5 (Незначительно) — утверждения «типы → меньше токенов» не подтверждены
+- **Полная оценка:** `docs/resource-evaluations/shiptypes-evaluation.md`
 
-**What's missing:**
-- Benchmark comparing token consumption: typed APIs (tRPC/Zod) vs untyped (REST/docs)
-- A/B test showing AI agent iterations with/sans types
-- Case study with reproducible metrics
+**Чего не хватает:**
+- Бенчмарка, сравнивающего расход токенов: типизированные API (tRPC/Zod) против нетипизированных (REST/документация)
+- A/B-теста, показывающего число итераций ИИ-агента с типами и без них
+- Кейса с воспроизводимыми метриками
 
-**Reevaluation triggers:**
-- [ ] Academic paper/blog with empirical data (token consumption metrics)
-- [ ] Anthropic official recommendation on schema-first for Claude Code
-- [ ] 5+ community discussions/issues requesting this topic
+**Триггеры для пересмотра:**
+- [ ] Научная работа или статья в блоге с эмпирическими данными (метрики потребления токенов)
+- [ ] Официальная рекомендация Anthropic по schema-first для Claude Code
+- [ ] 5+ обсуждений или issue в сообществе с запросом этой темы
 
-**If validated (score upgrade to 4/5):**
-- Add subsection in `guide/core/methodologies.md` (after CDD, line 172)
-- Use micro-integration template: `docs/resource-evaluations/shiptypes-evaluation.md` (section "Integration Plan")
+**Если подтвердится (повышение оценки до 4/5):**
+- Добавить подраздел в `guide/core/methodologies.md` (после CDD, строка 172)
+- Использовать шаблон микро-интеграции: `docs/resource-evaluations/shiptypes-evaluation.md` (раздел «Integration Plan»)
 
-**Check again:** August 2026
-- 3-line mention in "See Also" section
-- No full guide (maintenance burden, scope creep)
+**Проверить повторно:** Август 2026
+- Упоминание в 3 строки в разделе «См. также»
+- Без полноценного руководства (нагрузка на поддержку, расползание рамок проекта)
 
-**Source:** [daily.dev article](https://app.daily.dev/posts/make-claude-code-opus-talk-to-gemini-pro-b7pyiq394)
+**Источник:** [статья на daily.dev](https://app.daily.dev/posts/make-claude-code-opus-talk-to-gemini-pro-b7pyiq394)
 
-### Vibe Coding Discourse
+### Дискуссия вокруг вайб-кодинга (Vibe Coding)
 
-Evolution of the "developer as architect" narrative in AI-assisted development.
+Эволюция нарратива «разработчик как архитектор» в разработке с помощью ИИ.
 
-**Reference:** [Craig Adam - "Agile is Out, Architecture is Back"](https://medium.com/@craig_32726/agile-is-out-architecture-is-back-7586910ab810)
+**Ссылка:** [Craig Adam — «Agile is Out, Architecture is Back»](https://medium.com/@craig_32726/agile-is-out-architecture-is-back-7586910ab810)
 
-**Status:** Watching. Term "vibe coding" now mainstream (Collins Word of the Year 2025).
-
----
-
-## Discarded Ideas
-
-| Idea | Reason Discarded |
-|------|------------------|
-| LLM Fine-tuning guide | Out of scope - users don't control model training |
-| Model architecture internals | Too theoretical, not actionable |
-| Token pricing optimization | Changes too frequently, use official docs |
-| A2A Protocol (Agent-to-Agent) | Claude Code is single-agent with sub-agents, not true multi-agent |
-| AgentOps Enterprise Dashboard | Infrastructure doesn't exist for CLI tool |
-| LLM-as-a-Judge evaluation | Overkill for CLI, adds latency without proportional value |
-| Decision Trajectory logging | No access to internal traces (black box) |
-| 4 Pillars formal framework | Too academic - guide already covers symptoms pragmatically |
-| Canary/Blue-Green deployments | Infrastructure patterns, not relevant for CLI |
-| Memory Poisoning defenses | Theoretical risk requiring prior system compromise |
-| Prompt Engineering for Code Gen | Already well covered (xml_prompting, prompt_formula) |
-| Context Window Optimization | Already well covered (context_management, context_triage) |
-| Task Decomposition Patterns | Covered via plan_mode, interaction_loop |
-| Agent Architecture Comparisons | Out of scope - not multi-agent theory |
-| Real-World Case Studies | Non-verifiable metrics, marketing-prone |
-| Comparison with Other Tools | Out of scope, rapid obsolescence |
+**Статус:** В наблюдении. Термин «vibe coding» стал мейнстримом (слово года по версии словаря Collins за 2025 год).
 
 ---
 
-## Contributing
+## Отклонённые идеи
 
-Found something interesting? Add it with:
-1. Topic name and why it matters
-2. Specific research questions
-3. Perplexity query to start
+| Идея | Причина отклонения |
+|------|--------------------|
+| Руководство по дообучению (fine-tuning) LLM | Вне рамок руководства — пользователи не управляют обучением модели |
+| Внутреннее устройство архитектуры моделей | Слишком теоретично, не даёт практических шагов |
+| Оптимизация цен на токены | Меняется слишком часто, следует опираться на официальную документацию |
+| Протокол A2A (Agent-to-Agent) | Claude Code — одноагентный инструмент с субагентами, а не полноценная мультиагентная система |
+| Корпоративный дашборд AgentOps | Для CLI-инструмента такой инфраструктуры не существует |
+| Оценка LLM-as-a-Judge | Избыточно для CLI, добавляет задержку без соразмерной пользы |
+| Логирование траектории решений (Decision Trajectory) | Нет доступа к внутренним трассам (чёрный ящик) |
+| Формальный фреймворк «4 Pillars» | Слишком академично — руководство уже прагматично разбирает конкретные симптомы |
+| Деплои Canary/Blue-Green | Инфраструктурные паттерны, нерелевантны для CLI |
+| Защита от отравления памяти (Memory Poisoning) | Теоретический риск, требующий предварительной компрометации системы |
+| Промпт-инжиниринг для генерации кода | Уже хорошо раскрыто (xml_prompting, prompt_formula) |
+| Оптимизация контекстного окна | Уже хорошо раскрыто (context_management, context_triage) |
+| Паттерны декомпозиции задач | Раскрыто через plan_mode, interaction_loop |
+| Сравнение архитектур агентов | Вне рамок — это не учебник по теории мультиагентных систем |
+| Реальные кейсы из индустрии | Непроверяемые метрики, склонность к маркетинговому уклону |
+| Сравнение с другими инструментами | Вне рамок, быстро устаревает |
+
+---
+
+## Как внести вклад
+
+Нашли что-то интересное? Добавьте это, указав:
+1. Название темы и почему она важна
+2. Конкретные исследовательские вопросы
+3. Стартовый запрос для Perplexity

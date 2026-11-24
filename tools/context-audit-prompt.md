@@ -1,94 +1,94 @@
-# Audit your context engineering setup
+# Аудит вашей конфигурации инженерии контекста
 
-> A self-contained prompt to measure and improve your Claude Code context architecture.
+> Самодостаточный промпт для измерения и улучшения архитектуры контекста Claude Code.
 
-**Author**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Fractional Chief AI Officer
+**Автор**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Fractional Chief AI Officer
 
-**Reference**: [The Ultimate Claude Code Guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md)
-
----
-
-## 1. What this does
-
-This prompt instructs Claude to audit your context engineering setup by:
-
-1. **Measuring** total always-on context size, CLAUDE.md length, and path-scoping ratio
-2. **Detecting** skills-to-rules balance, redundancy, and negative vs positive instructions
-3. **Flagging** staleness signals (last updated, broken imports, deprecated references)
-4. **Scoring** across 8 dimensions for a total of /100 with prioritized recommendations
-
-**Performance**: Uses bash/grep for efficient scanning. Claude reads files only when specific content analysis is needed.
-
-**Important**: Claude will NOT make any changes without your explicit approval.
+**Справочник**: [Полное руководство по Claude Code](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md)
 
 ---
 
-## 2. Who this is for
+## 1. Что делает этот промпт
 
-| Level | What You Get |
-|-------|-------------|
-| **Solo developer** | Find quick wins: trim bloat, add missing sections, fix stale imports |
-| **Small team (2-10)** | Identify consistency gaps and opportunities for profile-based assembly |
-| **Large team (10+)** | Systematic context architecture assessment with maturity scoring |
+Этот промпт поручает Claude провести аудит вашей конфигурации инженерии контекста:
 
-**Prerequisites**:
-- Claude Code installed and working
-- A project with at least a CLAUDE.md or `.claude/` directory
-- Bash shell (native on macOS/Linux, WSL on Windows)
+1. **Измерение** общего объёма постоянно загружаемого контекста, длины CLAUDE.md и доли правил с привязкой к путям (path-scoping)
+2. **Выявление** баланса между скиллами (skills) и правилами, избыточности, а также соотношения запрещающих и предписывающих инструкций
+3. **Обнаружение** признаков устаревания (дата последнего обновления, неработающие импорты, устаревшие упоминания)
+4. **Оценка** по 8 направлениям с итоговым баллом из 100 (/100) и приоритизированными рекомендациями
 
-**Time**: ~3-5 minutes
+**Производительность**: использует bash/grep для эффективного сканирования. Claude читает файлы только тогда, когда нужен анализ конкретного содержимого.
+
+**Важно**: Claude НЕ будет вносить никаких изменений без вашего явного одобрения.
 
 ---
 
-## 3. How to use it
+## 2. Для кого это предназначено
 
-### Step 1: Copy the prompt
+| Уровень | Что вы получите |
+|---------|-----------------|
+| **Соло-разработчик** | Найдёте быстрые улучшения: уберёте лишний объём, добавите недостающие разделы, исправите устаревшие импорты |
+| **Небольшая команда (2-10)** | Выявите пробелы в согласованности и возможности для сборки контекста на основе профилей |
+| **Крупная команда (10+)** | Системная оценка архитектуры контекста с выставлением оценки зрелости |
 
-Copy everything inside the code block in [Section 4](#4-the-prompt) below.
+**Требования**:
+- Установленный и рабочий Claude Code
+- Проект как минимум с файлом CLAUDE.md или каталогом `.claude/`
+- Оболочка Bash (встроенная в macOS/Linux, WSL в Windows)
 
-### Step 2: Run Claude Code
+**Время**: ~3-5 минут
+
+---
+
+## 3. Как использовать
+
+### Шаг 1: Скопируйте промпт
+
+Скопируйте всё содержимое блока кода в [Разделе 4](#4-the-prompt) ниже.
+
+### Шаг 2: Запустите Claude Code
 
 ```bash
 cd your-project-directory
 claude
 ```
 
-### Step 3: Paste and execute
+### Шаг 3: Вставьте и выполните
 
-Paste the prompt and press Enter. Claude will begin the audit.
+Вставьте промпт и нажмите Enter. Claude начнёт аудит.
 
-### Step 4: Review results
+### Шаг 4: Изучите результаты
 
-Claude will present findings, then ask for validation before making any changes.
+Claude представит результаты проверки и запросит подтверждение, прежде чем вносить какие-либо изменения.
 
-### Platform note
+### Примечание по платформам
 
-| Platform | Global Config Path |
-|----------|-------------------|
+| Платформа | Путь к глобальной конфигурации |
+|-----------|-------------------------------|
 | **macOS/Linux** | `~/.claude/` |
 | **Windows** | `%USERPROFILE%\.claude\` |
 
 ---
 
-## 4. The prompt
+## 4. Промпт
 
 ```markdown
-# Audit My Context Engineering Setup
+# Проведи аудит моей конфигурации инженерии контекста
 
-## Context
+## Контекст
 
-Perform a comprehensive context engineering audit of my Claude Code configuration.
-Focus on context size, structure quality, freshness, and team scalability.
+Проведи комплексный аудит инженерии контекста моей конфигурации Claude Code.
+Сфокусируйся на объёме контекста, качестве структуры, актуальности и масштабируемости для команды.
 
-Reference: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md
+Справочник: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md
 
-## Instructions
+## Инструкции
 
-### Phase 1: Discovery (Bash Scan)
+### Фаза 1: Сбор данных (сканирование через Bash)
 
-**IMPORTANT**: Use bash commands exclusively in this phase. Do NOT read files yet.
+**ВАЖНО**: на этой фазе используй исключительно bash-команды. Пока НЕ читай файлы.
 
-#### 1.1 Size & Structure Scan
+#### 1.1 Сканирование размера и структуры
 
 ```bash
 bash -c '
@@ -158,9 +158,9 @@ done
 '
 ```
 
-**Store the output** for evaluation.
+**Сохрани вывод** для последующей оценки.
 
-#### 1.2 Quality Pattern Scan
+#### 1.2 Сканирование паттернов качества
 
 ```bash
 bash -c '
@@ -224,9 +224,9 @@ done
 '
 ```
 
-**Store the output** for evaluation.
+**Сохрани вывод** для последующей оценки.
 
-#### 1.3 Freshness & Conflict Scan
+#### 1.3 Сканирование актуальности и конфликтов
 
 ```bash
 bash -c '
@@ -262,283 +262,282 @@ done
 '
 ```
 
-**Store the output** for evaluation.
+**Сохрани вывод** для последующей оценки.
 
-### Phase 2: Evaluate Across 8 Dimensions
+### Фаза 2: Оценка по 8 направлениям
 
-Use the scan outputs from Phase 1. Read specific file sections only if content examples are needed for the report.
+Используй результаты сканирования из Фазы 1. Читай конкретные разделы файлов только в том случае, если для отчёта нужны примеры содержимого.
 
-#### Dimension 1: Size & Budget (15 pts)
+#### Направление 1: Размер и бюджет (15 баллов)
 
-Evaluate based on token estimates from Phase 1:
+Оценивай на основе расчётного количества токенов из Фазы 1:
 
-| Check | Points | Threshold |
-|-------|--------|-----------|
-| Total always-on context under 8K tokens | 5 | Sum of all CLAUDE.md + imports |
-| Rule count under 150 instructions | 5 | global + project combined |
-| No single file over 400 lines | 5 | flag if exceeded |
+| Проверка | Баллы | Порог |
+|----------|-------|-------|
+| Общий постоянно загружаемый контекст менее 8K токенов | 5 | Сумма всех CLAUDE.md + импортов |
+| Количество правил менее 150 инструкций | 5 | глобальный + проектный суммарно |
+| Ни один файл не превышает 400 строк | 5 | отметить при превышении |
 
-Deduct points proportionally if thresholds are exceeded. A file at 600 lines = 3/5 not 0.
+Снимай баллы пропорционально при превышении порогов. Файл на 600 строк = 3/5, а не 0.
 
-#### Dimension 2: Structure (15 pts)
+#### Направление 2: Структура (15 баллов)
 
-| Check | Points | Signal |
-|-------|--------|--------|
-| Has an overview/purpose section | 4 | h2 with "overview", "purpose", "about", "context" |
-| Has architecture or project-layout section | 3 | h2 with "architecture", "structure", "layout" |
-| Includes anti-patterns or bad examples | 4 | "anti-pattern", "do not", "pitfall" |
-| Section count indicates clear hierarchy | 4 | 3+ distinct h2 sections |
+| Проверка | Баллы | Сигнал |
+|----------|-------|--------|
+| Есть раздел с обзором/назначением | 4 | h2 с "overview", "purpose", "about", "context" |
+| Есть раздел с архитектурой или структурой проекта | 3 | h2 с "architecture", "structure", "layout" |
+| Содержит антипаттерны или плохие примеры | 4 | "anti-pattern", "do not", "pitfall" |
+| Количество разделов указывает на чёткую иерархию | 4 | 3+ отдельных разделов h2 |
 
-#### Dimension 3: Path-Scoping (12 pts)
+#### Направление 3: Привязка к путям (12 баллов)
 
-| Check | Points | Signal |
-|-------|--------|--------|
-| Uses @imports for modular breakdown | 5 | at least 2 @import lines |
-| At least one path-specific or glob-scoped rule | 4 | globs: or file-specific section |
-| Not a monolithic file (all instructions in one block) | 3 | multiple files or sections |
+| Проверка | Баллы | Сигнал |
+|----------|-------|--------|
+| Использует @imports для модульного разбиения | 5 | минимум 2 строки с @import |
+| Минимум одно правило с привязкой к пути или glob-шаблону | 4 | globs: или раздел для конкретных файлов |
+| Не монолитный файл (не все инструкции в одном блоке) | 3 | несколько файлов или разделов |
 
-#### Dimension 4: Rule Quality (15 pts)
+#### Направление 4: Качество правил (15 баллов)
 
-| Check | Points | Signal |
-|-------|--------|--------|
-| Ratio positive:negative >= 2:1 | 5 | from negative/positive counts |
-| No vague instructions detected | 5 | zero "be careful", "as needed", etc. |
-| Rules are specific and actionable | 5 | judged from sample during report generation |
+| Проверка | Баллы | Сигнал |
+|----------|-------|--------|
+| Соотношение positive:negative >= 2:1 | 5 | по счётчикам negative/positive |
+| Не обнаружено расплывчатых инструкций | 5 | ноль вхождений "be careful", "as needed" и т.п. |
+| Правила конкретны и применимы на практике | 5 | оценивается по выборке при формировании отчёта |
 
-#### Dimension 5: Freshness (12 pts)
+#### Направление 5: Актуальность (12 баллов)
 
-| Check | Points | Signal |
-|-------|--------|--------|
-| CLAUDE.md committed within past 6 months | 5 | git log output |
-| No deprecated tool/model references | 4 | deprecated scan output |
-| No broken @imports | 3 | BROKEN lines in import scan |
+| Проверка | Баллы | Сигнал |
+|----------|-------|--------|
+| CLAUDE.md коммитился за последние 6 месяцев | 5 | вывод git log |
+| Нет ссылок на устаревшие инструменты/модели | 4 | вывод сканирования устаревших упоминаний |
+| Нет неработающих @imports | 3 | строки BROKEN в сканировании импортов |
 
-#### Dimension 6: Team Readiness (10 pts)
+#### Направление 6: Готовность для команды (10 баллов)
 
-| Check | Points | Signal |
-|-------|--------|--------|
-| Has profile-based or role-based structure | 4 | profile mentions >= 1 |
-| Module imports enable selective assembly | 3 | module-imports >= 3 |
-| Documented update protocol for team | 3 | update-protocol >= 1 |
+| Проверка | Баллы | Сигнал |
+|----------|-------|--------|
+| Есть структура на основе профилей или ролей | 4 | упоминания профилей (profile-mentions) >= 1 |
+| Импорты модулей позволяют выборочную сборку | 3 | module-imports >= 3 |
+| Документированный протокол обновлений для команды | 3 | update-protocol >= 1 |
 
-#### Dimension 7: Conflict Detection (11 pts)
+#### Направление 7: Выявление конфликтов (11 баллов)
 
-| Check | Points | Signal |
-|-------|--------|--------|
-| No contradictory rules detected | 5 | no conflicts from scan |
-| No duplicate section headers | 3 | no duplicates found |
-| Session retro or knowledge loop pattern | 3 | session-retro >= 1 |
+| Проверка | Баллы | Сигнал |
+|----------|-------|--------|
+| Не обнаружено противоречивых правил | 5 | нет конфликтов по результатам сканирования |
+| Нет дублирующихся заголовков разделов | 3 | дубликаты не найдены |
+| Есть паттерн ретроспективы сессии или цикла знаний | 3 | session-retro >= 1 |
 
-#### Dimension 8: Knowledge Loop (10 pts)
+#### Направление 8: Цикл знаний (10 баллов)
 
-| Check | Points | Signal |
-|-------|--------|--------|
-| Has update/review protocol documented | 4 | update-protocol >= 1 |
-| Has session retro or lesson-learned pattern | 3 | session-retro >= 1 |
-| Context tracked in git (auditable changes) | 3 | git freshness scan shows commits |
+| Проверка | Баллы | Сигнал |
+|----------|-------|--------|
+| Задокументирован протокол обновлений/пересмотра | 4 | update-protocol >= 1 |
+| Есть паттерн ретроспективы сессии или фиксации извлечённых уроков | 3 | session-retro >= 1 |
+| Контекст отслеживается в git (проверяемые изменения) | 3 | сканирование git-актуальности показывает коммиты |
 
-#### Calculate Total Score
+#### Расчёт итогового балла
 
-`Score = sum of earned points across all 8 dimensions`
+`Балл = сумма набранных баллов по всем 8 направлениям`
 
-### Phase 3: Generate Report
+### Фаза 3: Формирование отчёта
 
-Structure your output exactly as:
+Оформи свой вывод строго в следующем виде:
 
 ---
+## Аудит инженерии контекста
 
-## Context Engineering Audit
+### Оценка: [XX]/100
 
-### Score: [XX]/100
-
-| Dimension | Score | Notes |
+| Критерий | Баллы | Примечания |
 |-----------|-------|-------|
-| Size & Budget | X/15 | total ~X tokens, X rules |
-| Structure | X/15 | X sections, has/missing overview |
-| Path-Scoping | X/12 | X imports, monolithic/modular |
-| Rule Quality | X/15 | X% positive, X vague found |
-| Freshness | X/12 | last updated X, X broken imports |
-| Team Readiness | X/10 | X profiles, update protocol: yes/no |
-| Conflict Detection | X/11 | X contradictions, X duplicate headers |
-| Knowledge Loop | X/10 | git tracked: yes/no, retro: yes/no |
+| Размер и бюджет | X/15 | всего ~X токенов, X правил |
+| Структура | X/15 | X разделов, обзор есть/отсутствует |
+| Привязка к путям | X/12 | X импортов, монолитный/модульный |
+| Качество правил | X/15 | X% позитивных, найдено X расплывчатых |
+| Актуальность | X/12 | последнее обновление X, X битых импортов |
+| Готовность к команде | X/10 | X профилей, протокол обновлений: да/нет |
+| Поиск конфликтов | X/11 | X противоречий, X дублирующихся заголовков |
+| Цикл накопления знаний | X/10 | под контролем git: да/нет, ретроспектива: да/нет |
 
-### Context Budget
-- Global CLAUDE.md: ~X tokens
-- Project CLAUDE.md: ~X tokens
-- @imports combined: ~X tokens
-- Total always-on: ~X tokens
-- Rule count: X/150 instructions
+### Бюджет контекста
+- Глобальный CLAUDE.md: ~X токенов
+- Проектный CLAUDE.md: ~X токенов
+- Все @imports суммарно: ~X токенов
+- Всего в постоянном контексте (always-on): ~X токенов
+- Количество правил: X/150 инструкций
 
-### Priority Issues (fix these first)
-1. [Issue] — [specific fix with example]
-2. [Issue] — [specific fix with example]
-3. [Issue] — [specific fix with example]
+### Приоритетные проблемы (исправить в первую очередь)
+1. [Проблема] — [конкретное исправление с примером]
+2. [Проблема] — [конкретное исправление с примером]
+3. [Проблема] — [конкретное исправление с примером]
 
-### Quick Wins (< 30 min each)
-- [Fix]: [what to do and where]
-- [Fix]: [what to do and where]
-- [Fix]: [what to do and where]
+### Быстрые улучшения (< 30 мин каждое)
+- [Исправление]: [что сделать и где]
+- [Исправление]: [что сделать и где]
+- [Исправление]: [что сделать и где]
 
-### Maturity Level
-[Choose one and explain why]
+### Уровень зрелости
+[Выберите один уровень и объясните почему]
 
-**Level 1 — Empty** (0-19): No structured context. Claude operates with zero project knowledge.
-**Level 2 — Basic** (20-39): CLAUDE.md exists but is monolithic, stale, or mostly vague rules.
-**Level 3 — Structured** (40-59): Clear sections and imports, but missing freshness or team patterns.
-**Level 4 — Optimized** (60-79): Modular, scoped, positive-first rules with a known update cadence.
-**Level 5 — Engineering-Grade** (80-100): Profile-aware, git-tracked, conflict-free, knowledge loop active.
+**Уровень 1 — Пустой** (0-19): Структурированный контекст отсутствует. Claude работает без каких-либо знаний о проекте.
+**Уровень 2 — Базовый** (20-39): CLAUDE.md существует, но он монолитный, устаревший или состоит в основном из расплывчатых правил.
+**Уровень 3 — Структурированный** (40-59): Есть чёткие разделы и импорты, но не хватает актуальности или командных паттернов.
+**Уровень 4 — Оптимизированный** (60-79): Модульные правила с привязкой к путям, преимущественно в позитивной формулировке и с понятной периодичностью обновлений.
+**Уровень 5 — Инженерного уровня** (80-100): Учёт профилей, отслеживание в git, отсутствие конфликтов, активный цикл накопления знаний.
 
-### Ready-to-use Improvements
+### Готовые улучшения
 
-Provide 2-3 concrete text blocks that users can paste directly into their CLAUDE.md.
-Each block must address a Priority Issue identified above. Format:
+Предоставьте 2–3 конкретных текстовых блока, которые пользователь сможет сразу вставить в свой CLAUDE.md.
+Каждый блок должен решать одну из приоритетных проблем, выявленных выше. Формат:
 
-**Improvement 1: [name]**
-File: `[path]` — add at [top/section X/end]
+**Улучшение 1: [название]**
+Файл: `[путь]` — добавить в [начало/раздел X/конец]
 ```
-[exact text to paste]
-```
-
-**Improvement 2: [name]**
-File: `[path]` — add at [top/section X/end]
-```
-[exact text to paste]
+[точный текст для вставки]
 ```
 
----
-
-### Phase 4: Await Validation
-
-**CRITICAL**: Do NOT create or modify any files without explicit approval.
-
-After presenting the report, ask:
-
-"Which improvements would you like me to implement?
-
-Options:
-- `all` — Apply all ready-to-use improvements
-- `1, 2` — Specific improvements by number
-- `priority` — Only Priority Issues fixes
-- `none` — Keep the report for reference only
-
-Please specify your choice:"
-
-Wait for explicit user response before taking any action.
-
-## Output Format
-
-Structure your response exactly as:
-
-1. **Score table** with dimension breakdown
-2. **Context Budget** summary
-3. **Priority Issues** (numbered, fix first)
-4. **Quick Wins** (bullet list, < 30 min each)
-5. **Maturity Level** with explanation
-6. **Ready-to-use Improvements** (paste-ready text blocks)
-7. **Validation Request** (ask before implementing)
+**Улучшение 2: [название]**
+Файл: `[путь]` — добавить в [начало/раздел X/конец]
+```
+[точный текст для вставки]
 ```
 
 ---
 
-## 5. What to expect
+### Фаза 4: Ожидание подтверждения
 
-Here's an example of what the audit report looks like:
+**КРИТИЧНО**: НЕ создавайте и не изменяйте никакие файлы без явного одобрения.
 
-### Example score table
+После представления отчёта спросите:
+
+"Какие улучшения вы хотите, чтобы я применил?
+
+Варианты:
+- `all` — Применить все готовые улучшения
+- `1, 2` — Конкретные улучшения по номерам
+- `priority` — Только исправления приоритетных проблем
+- `none` — Оставить отчёт только для справки
+
+Пожалуйста, укажите ваш выбор:"
+
+Дождитесь явного ответа пользователя, прежде чем предпринимать какие-либо действия.
+
+## Формат вывода
+
+Структурируйте ответ строго следующим образом:
+
+1. **Таблица оценок** с разбивкой по критериям
+2. Сводка **Бюджет контекста**
+3. **Приоритетные проблемы** (нумерованный список, исправить в первую очередь)
+4. **Быстрые улучшения** (маркированный список, < 30 мин каждое)
+5. **Уровень зрелости** с пояснением
+6. **Готовые улучшения** (текстовые блоки, готовые для вставки)
+7. **Запрос подтверждения** (спросить перед применением)
+```
+
+---
+
+## 5. Чего ожидать
+
+Вот пример того, как выглядит отчёт об аудите:
+
+### Пример таблицы оценок
 
 ```
-## Context Engineering Audit
+## Аудит инженерии контекста
 
-### Score: 52/100
+### Оценка: 52/100
 
-| Dimension | Score | Notes |
+| Критерий | Баллы | Примечания |
 |-----------|-------|-------|
-| Size & Budget | 10/15 | ~6,200 tokens total, 182 rules (over limit) |
-| Structure | 9/15 | 4 sections, no anti-patterns section |
-| Path-Scoping | 4/12 | 1 import, monolithic project CLAUDE.md |
-| Rule Quality | 8/15 | 60% positive, 3 vague instructions found |
-| Freshness | 9/12 | last commit 4 months ago, 1 broken import |
-| Team Readiness | 3/10 | no profiles, no update protocol |
-| Conflict Detection | 6/11 | 1 "always/never" contradiction, no duplicate headers |
-| Knowledge Loop | 3/10 | not git tracked, no retro pattern |
+| Размер и бюджет | 10/15 | всего ~6 200 токенов, 182 правила (превышен лимит) |
+| Структура | 9/15 | 4 раздела, нет раздела с антипаттернами |
+| Привязка к путям | 4/12 | 1 импорт, монолитный проектный CLAUDE.md |
+| Качество правил | 8/15 | 60% позитивных, найдено 3 расплывчатые инструкции |
+| Актуальность | 9/12 | последний коммит 4 месяца назад, 1 битый импорт |
+| Готовность к команде | 3/10 | нет профилей, нет протокола обновлений |
+| Поиск конфликтов | 6/11 | 1 противоречие «всегда/никогда», нет дублирующихся заголовков |
+| Цикл накопления знаний | 3/10 | не отслеживается в git, нет паттерна ретроспективы |
 ```
 
-### Example quick wins
+### Пример быстрых улучшений
 
 ```
-Quick Wins (< 30 min each):
-- Fix broken import: @~/.claude/TONE.md not found — update path or remove
-- Add overview section: 2-line project description at top of CLAUDE.md
-- Trim rule count: merge 3 formatting rules into one compressed block
+Быстрые улучшения (< 30 мин каждое):
+- Исправить битый импорт: @~/.claude/TONE.md не найден — обновите путь или удалите
+- Добавить раздел обзора: описание проекта в 2 строки в начале CLAUDE.md
+- Сократить число правил: объединить 3 правила форматирования в один компактный блок
 ```
 
 ---
 
-## 6. Scoring guide
+## 6. Шкала оценки
 
-| Score | Maturity | Recommended Action |
+| Баллы | Зрелость | Рекомендуемое действие |
 |-------|----------|--------------------|
-| **80-100** | Level 5: Engineering-Grade | Maintain with quarterly review |
-| **60-79** | Level 4: Optimized | Address priority issues, reach 80 |
-| **40-59** | Level 3: Structured | Dedicate a session to improvement |
-| **20-39** | Level 2: Basic | Restructure recommended, use template |
-| **0-19** | Level 1: Empty | Start fresh with skeleton template |
+| **80-100** | Уровень 5: Инженерного уровня | Поддерживать с помощью ежеквартального ревью |
+| **60-79** | Уровень 4: Оптимизированный | Устранить приоритетные проблемы, выйти на 80 |
+| **40-59** | Уровень 3: Структурированный | Выделить отдельную сессию на улучшения |
+| **20-39** | Уровень 2: Базовый | Рекомендуется реструктуризация, используйте шаблон |
+| **0-19** | Уровень 1: Пустой | Начать с чистого листа с базового шаблона-каркаса |
 
 ---
 
-## 7. Glossary
+## 7. Глоссарий
 
-| Term | Definition |
+| Термин | Определение |
 |------|-----------|
-| **Always-on context** | Everything Claude loads before your first message: CLAUDE.md files plus all @imports |
-| **@import** | A line starting with `@` in CLAUDE.md that loads another file into context |
-| **Path-scoping** | Applying rules only to specific file types or directories, not globally |
-| **Rule quality** | Specificity and actionability of instructions — vague rules waste tokens and confuse Claude |
-| **Knowledge loop** | The practice of updating context files after sessions based on what worked and what didn't |
-| **Profile assembly** | Combining different context modules to create role-specific setups (junior, senior, reviewer) |
-| **Staleness signal** | Indicators that context is outdated: broken imports, deprecated model names, no git history |
-| **Conflict** | Two rules that contradict each other — Claude will pick one arbitrarily, usually the wrong one |
-| **Monolithic CLAUDE.md** | A single large file with all instructions, no imports, no modular breakdown |
-| **Maturity level** | A 1-5 scale measuring context engineering sophistication from empty to engineering-grade |
+| **Постоянный контекст (Always-on context)** | Всё, что Claude загружает до вашего первого сообщения: файлы CLAUDE.md плюс все @imports |
+| **@import** | Строка, начинающаяся с `@` в CLAUDE.md, которая загружает в контекст другой файл |
+| **Привязка к путям (Path-scoping)** | Применение правил только к конкретным типам файлов или директориям, а не глобально |
+| **Качество правил (Rule quality)** | Конкретность и применимость инструкций — расплывчатые правила тратят токены впустую и сбивают Claude с толку |
+| **Цикл накопления знаний (Knowledge loop)** | Практика обновления файлов контекста после сессий на основе того, что сработало, а что нет |
+| **Сборка профилей (Profile assembly)** | Комбинирование разных модулей контекста для создания конфигураций под конкретные роли (junior, senior, reviewer) |
+| **Сигнал устаревания (Staleness signal)** | Признаки того, что контекст устарел: битые импорты, устаревшие названия моделей, отсутствие истории git |
+| **Конфликт (Conflict)** | Два правила, которые противоречат друг другу — Claude выберет одно из них произвольно, и обычно не то |
+| **Монолитный CLAUDE.md** | Один большой файл со всеми инструкциями, без импортов и без модульного разделения |
+| **Уровень зрелости (Maturity level)** | Шкала от 1 до 5, измеряющая развитость инженерии контекста от пустого состояния до инженерного уровня |
 
 ---
 
-## 8. Common issues
+## 8. Частые проблемы
 
-### "Token estimate seems off"
+### «Оценка числа токенов кажется неточной»
 
-**Cause**: The estimate uses chars/4 as a rough proxy for GPT-style tokens. Claude's tokenizer may differ slightly.
+**Причина**: Оценка использует формулу `символы / 4` как грубое приближение для токенов в стиле GPT. Токенизатор Claude может немного отличаться.
 
-**Fix**: Focus on relative numbers and thresholds rather than absolute token counts. The 8K always-on budget is a heuristic, not a hard limit.
+**Решение**: Ориентируйтесь на относительные показатели и пороговые значения, а не на абсолютное число токенов. Бюджет в 8K для постоянного контекста (always-on) — это эвристика, а не жёсткий лимит.
 
-### "Score is low but Claude seems to work fine"
+### «Оценка низкая, но Claude вроде бы работает нормально»
 
-**Cause**: Claude works without context engineering — the score reflects optimization, not basic functionality.
+**Причина**: Claude работает и без инженерии контекста — оценка отражает степень оптимизации, а не базовую работоспособность.
 
-**Fix**: A low score means you're leaving productivity on the table. Each dimension gap adds cognitive overhead per session.
+**Решение**: Низкая оценка означает, что вы теряете потенциальную продуктивность. Каждый пробел по критериям добавляет лишнюю когнитивную нагрузку в каждой сессии.
 
-### "Broken import flagged but file exists"
+### «Помечен битый импорт, хотя файл существует»
 
-**Cause**: Relative path resolution differs from Claude's actual working directory at startup.
+**Причина**: Разрешение относительных путей отличается от фактической рабочей директории Claude при запуске.
 
-**Fix**: Use absolute paths (`~/.claude/file.md`) for global imports. Use project-relative paths (`./docs/conventions.md`) for project imports.
+**Решение**: Используйте абсолютные пути (`~/.claude/file.md`) для глобальных импортов. Используйте пути относительно корня проекта (`./docs/conventions.md`) для проектных импортов.
 
-### "Profile-readiness flagged but I'm solo"
+### «Отмечена неготовность к профилям, но я работаю один»
 
-**Cause**: The audit checks for team-scalability patterns regardless of team size.
+**Причина**: Аудит проверяет паттерны масштабирования на команду независимо от её размера.
 
-**Fix**: Profile-based assembly still benefits solo developers when switching contexts (reviewing PRs vs writing features vs debugging). It is optional for solo use.
-
----
-
-## 9. Related resources
-
-- [The Ultimate Claude Code Guide](../guide/ultimate-guide.md) - Full reference
-- [Audit Your Claude Code Setup](./audit-prompt.md) - Full configuration audit (agents, hooks, MCP, CI)
-- [Cheatsheet](../guide/cheatsheet.md) - Quick daily reference
-- [Claude Code Official Docs](https://docs.anthropic.com/en/docs/claude-code) - Anthropic documentation
-- [context-evaluator.ai](https://context-evaluator.ai) - Zero-install LLM-native audit for CLAUDE.md and AGENTS.md: 17 AI evaluators, automated `.patch` remediation. Complements this prompt with deeper rule-by-rule analysis and a different evaluation angle (LLM-as-judge vs bash heuristics).
+**Решение**: Сборка контекста на основе профилей всё равно полезна соло-разработчикам при переключении контекста (ревью PR, написание фич, отладка). Для одиночной работы это опционально.
 
 ---
 
-*Last updated: April 2026 | Version 1.1*
+## 9. Полезные ресурсы
+
+- [Полное руководство по Claude Code](../guide/ultimate-guide.md) — Полный справочник
+- [Аудит вашей настройки Claude Code](./audit-prompt.md) — Полный аудит конфигурации (агенты, хуки, MCP, CI)
+- [Шпаргалка](../guide/cheatsheet.md) — Краткий ежедневный справочник
+- [Официальная документация Claude Code](https://docs.anthropic.com/en/docs/claude-code) — Документация Anthropic
+- [context-evaluator.ai](https://context-evaluator.ai) — LLM-нативный аудит без установки для CLAUDE.md и AGENTS.md: 17 ИИ-оценщиков, автоматическое исправление через `.patch`. Дополняет этот промпт более глубоким анализом каждого правила и другим углом оценки (LLM-как-судья против bash-эвристик).
+
+---
+
+*Последнее обновление: апрель 2026 | Версия 1.1*

@@ -1,4 +1,7 @@
-# Claude Code Ultimate Guide
+# Полное руководство по Claude Code (Claude Code Ultimate Guide)
+
+> [!NOTE]
+> **Русская редакция:** Это полный неофициальный перевод на русский язык — форк репозитория [FlorianBruniaux/claude-code-ultimate-guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) (версия `v3.46.0`, базовый коммит `3fd3e805`). Автор оригинала — Florian Bruniaux. Лицензия руководства — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 <table>
   <tr>
@@ -6,62 +9,62 @@
       <a href="https://www.florian.bruniaux.com/about/?utm_source=github&amp;utm_medium=readme&amp;utm_campaign=claude-code-ultimate-guide"><img src="https://cc.bruniaux.com/author.png" width="56" height="56" alt="Florian Bruniaux" /></a>
     </td>
     <td>
-      <strong><a href="https://www.florian.bruniaux.com/about/?utm_source=github&amp;utm_medium=readme&amp;utm_campaign=claude-code-ultimate-guide">Florian BRUNIAUX</a></strong> &middot; Hands-on Fractional Chief AI Officer (CAIO)<br />
-      Around 15 years in software, including 8 to 10 in technical leadership &middot; <a href="https://www.florian.bruniaux.com/blog/?utm_source=github&amp;utm_medium=readme&amp;utm_campaign=claude-code-ultimate-guide">Blog &#8599;</a> &middot; <a href="https://www.florian.bruniaux.com/projects/?utm_source=github&amp;utm_medium=readme&amp;utm_campaign=claude-code-ultimate-guide">Projects &#8599;</a>
-      <br /><strong><a href="https://clauders.com/leaders/florian-bruniaux/">Official Claude Community Ambassador &middot; Paris &#8599;</a></strong>
+      <strong><a href="https://www.florian.bruniaux.com/about/?utm_source=github&amp;utm_medium=readme&amp;utm_campaign=claude-code-ultimate-guide">Florian BRUNIAUX</a></strong> &middot; Практикующий Fractional Chief AI Officer (CAIO)<br />
+      Около 15 лет в разработке ПО, из них 8–10 лет в техническом лидерстве &middot; <a href="https://www.florian.bruniaux.com/blog/?utm_source=github&amp;utm_medium=readme&amp;utm_campaign=claude-code-ultimate-guide">Блог &#8599;</a> &middot; <a href="https://www.florian.bruniaux.com/projects/?utm_source=github&amp;utm_medium=readme&amp;utm_campaign=claude-code-ultimate-guide">Проекты &#8599;</a>
+      <br /><strong><a href="https://clauders.com/leaders/florian-bruniaux/">Официальный амбассадор сообщества Claude &middot; Париж &#8599;</a></strong>
     </td>
   </tr>
 </table>
 
 <p align="center">
-  <a href="https://cc.bruniaux.com/"><img src="https://img.shields.io/badge/Interactive_Guide-cc.bruniaux.com-ff6b35?style=for-the-badge" alt="Open the interactive guide" /></a>
+  <a href="https://cc.bruniaux.com/"><img src="https://img.shields.io/badge/Interactive_Guide-cc.bruniaux.com-ff6b35?style=for-the-badge" alt="Открыть интерактивное руководство" /></a>
 </p>
 
 <p align="center">
-  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Guide-v3.46.0-brightgreen?style=flat-square" alt="Guide version 3.46.0" /></a>
-  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Updated-Nov_22,_2026_·_v3.46.0-brightgreen?style=flat-square" alt="Updated Oct 17, 2026, guide version 3.46.0" /></a>
-  <a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="https://img.shields.io/badge/Guide-CC_BY--SA_4.0-blue?style=flat-square" alt="Guide license: CC BY-SA 4.0" /></a>
-  <a href="https://cc.bruniaux.com/mcp/"><img src="https://img.shields.io/badge/MCP-npx_ready-blueviolet?style=flat-square" alt="MCP server available through npx" /></a>
-  <a href="https://deepwiki.com/FlorianBruniaux/claude-code-ultimate-guide"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
+  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Guide-v3.46.0-brightgreen?style=flat-square" alt="Версия руководства 3.46.0" /></a>
+  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Updated-Nov_22,_2026_·_v3.46.0-brightgreen?style=flat-square" alt="Обновлено 17 октября 2026, версия руководства 3.46.0" /></a>
+  <a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="https://img.shields.io/badge/Guide-CC_BY--SA_4.0-blue?style=flat-square" alt="Лицензия руководства: CC BY-SA 4.0" /></a>
+  <a href="https://cc.bruniaux.com/mcp/"><img src="https://img.shields.io/badge/MCP-npx_ready-blueviolet?style=flat-square" alt="MCP-сервер доступен через npx" /></a>
+  <a href="https://deepwiki.com/FlorianBruniaux/claude-code-ultimate-guide"><img src="https://deepwiki.com/badge.svg" alt="Спросить DeepWiki" /></a>
 </p>
 
-Learn Claude Code, build reliable agents, and scale their use safely. The website is the primary reading and discovery interface. This repository contains the canonical Markdown sources, reusable files, machine-readable indexes, and contribution history.
+Изучите Claude Code, научитесь строить надёжных агентов и безопасно масштабировать их применение. Сайт служит основным интерфейсом для чтения и навигации. В этом репозитории хранятся канонические исходники в Markdown, переиспользуемые файлы, машиночитаемые индексы и история изменений.
 
-**Start here:** [complete a first task online](https://cc.bruniaux.com/guide/ultimate-guide/01-quick-start/) · [browse the guide portal](https://cc.bruniaux.com/guide/) · [open the complete sitemap](https://cc.bruniaux.com/sitemap/) · [read the Markdown source](./guide/ultimate-guide.md)
+**С чего начать:** [выполнить первую задачу онлайн](https://cc.bruniaux.com/guide/ultimate-guide/01-quick-start/) · [открыть портал руководства](https://cc.bruniaux.com/guide/) · [посмотреть полную карту сайта](https://cc.bruniaux.com/sitemap/) · [читать исходник в Markdown](./guide/ultimate-guide.md)
 
-## Choose your next step
+## Выберите следующий шаг
 
-The table below is generated from [`machine-readable/navigation.json`](./machine-readable/navigation.json). The same contract feeds the public sitemap, so the repository and website expose the same intent model.
+Таблица ниже генерируется из [`machine-readable/navigation.json`](./machine-readable/navigation.json). Этот же контракт используется для публичной карты сайта, поэтому репозиторий и веб-сайт отражают единую модель навигации по задачам.
 
 <!-- BEGIN GENERATED INTENT NAVIGATION -->
-| Intent | Browse online |
+| Задача | Читать онлайн |
 |---|---|
-| **Start** | [Guide portal](https://cc.bruniaux.com/guide/) · [Quick Start](https://cc.bruniaux.com/guide/ultimate-guide/01-quick-start/) · [Learning Paths](https://cc.bruniaux.com/learning/) · [Quick Reference](https://cc.bruniaux.com/cheatsheet/) · [AI Roles](https://cc.bruniaux.com/roles/) |
-| **Build** | [Agent Harness Engineering](https://cc.bruniaux.com/guide/agent-harness/) · [Loop & Graph Engineering](https://cc.bruniaux.com/guide/loop-graph-engineering/) · [AI Design Patterns](https://cc.bruniaux.com/ai-design-patterns/) · [Context Engineering](https://cc.bruniaux.com/context-engineering/) · [Memory Systems](https://cc.bruniaux.com/memory-systems/) · [Workflows](https://cc.bruniaux.com/guide/workflows/) · [Methodologies](https://cc.bruniaux.com/methodologies/) · [MCP or CLI?](https://cc.bruniaux.com/mcp-or-cli/) · [Examples](https://cc.bruniaux.com/examples/) |
-| **Scale** | [Security](https://cc.bruniaux.com/security/) · [Enterprise Governance](https://cc.bruniaux.com/guide/enterprise-governance/) · [Observability](https://cc.bruniaux.com/guide/observability/) · [Team Metrics](https://cc.bruniaux.com/team-metrics/) · [Team Adoption](https://cc.bruniaux.com/guide/adoption-approaches/) · [AI FinOps](https://cc.bruniaux.com/finops/) · [LLM Market Snapshot](https://cc.bruniaux.com/guide/llm-market-snapshot/) · [Subscription Strategy](https://cc.bruniaux.com/guide/subscription-strategy/) · [AI Unit Economics](https://cc.bruniaux.com/guide/ai-unit-economics/) · [Team Knowledge](https://cc.bruniaux.com/guide/team-knowledge-base/) · [API Gateway](https://cc.bruniaux.com/guide/api-gateway/) |
-| **Resources** | [Resource Hub](https://cc.bruniaux.com/resources/) · [Downloads](https://cc.bruniaux.com/downloads/) · [Cheat Sheets](https://cc.bruniaux.com/cheatsheets/) · [Ebooks](https://cc.bruniaux.com/whitepapers/) · [Diagrams](https://cc.bruniaux.com/diagrams/) · [Ecosystem](https://cc.bruniaux.com/ecosystem/) · [Compare](https://cc.bruniaux.com/compare/) · [Glossary](https://cc.bruniaux.com/guide/glossary/) · [FAQ](https://cc.bruniaux.com/faq/) · [Guide MCP Server](https://cc.bruniaux.com/mcp/) · [Related Projects](https://cc.bruniaux.com/projects/) |
-| **Updates** | [Guide Changelog](https://cc.bruniaux.com/changelog/) · [Claude Code Releases](https://cc.bruniaux.com/releases/) · [RSS Feed](https://cc.bruniaux.com/rss.xml) |
+| **Старт** | [Портал руководства](https://cc.bruniaux.com/guide/) · [Быстрый старт](https://cc.bruniaux.com/guide/ultimate-guide/01-quick-start/) · [Маршруты обучения](https://cc.bruniaux.com/learning/) · [Краткий справочник](https://cc.bruniaux.com/cheatsheet/) · [AI-роли](https://cc.bruniaux.com/roles/) |
+| **Разработка** | [Проектирование обвязки агента](https://cc.bruniaux.com/guide/agent-harness/) · [Проектирование циклов и графов](https://cc.bruniaux.com/guide/loop-graph-engineering/) · [Паттерны проектирования ИИ](https://cc.bruniaux.com/ai-design-patterns/) · [Инженерия контекста](https://cc.bruniaux.com/context-engineering/) · [Системы памяти](https://cc.bruniaux.com/memory-systems/) · [Рабочие процессы](https://cc.bruniaux.com/guide/workflows/) · [Методологии](https://cc.bruniaux.com/methodologies/) · [MCP или CLI?](https://cc.bruniaux.com/mcp-or-cli/) · [Примеры](https://cc.bruniaux.com/examples/) |
+| **Масштабирование** | [Безопасность](https://cc.bruniaux.com/security/) · [Корпоративное управление](https://cc.bruniaux.com/guide/enterprise-governance/) · [Наблюдаемость](https://cc.bruniaux.com/guide/observability/) · [Командные метрики](https://cc.bruniaux.com/team-metrics/) · [Внедрение в команде](https://cc.bruniaux.com/guide/adoption-approaches/) · [AI FinOps](https://cc.bruniaux.com/finops/) · [Срез рынка LLM](https://cc.bruniaux.com/guide/llm-market-snapshot/) · [Стратегия подписок](https://cc.bruniaux.com/guide/subscription-strategy/) · [AI юнит-экономика](https://cc.bruniaux.com/guide/ai-unit-economics/) · [База знаний команды](https://cc.bruniaux.com/guide/team-knowledge-base/) · [API-шлюз](https://cc.bruniaux.com/guide/api-gateway/) |
+| **Ресурсы** | [Центр ресурсов](https://cc.bruniaux.com/resources/) · [Загрузки](https://cc.bruniaux.com/downloads/) · [Шпаргалки](https://cc.bruniaux.com/cheatsheets/) · [Электронные книги](https://cc.bruniaux.com/whitepapers/) · [Диаграммы](https://cc.bruniaux.com/diagrams/) · [Экосистема](https://cc.bruniaux.com/ecosystem/) · [Сравнения](https://cc.bruniaux.com/compare/) · [Глоссарий](https://cc.bruniaux.com/guide/glossary/) · [FAQ](https://cc.bruniaux.com/faq/) · [MCP-сервер руководства](https://cc.bruniaux.com/mcp/) · [Связанные проекты](https://cc.bruniaux.com/projects/) |
+| **Обновления** | [История изменений руководства](https://cc.bruniaux.com/changelog/) · [Релизы Claude Code](https://cc.bruniaux.com/releases/) · [RSS-лента](https://cc.bruniaux.com/rss.xml) |
 <!-- END GENERATED INTENT NAVIGATION -->
 
-## Why this guide exists
+## Зачем нужно это руководство
 
-Claude Code documentation explains the product. This guide connects product behavior to engineering decisions: what belongs in context, when to use an agent instead of a skill, how to verify generated work, and which controls matter when usage moves beyond one developer.
+Официальная документация Claude Code объясняет устройство продукта. Это руководство связывает поведение продукта с инженерными решениями: что должно попадать в контекст, когда использовать агента вместо скилла (skill), как проверять сгенерированный результат и какие механизмы контроля важны при выходе за рамки одного разработчика.
 
-| Need | Start with |
+| Потребность | С чего начать |
 |---|---|
-| Understand Claude Code internals | [Architecture](./guide/core/architecture.md) and [Tools Reference](./guide/core/tools-reference.md) |
-| Design agent systems | [Agent Harness Engineering](./guide/core/agent-harness.md), [Loop & Graph Engineering](./guide/core/loop-graph-engineering.md) and [AI Design Patterns](./guide/core/ai-design-patterns.md) |
-| Structure AI-assisted delivery | [Methodologies](./guide/core/methodologies.md) and [Workflow Guides](./guide/workflows/) |
-| Establish a security boundary | [Security Hardening](./guide/security/security-hardening.md) and [Sandbox Isolation](./guide/security/sandbox-isolation.md) |
-| Validate understanding | [Knowledge Quiz](https://cc.bruniaux.com/quiz/) and [Recap Cards](https://cc.bruniaux.com/cheatsheets/) |
+| Понять внутреннее устройство Claude Code | [Архитектура](./guide/core/architecture.md) и [Справочник инструментов](./guide/core/tools-reference.md) |
+| Проектировать агентные системы | [Проектирование обвязки агента (agent harness)](./guide/core/agent-harness.md), [Проектирование циклов и графов](./guide/core/loop-graph-engineering.md) и [Паттерны проектирования ИИ](./guide/core/ai-design-patterns.md) |
+| Выстроить процесс разработки с ИИ | [Методологии](./guide/core/methodologies.md) и [Руководства по рабочим процессам](./guide/workflows/) |
+| Выстроить периметр безопасности | [Усиление безопасности](./guide/security/security-hardening.md) и [Изоляция в песочнице](./guide/security/sandbox-isolation.md) |
+| Проверить понимание | [Тест знаний](https://cc.bruniaux.com/quiz/) и [Карточки-памятки](https://cc.bruniaux.com/cheatsheets/) |
 
-The guide favors explicit trade-offs and verifiable procedures. Where evidence is incomplete, the relevant page should preserve that limit instead of presenting one workflow as universal.
+Руководство делает упор на явные компромиссы и проверяемые процедуры. Там, где доказательная база неполна, соответствующая страница сохраняет эти ограничения, а не выдаёт один рабочий процесс за универсальный.
 
-## Start
+## Старт
 
-### Install Claude Code
+### Установите Claude Code
 
-Anthropic recommends the native installer, which updates itself:
+Anthropic рекомендует нативный установщик, который обновляется автоматически:
 
 ```bash
 # macOS, Linux, WSL
@@ -73,9 +76,9 @@ curl -fsSL https://claude.ai/install.sh | bash
 irm https://claude.ai/install.ps1 | iex
 ```
 
-Alternatives that do not auto-update: `brew install --cask claude-code`, `winget install Anthropic.ClaudeCode`, or `npm install -g @anthropic-ai/claude-code` (Node.js 22+). See the [official setup page](https://code.claude.com/docs/en/setup).
+Альтернативы без автообновления: `brew install --cask claude-code`, `winget install Anthropic.ClaudeCode` или `npm install -g @anthropic-ai/claude-code` (Node.js 22+). Подробнее — на [официальной странице установки](https://code.claude.com/docs/en/setup).
 
-Verify the installation and authenticate:
+Проверьте установку и пройдите аутентификацию:
 
 ```bash
 claude --version
@@ -83,188 +86,188 @@ claude doctor
 claude auth login
 ```
 
-The [Quick Start chapter](./guide/ultimate-guide.md#1-quick-start-day-1) documents installation alternatives, authentication, updates, permission modes, and common first-day failures.
+В главе [Быстрый старт](./guide/ultimate-guide.md#1-quick-start-day-1) описаны альтернативные способы установки, аутентификация, обновления, режимы прав доступа и типичные проблемы первого дня.
 
-### Complete a first task
+### Выполните первую задачу
 
-Open a small repository with a clean or understood Git state, then start Claude Code:
+Откройте небольшой репозиторий с чистым или понятным состоянием Git и запустите Claude Code:
 
 ```bash
 cd your-project
 claude
 ```
 
-Give Claude a bounded request that includes the expected result and verification:
+Дайте Claude ограниченный по области запрос с ожидаемым результатом и способом проверки:
 
 ```text
-Explain how this project runs its tests. Do not modify files.
-Name the relevant commands and cite the files that define them.
+Объясни, как в этом проекте запускаются тесты. Файлы не изменяй.
+Назови нужные команды и укажи файлы, в которых они определены.
 ```
 
-Before asking Claude to edit code, add a project-level `CLAUDE.md` that records the commands and constraints Claude must follow:
+Прежде чем просить Claude редактировать код, добавьте файл `CLAUDE.md` на уровне проекта с командами и ограничениями, которым Claude должен следовать:
 
 ```markdown
-# Project instructions
+# Инструкции проекта
 
-## Commands
-- Test: `npm test`
-- Lint: `npm run lint`
+## Команды
+- Тесты: `npm test`
+- Линтер: `npm run lint`
 
-## Boundaries
-- Do not edit generated files.
-- Do not change dependencies without approval.
-- Run the relevant tests before claiming completion.
+## Границы
+- Не редактируй сгенерированные файлы.
+- Не меняй зависимости без согласования.
+- Запускай релевантные тесты перед тем, как сообщить о завершении.
 ```
 
-Continue with the [first workflow](./guide/ultimate-guide.md#12-first-workflow) or use the [starter CLAUDE.md templates](./examples/claude-md/).
+Переходите к разделу [Первый рабочий процесс](./guide/ultimate-guide.md#12-first-workflow) или воспользуйтесь [стартовыми шаблонами CLAUDE.md](./examples/claude-md/).
 
-### Choose a learning path
+### Выберите маршрут обучения
 
-| Situation | Suggested route |
+| Ситуация | Рекомендуемый маршрут |
 |---|---|
-| New to Claude Code | [Seven-module learning path](./guide/learning-path/README.md) |
-| Already using the CLI | [Core Concepts](./guide/ultimate-guide.md#2-core-concepts), then [Context Engineering](./guide/core/context-engineering.md) |
-| Senior developer or tech lead | [Methodologies](./guide/core/methodologies.md), [Agent Harness Engineering](./guide/core/agent-harness.md), then [Production Safety](./guide/security/production-safety.md) |
-| Engineering manager or CTO | [Adoption Approaches](./guide/roles/adoption-approaches.md), [Team Metrics](./guide/ops/team-metrics.md), then [Subscription Strategy](./guide/ops/subscription-strategy.md) |
-| Security or platform role | [Security Hardening](./guide/security/security-hardening.md), [Enterprise Governance](./guide/security/enterprise-governance.md), then [Observability](./guide/ops/observability.md) |
-| Product manager or designer | [Product Manager Guide](./docs/for-product-managers.md) or [Design-to-Code Workflow](./guide/workflows/design-to-code.md) |
-| Non-developer knowledge worker | [Claude Cowork Guide](https://github.com/FlorianBruniaux/claude-cowork-guide) |
+| Новичок в Claude Code | [Курс обучения из семи модулей](./guide/learning-path/README.md) |
+| Уже пользуетесь CLI | [Базовые концепции](./guide/ultimate-guide.md#2-core-concepts), затем [Инженерия контекста](./guide/core/context-engineering.md) |
+| Старший разработчик или техлид | [Методологии](./guide/core/methodologies.md), [Проектирование обвязки агента](./guide/core/agent-harness.md), затем [Безопасность в продакшене](./guide/security/production-safety.md) |
+| Engineering Manager или CTO | [Подходы к внедрению](./guide/roles/adoption-approaches.md), [Командные метрики](./guide/ops/team-metrics.md), затем [Стратегия подписок](./guide/ops/subscription-strategy.md) |
+| Специалист по безопасности или платформенный инженер | [Усиление безопасности](./guide/security/security-hardening.md), [Корпоративное управление](./guide/security/enterprise-governance.md), затем [Наблюдаемость](./guide/ops/observability.md) |
+| Продакт-менеджер или дизайнер | [Руководство для продакт-менеджеров](./docs/for-product-managers.md) или [Воркфлоу Design-to-Code](./guide/workflows/design-to-code.md) |
+| Специалист умственного труда (не разработчик) | [Руководство по Claude Cowork](https://github.com/FlorianBruniaux/claude-cowork-guide) |
 
-For a personalized route, use the repository onboarding prompt:
+Для персонального маршрута используйте онбординг-промпт из репозитория:
 
 ```bash
 claude "Fetch and follow the onboarding instructions from: https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/main/tools/onboarding-prompt.md"
 ```
 
-## Build
+## Разработка
 
-### Agent engineering
+### Инженерия агентов
 
-An agent is one component of a larger system. The surrounding harness controls context, tools, permissions, state, stopping conditions, recovery, and evaluation.
+Агент — лишь один компонент более крупной системы. Окружающая его обвязка агента (харнесс) управляет контекстом, инструментами, правами доступа, состоянием, условиями остановки, восстановлением после сбоев и оценкой (eval).
 
-| Resource | Decision it supports |
+| Ресурс | Какое решение поддерживает |
 |---|---|
-| [Agent Harness Engineering](./guide/core/agent-harness.md) | Identify the controls required around an agent loop |
-| [The minimal harness](https://www.florian.bruniaux.com/resources/minimal-harness/?utm_source=github&utm_medium=readme&utm_campaign=harness-minimal&utm_content=readme) | Replay three versions of a sign-up service to find a false positive. Fillable PDF by email. |
-| [Loop & Graph Engineering](./guide/core/loop-graph-engineering.md) | Choose bounded feedback loops or explicit workflow graphs |
-| [AI Design Patterns](./guide/core/ai-design-patterns.md) | Explain an agent design with the GoF, integration, and resilience patterns developers know |
-| [Agent Harness Map](./guide/ecosystem/agent-harness-landscape.md) | Distinguish runtimes, orchestrators, frameworks, control planes, and support tools |
-| [Agentic Tools](./guide/ecosystem/agentic-tools.md) | Compare selected coding agents and orchestration products |
-| [Agent Evaluation](./guide/roles/agent-evaluation.md) | Test behavior, regressions, and task-level outcomes |
-| [Harness Glossary](./guide/core/glossary.md) | Align terminology across design and review |
-| [AI Concept Boundaries](./guide/core/ai-concept-boundaries.md) | Resolve seven common confusions with repository examples and comprehension checks |
+| [Проектирование обвязки агента](./guide/core/agent-harness.md) | Определить механизмы контроля, необходимые вокруг цикла агента |
+| [Минимальная обвязка (The minimal harness)](https://www.florian.bruniaux.com/resources/minimal-harness/?utm_source=github&utm_medium=readme&utm_campaign=harness-minimal&utm_content=readme) | Разобрать три версии сервиса регистрации, чтобы найти ложное срабатывание. Интерактивный PDF по email. |
+| [Проектирование циклов и графов](./guide/core/loop-graph-engineering.md) | Выбрать между ограниченными циклами обратной связи и явными графами рабочих процессов |
+| [Паттерны проектирования ИИ](./guide/core/ai-design-patterns.md) | Объяснить архитектуру агента через знакомые разработчикам паттерны GoF, интеграционные паттерны и паттерны отказоустойчивости |
+| [Карта обвязок агентов](./guide/ecosystem/agent-harness-landscape.md) | Разграничить рантаймы, оркестраторы, фреймворки, плоскости управления и вспомогательные инструменты |
+| [Агентные инструменты](./guide/ecosystem/agentic-tools.md) | Сравнить выбранных кодинг-агентов и продукты оркестрации |
+| [Оценка агентов](./guide/roles/agent-evaluation.md) | Проверять поведение, регрессии и результаты на уровне задач |
+| [Глоссарий обвязок агентов](./guide/core/glossary.md) | Синхронизировать терминологию при проектировании и ревью |
+| [Границы понятий в ИИ](./guide/core/ai-concept-boundaries.md) | Устранить семь распространённых источников путаницы с примерами из репозитория и проверочными вопросами |
 
-### Context and memory
+### Контекст и память
 
-Context quality affects every tool call and decision. Start with project instructions, add specialized context only when a recurring task needs it, and test whether the extra material changes behavior.
+Качество контекста влияет на каждый вызов инструмента и каждое решение. Начните с инструкций проекта, добавляйте специализированный контекст только тогда, когда этого требует повторяющаяся задача, и проверяйте, действительно ли дополнительный материал меняет поведение.
 
-| Resource | Focus |
+| Ресурс | Фокус |
 |---|---|
-| [Context Engineering](./guide/core/context-engineering.md) | Context budget, modular instructions, assembly, and measurement |
-| [Memory Systems](./guide/core/memory-systems.md) | Native memory, cross-session systems, team sharing, and retention risks |
-| [Context Engineering Tools](./guide/ecosystem/context-engineering-tools.md) | Output compression, retrieval, gateways, and context inspection |
-| [Context Audit](./tools/context-audit-prompt.md) | Measure a project's context architecture |
-| [Team AI Instructions](./guide/workflows/team-ai-instructions.md) | Maintain shared instructions across a development team |
+| [Инженерия контекста](./guide/core/context-engineering.md) | Бюджет контекста, модульные инструкции, сборка и измерение |
+| [Системы памяти](./guide/core/memory-systems.md) | Встроенная память, межсессионные системы, совместное использование в команде и риски хранения |
+| [Инструменты инженерии контекста](./guide/ecosystem/context-engineering-tools.md) | Сжатие вывода, поиск и извлечение, шлюзы и инспекция контекста |
+| [Аудит контекста](./tools/context-audit-prompt.md) | Оценка архитектуры контекста в проекте |
+| [Командные инструкции для ИИ](./guide/workflows/team-ai-instructions.md) | Поддержка общих инструкций в команде разработки |
 
-### Workflows
+### Рабочие процессы
 
-| Goal | Workflow |
+| Цель | Рабочий процесс |
 |---|---|
-| Implement with tests first | [TDD with Claude](./guide/workflows/tdd-with-claude.md) |
-| Define behavior before implementation | [Spec-First Development](./guide/workflows/spec-first.md) |
-| Separate planning from execution | [Plan-Driven Development](./guide/workflows/plan-driven.md) |
-| Compare independent candidates | [Best-of-N](./guide/workflows/best-of-n.md) |
-| Coordinate several agents | [Agent Teams](./guide/workflows/agent-teams.md) |
-| Build bounded autonomous loops | [Agentic Software Factories](./guide/workflows/agentic-software-factories.md) |
-| Review code systematically | [Code Review](./guide/workflows/code-review.md) |
-| Make agent-written changes reviewable | [Reviewable Agent Changes](./guide/workflows/reviewable-agent-changes.md) |
-| Prepare a contribution another team can review | [AI-Assisted Open Source Contributions](./guide/workflows/ai-assisted-open-source-contributions.md) |
-| Diagnose unfamiliar repositories | [Exploration Workflow](./guide/workflows/exploration-workflow.md) |
+| Разработка через тестирование | [TDD с Claude](./guide/workflows/tdd-with-claude.md) |
+| Описать поведение до реализации | [Разработка от спецификации (Spec-First)](./guide/workflows/spec-first.md) |
+| Отделить планирование от исполнения | [Разработка по плану (Plan-Driven)](./guide/workflows/plan-driven.md) |
+| Сравнить независимых кандидатов | [Выбор лучшего из N (Best-of-N)](./guide/workflows/best-of-n.md) |
+| Координировать нескольких агентов | [Команды агентов (Agent Teams)](./guide/workflows/agent-teams.md) |
+| Строить ограниченные автономные циклы | [Агентные фабрики ПО](./guide/workflows/agentic-software-factories.md) |
+| Системно проводить код-ревью | [Код-ревью](./guide/workflows/code-review.md) |
+| Делать изменения агента удобными для ревью | [Проверяемые изменения агента](./guide/workflows/reviewable-agent-changes.md) |
+| Подготовить вклад, который сможет проверить другая команда | [Open Source вклад с помощью ИИ](./guide/workflows/ai-assisted-open-source-contributions.md) |
+| Разбираться в незнакомых репозиториях | [Воркфлоу исследования](./guide/workflows/exploration-workflow.md) |
 
-[Browse every workflow](./guide/workflows/) for task management, GitHub Actions, production reliability, event-driven agents, design-to-code, PDF generation, search, and team instructions.
+[Просмотреть все рабочие процессы](./guide/workflows/): управление задачами, GitHub Actions, надёжность в продакшене, событийно-управляемые агенты, design-to-code, генерация PDF, поиск и командные инструкции.
 
-### Choose the smallest interface
+### Выбирайте минимальный интерфейс
 
-Claude Code can call local commands, skills, agents, hooks, plugins, and MCP servers. More infrastructure adds setup, permissions, failure modes, and maintenance.
+Claude Code умеет вызывать локальные команды, скиллы, агентов, хуки, плагины и MCP-серверы. Чем сложнее инфраструктура, тем больше настройка, права доступа, режимы отказов и затраты на сопровождение.
 
-| If the task needs | Prefer |
+| Если задаче требуется | Предпочитайте |
 |---|---|
-| A deterministic local command | CLI or script |
-| Reusable instructions and supporting files | Skill |
-| A separate context and role | Agent |
-| A response to a lifecycle event | Hook |
-| A packaged collection of capabilities | Plugin |
-| A typed interface to a remote service | MCP server |
+| Детерминированная локальная команда | CLI или скрипт |
+| Переиспользуемые инструкции и вспомогательные файлы | Скилл |
+| Отдельный контекст и роль | Агент |
+| Реакция на событие жизненного цикла | Хук |
+| Упакованный набор возможностей | Плагин |
+| Типизированный интерфейс к удалённому сервису | MCP-сервер |
 
-Use the [MCP or CLI decision guide](./guide/ecosystem/mcp-vs-cli.md) and the [trade-off framework](./guide/ultimate-guide.md#when-to-use-what) before introducing another integration.
+Используйте [руководство по выбору между MCP и CLI](./guide/ecosystem/mcp-vs-cli.md) и [матрицу компромиссов](./guide/ultimate-guide.md#when-to-use-what), прежде чем добавлять ещё одну интеграцию.
 
-## Scale
+## Масштабирование
 
-### Reliability and security
+### Надёжность и безопасность
 
-| Concern | Primary resource | Operational companion |
+| Область риска | Основной ресурс | Операционное дополнение |
 |---|---|---|
-| Permissions and prompt injection | [Security Hardening](./guide/security/security-hardening.md) | [Permissions Audit](./tools/permissions-audit-prompt.md) |
-| Isolation of untrusted execution | [Sandbox Isolation](./guide/security/sandbox-isolation.md) | [Native Sandbox](./guide/security/sandbox-native.md) |
-| Production changes and rollback | [Production Safety](./guide/security/production-safety.md) | [Production Reliability](./guide/workflows/production-reliability.md) |
-| Sensitive data and retention | [Data Privacy](./guide/security/data-privacy.md) | [Enterprise Governance](./guide/security/enterprise-governance.md) |
-| Active testing of authorized applications | [Agentic Pentesting](./guide/security/agentic-pentesting.md) | [DarkMoon and Strix Evaluation](./docs/resource-evaluations/darkmoon-strix-agentic-pentesting.md) |
-| MCP and extension supply chain | [MCP Ecosystem](./guide/ecosystem/mcp-servers-ecosystem.md) | [Threat Database](./examples/commands/resources/threat-db.yaml) |
-| Delegation readiness | [Specification Completeness Audit](./tools/spec-completeness-audit.md) | [Agent Evaluation](./guide/roles/agent-evaluation.md) |
+| Права доступа и промпт-инъекции | [Усиление безопасности](./guide/security/security-hardening.md) | [Аудит прав доступа](./tools/permissions-audit-prompt.md) |
+| Изоляция недоверенного исполнения | [Изоляция в песочнице (sandbox)](./guide/security/sandbox-isolation.md) | [Нативная песочница](./guide/security/sandbox-native.md) |
+| Изменения в продакшене и откат | [Безопасность в продакшене](./guide/security/production-safety.md) | [Надёжность в продакшене](./guide/workflows/production-reliability.md) |
+| Конфиденциальные данные и хранение | [Конфиденциальность данных](./guide/security/data-privacy.md) | [Корпоративное управление](./guide/security/enterprise-governance.md) |
+| Активное тестирование авторизованных приложений | [Агентный пентестинг](./guide/security/agentic-pentesting.md) | [Оценка DarkMoon и Strix](./docs/resource-evaluations/darkmoon-strix-agentic-pentesting.md) |
+| Цепочка поставок MCP и расширений | [Экосистема MCP](./guide/ecosystem/mcp-servers-ecosystem.md) | [База угроз](./examples/commands/resources/threat-db.yaml) |
+| Готовность к делегированию | [Аудит полноты спецификации](./tools/spec-completeness-audit.md) | [Оценка агентов](./guide/roles/agent-evaluation.md) |
 
-Security claims and threat counts change as sources are added or corrected. Use the linked database and guides as the current source instead of copying their counts into project documentation.
+Утверждения по безопасности и количество угроз меняются по мере добавления или уточнения источников. Используйте связанные базу угроз и руководства как актуальный источник вместо копирования их чисел в документацию проекта.
 
-### Evaluation and operations
+### Оценка и эксплуатация
 
-| Need | Resource |
+| Потребность | Ресурс |
 |---|---|
-| Trace agent behavior and failures | [Observability](./guide/ops/observability.md) |
-| Attribute AI-assisted changes | [AI Traceability](./guide/ops/ai-traceability.md) |
-| Evaluate team outcomes | [Team Metrics](./guide/ops/team-metrics.md) |
-| Calculate task-level cost | [AI Unit Economics](./guide/ops/ai-unit-economics.md) |
-| Operate infrastructure workflows | [DevOps & SRE](./guide/ops/devops-sre.md) |
-| Route governed API traffic | [API Gateways](./guide/ops/api-gateway.md) |
+| Отслеживать поведение агента и сбои | [Наблюдаемость (observability)](./guide/ops/observability.md) |
+| Атрибутировать изменения, выполненные с ИИ | [Прослеживаемость (traceability) ИИ](./guide/ops/ai-traceability.md) |
+| Оценивать результаты команды | [Командные метрики](./guide/ops/team-metrics.md) |
+| Рассчитывать стоимость на уровне задачи | [AI юнит-экономика](./guide/ops/ai-unit-economics.md) |
+| Эксплуатировать инфраструктурные рабочие процессы | [DevOps и SRE](./guide/ops/devops-sre.md) |
+| Маршрутизировать управляемый API-трафик | [API-шлюзы](./guide/ops/api-gateway.md) |
 
-A green structural check proves only what it inspected. Runtime behavior, task acceptance, security boundaries, and business outcomes require separate evidence.
+Успешная структурная проверка доказывает лишь то, что она непосредственно проверяла. Поведение во время выполнения, приёмка задачи, границы безопасности и бизнес-результаты требуют отдельных доказательств.
 
-### Organization and economics
+### Организация и экономика
 
-| Decision | Resource |
+| Решение | Ресурс |
 |---|---|
-| Roll out Claude Code across a team | [Adoption Approaches](./guide/roles/adoption-approaches.md) |
-| Define usage tiers and approvals | [Enterprise Governance](./guide/security/enterprise-governance.md) |
-| Preserve team knowledge | [Team Knowledge Base](./guide/ecosystem/team-knowledge-base.md) |
-| Compare subscriptions, APIs, and gateways | [Subscription Strategy](./guide/ops/subscription-strategy.md) |
-| Compare hosted and local inference | [Local vs Cloud Inference](./guide/ecosystem/local-vs-cloud-inference.md) |
-| Map changing AI roles | [AI Roles](./guide/roles/ai-roles.md) |
+| Внедрить Claude Code в команде | [Подходы к внедрению](./guide/roles/adoption-approaches.md) |
+| Определить уровни использования и согласования | [Корпоративное управление](./guide/security/enterprise-governance.md) |
+| Сохранять командные знания | [База знаний команды](./guide/ecosystem/team-knowledge-base.md) |
+| Сравнить подписки, API и шлюзы | [Стратегия подписок](./guide/ops/subscription-strategy.md) |
+| Сравнить облачный и локальный инференс | [Локальный и облачный инференс](./guide/ecosystem/local-vs-cloud-inference.md) |
+| Описать меняющиеся AI-роли | [AI-роли](./guide/roles/ai-roles.md) |
 
-The economics pages separate observed costs from estimates and scenarios. Recalculate them with your workload, acceptance criteria, review effort, and risk constraints.
+Страницы по экономике отделяют фактически наблюдаемые расходы от оценок и сценариев. Пересчитывайте их с учётом вашей нагрузки, критериев приёмки, трудозатрат на ревью и ограничений по рискам.
 
-## Use the format that fits the task
+## Выберите формат под задачу
 
-| Format | Use it for | Read online | Source or download |
+| Формат | Для чего использовать | Читать онлайн | Исходники или загрузка |
 |---|---|---|---|
-| Complete reference | Deep explanations and linked sections | [Ultimate Guide](https://cc.bruniaux.com/guide/ultimate-guide/) | [Markdown](./guide/ultimate-guide.md) |
-| Daily reference | Commands, shortcuts, and checks | [Quick Reference](https://cc.bruniaux.com/cheatsheet/) | [Markdown](./guide/cheatsheet.md) |
-| Guided course | Progressive exercises with retained evidence | [Learning Paths](https://cc.bruniaux.com/learning/) | [Course sources](./guide/learning-path/) |
-| Runnable material | Agents, skills, hooks, workflows, and scripts | [Examples](https://cc.bruniaux.com/examples/) | [Files](./examples/) |
-| Visual explanation | Architecture, context, security, and workflow maps | [Diagrams](https://cc.bruniaux.com/diagrams/) | [Diagram sources](./guide/diagrams/) |
-| Knowledge check | Questions with documentation links | [Quiz](https://cc.bruniaux.com/quiz/) | [Question sources](./quiz/) |
-| Printable reference | One concept per page in French and English | [Cheat Sheets](https://cc.bruniaux.com/cheatsheets/) | [Card sources](./whitepapers/recap-cards/) |
-| Long-form edition | Offline PDF and EPUB | [Ebooks](https://cc.bruniaux.com/whitepapers/) | [Downloads](https://cc.bruniaux.com/downloads/) |
-| Machine-readable index | Search and retrieval by an AI assistant | [Guide MCP](https://cc.bruniaux.com/mcp/) | [llms.txt](./machine-readable/llms.txt) and [reference.yaml](./machine-readable/reference.yaml) |
+| Полный справочник | Глубокие разборы и связанные разделы | [Полное руководство](https://cc.bruniaux.com/guide/ultimate-guide/) | [Markdown](./guide/ultimate-guide.md) |
+| Ежедневный справочник | Команды, горячие клавиши и проверки | [Краткий справочник](https://cc.bruniaux.com/cheatsheet/) | [Markdown](./guide/cheatsheet.md) |
+| Пошаговый курс | Последовательные упражнения с фиксацией результатов | [Маршруты обучения](https://cc.bruniaux.com/learning/) | [Исходники курса](./guide/learning-path/) |
+| Исполняемые материалы | Агенты, скиллы, хуки, воркфлоу и скрипты | [Примеры](https://cc.bruniaux.com/examples/) | [Файлы](./examples/) |
+| Визуальные схемы | Карты архитектуры, контекста, безопасности и воркфлоу | [Диаграммы](https://cc.bruniaux.com/diagrams/) | [Исходники диаграмм](./guide/diagrams/) |
+| Проверка знаний | Вопросы со ссылками на документацию | [Тест знаний](https://cc.bruniaux.com/quiz/) | [Исходники вопросов](./quiz/) |
+| Справочник для печати | Одна концепция на страницу (на французском и английском) | [Шпаргалки](https://cc.bruniaux.com/cheatsheets/) | [Исходники карточек](./whitepapers/recap-cards/) |
+| Длинноформатное издание | Офлайн PDF и EPUB | [Электронные книги](https://cc.bruniaux.com/whitepapers/) | [Загрузки](https://cc.bruniaux.com/downloads/) |
+| Машиночитаемый индекс | Поиск и извлечение для ИИ-ассистентов | [MCP руководства](https://cc.bruniaux.com/mcp/) | [llms.txt](./machine-readable/llms.txt) и [reference.yaml](./machine-readable/reference.yaml) |
 
-## MCP Server: Use the guide from any coding client
+## MCP-сервер: используйте руководство из любого кодинг-клиента
 
 <!-- mcp-product:start -->
-Install the guide as a stdio MCP server and query it from Claude Code, Codex, Cursor, VS Code, or another MCP client.
+Установите руководство как stdio MCP-сервер и обращайтесь к нему из Claude Code, Codex, Cursor, VS Code или любого другого MCP-клиента.
 
 ```bash
 claude mcp add --scope user claude-code-guide -- npx -y claude-code-ultimate-guide-mcp@1.3.8
 codex mcp add claude-code-guide -- npx -y claude-code-ultimate-guide-mcp@1.3.8
 ```
 
-Project-scoped Claude Code configuration belongs in `.mcp.json`:
+Конфигурация Claude Code на уровне проекта размещается в `.mcp.json`:
 
 ```json
 {
@@ -278,148 +281,148 @@ Project-scoped Claude Code configuration belongs in `.mcp.json`:
 }
 ```
 
-| Capability | Count | Names |
+| Возможность | Кол-во | Имена |
 | --- | ---: | --- |
-| Tools | 17 | `compare_versions`, `diff_official_docs`, `get_changelog`, `get_cheatsheet`, `get_digest`, `get_example`, `get_release`, `get_threat`, `init_official_docs`, `list_examples`, `list_threats`, `list_topics`, `read_section`, `refresh_official_docs`, `search_examples`, `search_guide`, `search_official_docs` |
-| Resources | 7 | `claude-code-guide://agent-harnesses`, `claude-code-guide://ai-design-patterns`, `claude-code-guide://distribution-channels`, `claude-code-guide://llms`, `claude-code-guide://reference`, `claude-code-guide://releases`, `claude-code-guide://translations` |
-| Prompts | 1 | `claude-code-expert` |
-| Companion commands | 5 | `/ccguide:daily`, `/ccguide:diff-docs`, `/ccguide:init-docs`, `/ccguide:refresh-docs`, `/ccguide:search-docs` |
+| Инструменты (Tools) | 17 | `compare_versions`, `diff_official_docs`, `get_changelog`, `get_cheatsheet`, `get_digest`, `get_example`, `get_release`, `get_threat`, `init_official_docs`, `list_examples`, `list_threats`, `list_topics`, `read_section`, `refresh_official_docs`, `search_examples`, `search_guide`, `search_official_docs` |
+| Ресурсы (Resources) | 7 | `claude-code-guide://agent-harnesses`, `claude-code-guide://ai-design-patterns`, `claude-code-guide://distribution-channels`, `claude-code-guide://llms`, `claude-code-guide://reference`, `claude-code-guide://releases`, `claude-code-guide://translations` |
+| Промпты (Prompts) | 1 | `claude-code-expert` |
+| Сопутствующие команды | 5 | `/ccguide:daily`, `/ccguide:diff-docs`, `/ccguide:init-docs`, `/ccguide:refresh-docs`, `/ccguide:search-docs` |
 
-The list operations and search index use bundled content. Section, example, cheatsheet, changelog, digest (`get_digest`), and threat tools can fetch GitHub content and write a 24-hour local cache. The official-doc initialization and refresh tools fetch Anthropic documentation and write separate local snapshots.
+Операции списков и поисковый индекс используют встроенный контент. Инструменты для разделов, примеров, шпаргалок, журнала изменений, дайджеста (`get_digest`) и угроз могут загружать содержимое с GitHub и сохранять локальный кэш на 24 часа. Инструменты инициализации и обновления официальной документации загружают документацию Anthropic и сохраняют отдельные локальные снимки.
 
-[Canonical technical guide, installation, privacy, limitations, and dated statistics](./guide/ecosystem/claude-code-guide-mcp.md)
+[Каноническое техническое руководство: установка, приватность, ограничения и датированная статистика](./guide/ecosystem/claude-code-guide-mcp.md)
 
-[Package README and diagnostics](./mcp-server/README.md)
+[README пакета и диагностика](./mcp-server/README.md)
 
-Companion commands rendered from the repository: `/ccguide:daily`, `/ccguide:diff-docs`, `/ccguide:init-docs`, `/ccguide:refresh-docs`, `/ccguide:search-docs`.
+Сопутствующие команды, генерируемые из репозитория: `/ccguide:daily`, `/ccguide:diff-docs`, `/ccguide:init-docs`, `/ccguide:refresh-docs`, `/ccguide:search-docs`.
 <!-- mcp-product:end -->
 
-### Load the guide into another assistant
+### Загрузите руководство в другой ассистент
 
-Use the small index for discovery:
+Используйте компактный индекс для первичной навигации:
 
 ```bash
 curl -sL https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/main/machine-readable/llms.txt
 ```
 
-Use [reference.yaml](./machine-readable/reference.yaml) when the assistant needs structured topic routes and links into the full guide. Maintenance instructions belong in the [machine-readable documentation](./machine-readable/README.md), not in this README.
+Используйте [reference.yaml](./machine-readable/reference.yaml), когда ассистенту нужны структурированные маршруты по темам и ссылки на полное руководство. Инструкции по сопровождению находятся в [машиночитаемой документации](./machine-readable/README.md), а не в этом README.
 
-## Complementary ecosystem
+## Смежная экосистема
 
-No single repository needs to cover learning, installation, curation, reference material, and every specialized interface. Choose the resource that matches the current task.
+Ни один репозиторий не обязан одновременно охватывать обучение, установку, подборки, справочные материалы и каждый специализированный интерфейс. Выбирайте ресурс, подходящий под текущую задачу.
 
-| Need | Resource | What it provides |
+| Потребность | Ресурс | Что предоставляет |
 |---|---|---|
-| Verify Claude Code behavior | [Official Claude Code documentation](https://code.claude.com/docs) | Primary product documentation |
-| Learn architecture, trade-offs, security, and workflows | [Claude Code Guide](https://cc.bruniaux.com/guide/) | Explanations, decision guides, operational checks, and examples |
-| Discover community projects | [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) | Curated links across the ecosystem |
-| Install a collection of configurations | [everything-claude-code](https://github.com/affaan-m/everything-claude-code) | Packaged agents, skills, hooks, and configurations |
-| Browse installable templates | [claude-code-templates](https://github.com/davila7/claude-code-templates) | Template catalog and CLI distribution |
-| Start from official skill examples | [anthropics/skills](https://github.com/anthropics/skills) | Anthropic-maintained skill examples |
-| Browse the skills marketplace | [skills.sh](https://skills.sh/) | Search and installation routes for published skills |
-| Curate Claude Code hooks | [awesome-claude-code-hooks](https://github.com/loqimean/awesome-claude-code-hooks) | Curated list of Claude Code hooks |
-| Work outside software development | [Claude Cowork Guide](https://github.com/FlorianBruniaux/claude-cowork-guide) | Workflows for knowledge workers |
-| Compare coding-agent capabilities | [AI Coding Agents Matrix](https://coding-agents-matrix.dev) | Cross-agent feature comparison |
+| Проверить поведение Claude Code | [Официальная документация Claude Code](https://code.claude.com/docs) | Первичная документация продукта |
+| Изучить архитектуру, компромиссы, безопасность и рабочие процессы | [Claude Code Guide](https://cc.bruniaux.com/guide/) | Объяснения, руководства по выбору решений, операционные проверки и примеры |
+| Найти проекты сообщества | [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) | Кураторский список ссылок по экосистеме |
+| Установить набор конфигураций | [everything-claude-code](https://github.com/affaan-m/everything-claude-code) | Упакованные агенты, скиллы, хуки и конфигурации |
+| Подобрать устанавливаемые шаблоны | [claude-code-templates](https://github.com/davila7/claude-code-templates) | Каталог шаблонов и распространение через CLI |
+| Начать с официальных примеров скиллов | [anthropics/skills](https://github.com/anthropics/skills) | Примеры скиллов, поддерживаемые Anthropic |
+| Просмотреть маркетплейс скиллов | [skills.sh](https://skills.sh/) | Поиск и маршруты установки опубликованных скиллов |
+| Подобрать хуки для Claude Code | [awesome-claude-code-hooks](https://github.com/loqimean/awesome-claude-code-hooks) | Кураторский список хуков Claude Code |
+| Работать вне разработки ПО | [Claude Cowork Guide](https://github.com/FlorianBruniaux/claude-cowork-guide) | Рабочие процессы для специалистов умственного труда |
+| Сравнить возможности кодинг-агентов | [AI Coding Agents Matrix](https://coding-agents-matrix.dev) | Межпродуктовое сравнение функций агентов |
 
-This short list was reviewed on 2026-08-31. Project activity, installation methods, and scope can change. Browse the public [Ecosystem](https://cc.bruniaux.com/ecosystem/) and [Compare](https://cc.bruniaux.com/compare/) pages first. The [AI Ecosystem source](./guide/ecosystem/ai-ecosystem.md), [Third-Party Tools source](./guide/ecosystem/third-party-tools.md), and [Resource Evaluations](./docs/resource-evaluations/) retain the deeper evidence.
+Этот краткий список проверялся 2026-08-31. Активность проектов, способы установки и область охвата могут меняться. Сначала посмотрите публичные страницы [Экосистема](https://cc.bruniaux.com/ecosystem/) и [Сравнения](https://cc.bruniaux.com/compare/). Более подробные данные сохранены в исходниках [Экосистема ИИ](./guide/ecosystem/ai-ecosystem.md), [Сторонние инструменты](./guide/ecosystem/third-party-tools.md) и [Оценки ресурсов](./docs/resource-evaluations/).
 
-For desktop workspaces over existing agent CLIs, see the [October 2026 workspace comparison](./guide/ecosystem/third-party-tools.md#desktop-agent-workspace-comparison), including Conductor's local/cloud workflow and Vibe Kanban's maintenance note.
+По десктопным рабочим пространствам поверх существующих агентных CLI см. [сравнение рабочих пространств за октябрь 2026](./guide/ecosystem/third-party-tools.md#desktop-agent-workspace-comparison), включая локальный/облачный воркфлоу Conductor и заметку о статусе сопровождения Vibe Kanban.
 
-## Updates
+## Обновления
 
-Guide changes and Claude Code product releases answer different questions:
+Изменения руководства и релизы самого продукта Claude Code отвечают на разные вопросы:
 
-| Feed | Tracks | Source |
+| Лента | Что отслеживает | Источник |
 |---|---|---|
-| [Guide Changelog](https://cc.bruniaux.com/changelog/) | New pages, corrections, and major repository revisions | [CHANGELOG.md](./CHANGELOG.md) |
-| [Claude Code Releases](https://cc.bruniaux.com/releases/) | Claude Code product versions and operational impact | [Release source](./guide/core/claude-code-releases.md) |
-| [RSS Feed](https://cc.bruniaux.com/rss.xml) | Published guide and product updates in a feed reader | Generated by the website |
+| [История изменений руководства](https://cc.bruniaux.com/changelog/) | Новые страницы, исправления и крупные ревизии репозитория | [CHANGELOG.md](./CHANGELOG.md) |
+| [Релизы Claude Code](https://cc.bruniaux.com/releases/) | Версии продукта Claude Code и их операционное влияние | [Исходник релизов](./guide/core/claude-code-releases.md) |
+| [RSS-лента](https://cc.bruniaux.com/rss.xml) | Опубликованные обновления руководства и продукта в RSS-ридере | Генерируется сайтом |
 
-Recent guide additions include:
+Среди недавних дополнений руководства:
 
-- [Mistral Large 4 evaluation](./docs/resource-evaluations/mistral-large-4.md): October 6 launch evidence, promotional pricing, independent results, regional inference, and pending weights; integrated into the [market snapshot](./guide/ops/llm-market-snapshot.md) and [AI ecosystem](./guide/ecosystem/ai-ecosystem.md#21-mistral-large-4-multimodal-api-candidate).
-- [Loop & Graph Engineering](https://cc.bruniaux.com/guide/loop-graph-engineering/) ([source](./guide/core/loop-graph-engineering.md)): bounded feedback, workflow state, stopping rules, recovery, and judgment allocation.
-- [AI Design Patterns](https://cc.bruniaux.com/ai-design-patterns/) ([source](./guide/core/ai-design-patterns.md)): classic patterns mapped to Claude Code mechanisms, where each analogy breaks, native agent patterns, and anti-patterns.
-- [Subscription Strategy](https://cc.bruniaux.com/guide/subscription-strategy/) ([source](./guide/ops/subscription-strategy.md)): seats, APIs, gateways, self-hosting scenarios, and team-scale decision gates.
-- [Cross-Session Messaging](https://cc.bruniaux.com/guide/workflows/cross-session-messaging/) ([source](./guide/workflows/cross-session-messaging.md)): peer discovery, delivery, security boundaries, and correlated-drift controls.
+- [Оценка Mistral Large 4](./docs/resource-evaluations/mistral-large-4.md): данные запуска от 6 октября, промо-цены, независимые результаты, региональный инференс и ожидаемая публикация весов; интегрировано в [срез рынка](./guide/ops/llm-market-snapshot.md) и [экосистему ИИ](./guide/ecosystem/ai-ecosystem.md#21-mistral-large-4-multimodal-api-candidate).
+- [Проектирование циклов и графов](https://cc.bruniaux.com/guide/loop-graph-engineering/) ([исходник](./guide/core/loop-graph-engineering.md)): ограниченная обратная связь, состояние рабочего процесса, правила остановки, восстановление и распределение ответственности за суждения.
+- [Паттерны проектирования ИИ](https://cc.bruniaux.com/ai-design-patterns/) ([исходник](./guide/core/ai-design-patterns.md)): классические паттерны в проекции на механизмы Claude Code, границы применимости каждой аналогии, нативные агентные паттерны и антипаттерны.
+- [Стратегия подписок](https://cc.bruniaux.com/guide/subscription-strategy/) ([исходник](./guide/ops/subscription-strategy.md)): пользовательские места, API, шлюзы, сценарии самостоятельного хостинга и критерии принятия решений при масштабировании команды.
+- [Межсессионный обмен сообщениями](https://cc.bruniaux.com/guide/workflows/cross-session-messaging/) ([исходник](./guide/workflows/cross-session-messaging.md)): обнаружение узлов, доставка сообщений, границы безопасности и контроль скоррелированного дрейфа.
 
-Use the changelog for the complete history. The README should expose only a small current selection.
+Полную историю смотрите в журнале изменений. README содержит лишь небольшую актуальную подборку.
 
-## Languages and translations
+## Языки и переводы
 
-English is the canonical edition. French is maintained in this repository. Simplified Chinese, Ukrainian, and Latin American Spanish are independent community editions with separate update schedules.
+Английская версия является канонической. Французская версия поддерживается в этом репозитории. Упрощённый китайский, украинский и латиноамериканский испанский — независимые редакции сообщества с собственными графиками обновлений.
 
-| Language | Edition |
+| Язык | Редакция |
 |---|---|
-| English | [Canonical guide](./guide/ultimate-guide.md) |
-| Français | [French guide maintained in this repository](./guide/ultimate-guide.fr.md) |
-| 简体中文 | [Community edition by JAYcodr](https://github.com/JAYcodr/claude-code-ultimate-guide-zh) |
-| Українська | [Community edition by gerasimsergey](https://github.com/gerasimsergey/claude-code-ultimate-guide-ua) |
-| Español latinoamericano | [Community edition by Richardls](https://github.com/Richardls/claude-code-ultimate-guide-es) |
+| English | [Каноническое руководство](./guide/ultimate-guide.md) |
+| Français | [Французское руководство, поддерживаемое в этом репозитории](./guide/ultimate-guide.fr.md) |
+| 简体中文 | [Редакция сообщества от JAYcodr](https://github.com/JAYcodr/claude-code-ultimate-guide-zh) |
+| Українська | [Редакция сообщества от gerasimsergey](https://github.com/gerasimsergey/claude-code-ultimate-guide-ua) |
+| Español latinoamericano | [Редакция сообщества от Richardls](https://github.com/Richardls/claude-code-ultimate-guide-es) |
 
-The [translation status page](./guide/core/translations.md) records maintainers, source commits, coverage, measured lag, and review status.
+На странице [статуса переводов](./guide/core/translations.md) фиксируются мейнтейнеры, исходные коммиты, полнота охвата, измеренное отставание и статус ревью.
 
-## Repository map
+## Карта репозитория
 
 ```text
 guide/
-├── ultimate-guide.md       Complete reference
-├── learning-path/          Guided course
-├── core/                   Architecture, tools, context, methods
-├── security/               Hardening, isolation, privacy, governance
-├── ecosystem/              Agents, MCP, tools, inference, knowledge
-├── roles/                  Adoption, learning, evaluation, careers
-├── ops/                    Observability, metrics, economics, gateways
-├── workflows/              Task-oriented delivery guides
-└── diagrams/               Mermaid diagrams with text fallbacks
+├── ultimate-guide.md       Полный справочник
+├── learning-path/          Пошаговый курс
+├── core/                   Архитектура, инструменты, контекст, методологии
+├── security/               Усиление безопасности, изоляция, приватность, управление
+├── ecosystem/              Агенты, MCP, инструменты, инференс, знания
+├── roles/                  Внедрение, обучение, оценка, карьера
+├── ops/                    Наблюдаемость, метрики, экономика, шлюзы
+├── workflows/              Практические руководства по рабочим процессам
+└── diagrams/               Диаграммы Mermaid с текстовыми фолбэками
 
-examples/                   Reusable agents, skills, hooks, and workflows
-machine-readable/           Structured indexes and release data
-mcp-server/                 Packaged guide access for MCP clients
-quiz/                       Local knowledge validation
-docs/resource-evaluations/  Reviewed external resources
-whitepapers/                French and English long-form sources
+examples/                   Переиспользуемые агенты, скиллы, хуки и воркфлоу
+machine-readable/           Структурированные индексы и данные о релизах
+mcp-server/                 Упакованный доступ к руководству для MCP-клиентов
+quiz/                       Локальная проверка знаний
+docs/resource-evaluations/  Оценённые внешние ресурсы
+whitepapers/                Длинноформатные исходники на французском и английском
 ```
 
-The detailed [guide index](./guide/README.md), [examples catalog](./examples/README.md), and [tool index](./tools/README.md) are the canonical navigation pages for those directories.
+Подробный [индекс руководства](./guide/README.md), [каталог примеров](./examples/README.md) и [индекс инструментов](./tools/README.md) служат каноническими страницами навигации для соответствующих каталогов.
 
-## Contributing
+## Участие в развитии
 
-Corrections, missing evidence, broken links, examples, quiz questions, and documentation improvements are welcome. Read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
+Приветствуются исправления, недостающие подтверждения, починка битых ссылок, примеры, вопросы для тестов и улучшения документации. Прочитайте [CONTRIBUTING.md](./CONTRIBUTING.md), прежде чем открывать pull request.
 
-Useful contribution routes:
+Полезные направления вклада:
 
-- Report an incorrect or outdated claim through [GitHub Issues](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/issues).
-- Submit an external resource through the [resource evaluation process](./docs/resource-evaluations/README.md).
-- Propose a focused guide or workflow with its sources, boundaries, and verification method.
-- Improve an example without weakening its existing security checks.
+- Сообщайте о неточных или устаревших утверждениях через [GitHub Issues](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/issues).
+- Предлагайте внешние ресурсы через [процесс оценки ресурсов](./docs/resource-evaluations/README.md).
+- Предлагайте сфокусированное руководство или рабочий процесс с указанием источников, границ применимости и способа проверки.
+- Улучшайте примеры, не ослабляя существующие проверки безопасности.
 
-## Maintainer
+## Мейнтейнер
 
-Florian Bruniaux maintains this guide.
+Это руководство поддерживает Florian Bruniaux.
 
-[GitHub](https://github.com/FlorianBruniaux) · [LinkedIn](https://www.linkedin.com/in/florian-bruniaux-43408b83/) · [Portfolio](https://www.florian.bruniaux.com/)
+[GitHub](https://github.com/FlorianBruniaux) · [LinkedIn](https://www.linkedin.com/in/florian-bruniaux-43408b83/) · [Портфолио](https://www.florian.bruniaux.com/)
 
 <!-- BEGIN GENERATED RELATED PROJECTS -->
 <!-- Source: https://github.com/FlorianBruniaux/FlorianBruniaux/blob/main/ecosystem/projects.json; project: claude-code-guide -->
-## Explore the ecosystem
+## Исследуйте экосистему
 
-These projects extend the workflow without duplicating this tool:
+Эти проекты расширяют рабочий процесс, не дублируя этот инструмент:
 
-- **Install with [claude-code-plugins](https://github.com/FlorianBruniaux/claude-code-plugins)**: move from explanations to installable templates.
-- **Validate with [ctxharness](https://github.com/FlorianBruniaux/ctxharness)**: test whether documented context and instructions still match the repository.
-- **Secure with [agentsec-triage](https://github.com/FlorianBruniaux/agentsec-triage)**: connect security guidance to a versioned operational feed.
-- **Continue with [Claude Cowork Guide](https://github.com/FlorianBruniaux/claude-cowork-guide)**: switch to workflows designed for knowledge workers and non-developers.
+- **Устанавливайте с [claude-code-plugins](https://github.com/FlorianBruniaux/claude-code-plugins)**: переходите от объяснений к устанавливаемым шаблонам.
+- **Проверяйте с [ctxharness](https://github.com/FlorianBruniaux/ctxharness)**: тестируйте, по-прежнему ли задокументированный контекст и инструкции соответствуют репозиторию.
+- **Защищайте с [agentsec-triage](https://github.com/FlorianBruniaux/agentsec-triage)**: связывайте рекомендации по безопасности с версионируемой операционной лентой.
+- **Продолжайте с [Claude Cowork Guide](https://github.com/FlorianBruniaux/claude-cowork-guide)**: переходите к рабочим процессам, созданным для специалистов умственного труда и неразработчиков.
 
-[Browse the complete open-source galaxy](https://github.com/FlorianBruniaux#open-source-galaxy)
+[Открыть всю open-source экосистему](https://github.com/FlorianBruniaux#open-source-galaxy)
 <!-- END GENERATED RELATED PROJECTS -->
 
-## License
+## Лицензия
 
-The guide uses [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Reusable templates use [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Check the repository license files before redistributing mixed content.
+Руководство распространяется под лицензией [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Переиспользуемые шаблоны распространяются под лицензией [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Перед повторным распространением смешанного контента проверьте файлы лицензий в репозитории.
 
-Watch [GitHub Releases](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/releases) or subscribe to the [RSS feed](https://cc.bruniaux.com/rss.xml) for updates.
+Следите за [GitHub Releases](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/releases) или подпишитесь на [RSS-ленту](https://cc.bruniaux.com/rss.xml), чтобы получать обновления.
 
 ---
 
-*Version 3.46.0 | Updated daily · Nov 22, 2026*
+*Версия 3.46.0 | Обновляется ежедневно · 22 ноября 2026*

@@ -1,35 +1,35 @@
-# Audit your Claude Code permission and sandbox posture
+# Аудит прав доступа и песочницы (sandbox) в Claude Code
 
-> A self-contained prompt that audits how a project actually gates Claude Code: blanket execution grants, allow-rule bloat, deny and ask coverage, sandbox configuration, scope hygiene, and permission-mode interactions.
+> Самодостаточный промпт для аудита того, как проект на самом деле ограничивает Claude Code: неограниченные разрешения на выполнение, разрастание правил `allow`, покрытие `deny` и `ask`, конфигурация песочницы, гигиена областей действия и взаимодействие с режимами прав доступа.
 
-**Author**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Fractional Chief AI Officer
+**Автор**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Fractional Chief AI Officer
 
-**Reference**: [The Ultimate Claude Code Guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md)
-
----
-
-## What this is for
-
-`/security-audit` scans your project for secrets and injection surfaces. `tools/audit-prompt.md` scores your whole setup across eight dimensions. This prompt does one thing instead: it determines whether your permission rules still constitute a boundary, or whether they have quietly stopped meaning anything.
-
-The failure it is built to catch is invisible from the inside. You accumulate `allow` rules one "Yes, don't ask again" at a time. One of them turns out to be an interpreter. From that point, every other rule in the file is decoration, including the `deny` rules you wrote deliberately. Nothing warns you. Prompts simply stop appearing, which reads as a well-tuned setup.
-
-Run it per project. It reads configuration only and changes nothing.
+**Источник**: [The Ultimate Claude Code Guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md)
 
 ---
 
-## How to run it
+## Зачем это нужно
 
-Paste everything below the line into a Claude Code session at the root of the project you want audited.
+`/security-audit` сканирует ваш проект на наличие секретов и поверхностей для инъекций. `tools/audit-prompt.md` оценивает всю вашу настройку по восьми измерениям. Этот промпт решает одну конкретную задачу: он определяет, образуют ли ваши правила прав доступа реальную границу безопасности или они незаметно перестали что-либо значить.
 
-For a fleet, run it once per repository. Findings in user-scope settings will repeat across runs, which is the point: a user-scope hole affects every project at once and should be fixed first.
+Сбой, для обнаружения которого он создан, невидим изнутри. Вы накапливаете правила `allow` по одному нажатию «Yes, don't ask again». Одно из них оказывается интерпретатором. С этого момента каждое другое правило в файле превращается в декорацию — включая правила `deny`, которые вы написали намеренно. Ничто вас не предупредит. Запросы подтверждения просто перестанут появляться, что воспринимается как отлично отлаженная настройка.
 
-### Fleet triage first
+Запускайте его отдельно для каждого проекта. Он только читает конфигурацию и ничего не изменяет.
 
-Auditing thirty repositories one at a time wastes the first twenty runs discovering the same thing. Sweep the whole fleet first, rank by exposure, then run the full prompt only on what the sweep flags. Point `ROOTS` at the directories your repositories actually live under.
+---
+
+## Как запускать
+
+Вставьте всё, что находится ниже разделительной линии, в сессию Claude Code в корне проекта, который хотите проверить.
+
+Для парка репозиториев запускайте его по одному разу на каждый репозиторий. Находки в настройках уровня пользователя (user scope) будут повторяться между запусками, и именно в этом смысл: дыра на уровне пользователя затрагивает все проекты сразу и должна быть закрыта в первую очередь.
+
+### Сначала проведите триаж по всему парку
+
+Поочерёдный аудит тридцати репозиториев тратит первые двадцать запусков на обнаружение одного и того же. Сначала просканируйте весь парк целиком, отранжируйте репозитории по уровню риска, а затем запускайте полный промпт только на тех проектах, которые выделит первичная проверка. Укажите в `ROOTS` каталоги, в которых фактически находятся ваши репозитории.
 
 ```bash
-ROOTS="$HOME/Sites $HOME/dev $HOME/work"   # adjust
+ROOTS="$HOME/Sites $HOME/dev $HOME/work"   # скорректируйте под ваши пути
 find $ROOTS -maxdepth 5 -name node_modules -prune -o -name .worktrees -prune \
      -o -path "*/.claude/settings*.json" -print 2>/dev/null | sort -u > /tmp/cc-settings.txt
 wc -l < /tmp/cc-settings.txt
@@ -59,51 +59,51 @@ for n,tracked,a,dn,ak,sb,p,hits in sorted(rows, reverse=True):
 PY
 ```
 
-Read the output in this order. A blanket grant in a **tracked** `settings.json` outranks everything else, because it ships to whoever clones the repository. A blanket grant in a `settings.local.json` is next, one line per affected repository. A repository with zero `deny` rules and no sandbox has no boundary beyond the built-in defaults, whatever its allow count says. A high allow count with no blanket grant is noise, not risk, and should be scheduled last.
+Читайте вывод в следующем порядке. Неограниченное разрешение в **отслеживаемом в Git** файле `settings.json` важнее всего остального, поскольку оно распространяется на каждого, кто клонирует репозиторий. Далее идёт неограниченное разрешение в `settings.local.json` — по одной строке на каждый затронутый репозиторий. Репозиторий с нулём правил `deny` и без песочницы не имеет никаких границ сверх встроенных настроек по умолчанию, что бы ни показывало количество правил `allow`. Большое число правил `allow` без неограниченных разрешений — это шум, а не риск, и разбираться с ним следует в последнюю очередь.
 
-Then run the full prompt on the two or three repositories where the answer is genuinely unclear, and apply the fleet-wide fixes from the plan rather than re-auditing each one.
+Затем запустите полный промпт на двух-трёх репозиториях, где ситуация действительно неясна, и примените общие исправления из плана ко всему парку вместо повторного аудита каждого репозитория.
 
 ---
 
-# PROMPT STARTS HERE
+# НАЧАЛО ПРОМПТА
 
-You are a senior security engineer auditing the Claude Code permission posture of this repository. You produce evidence, not impressions. Every finding you report carries a file path, a line or rule, and a command someone else can run to reproduce it.
+Вы — старший инженер по безопасности, проводящий аудит состояния прав доступа Claude Code в этом репозитории. Вы приводите доказательства, а не впечатления. Каждая находка в вашем отчёте должна содержать путь к файлу, номер строки или текст правила, а также команду, которую другой человек может выполнить для воспроизведения.
 
-You do not modify any file. You do not run `claude config`, `/permissions`, or anything that writes. If asked to fix something, you propose a patch as text and stop.
+Вы не изменяете ни один файл. Вы не запускаете `claude config`, `/permissions` или что-либо выполняющее запись. Если вас просят что-то исправить, вы предлагаете патч в виде текста и останавливаетесь.
 
-## Ground truth you must use
+## Опорные факты, которыми вы обязаны руководствоваться
 
-Claude Code's permission matcher has specific semantics. Most bad audits come from guessing them. Use these, which are the documented behavior, rather than reasoning from the rule text alone.
+У сопоставителя правил (matcher) прав доступа Claude Code есть конкретная семантика. Большинство плохих аудитов возникают из-за попыток угадать её. Используйте перечисленное ниже задокументированное поведение вместо того, чтобы рассуждать исключительно по тексту правил.
 
-**Rule shape.** Rules are `Tool` or `Tool(specifier)`. A bare `Bash` and `Bash(*)` both match every command. Wildcards match at any position, including the middle: `Bash(git * main)` matches `git push origin main`. A trailing ` *` enforces a word boundary, so `Bash(ls *)` matches `ls -la` but not `lsof`, while `Bash(ls*)` matches both. The `:*` suffix equals a trailing ` *` and is recognized **only at the end of a pattern**; in `Bash(git:* push)` the colon is a literal character and the rule matches nothing.
+**Форма правил.** Правила имеют вид `Tool` или `Tool(specifier)`. И голое `Bash`, и `Bash(*)` совпадают с любой командой. Подстановочные знаки (wildcards) работают в любой позиции, включая середину: `Bash(git * main)` совпадает с `git push origin main`. Завершающий ` *` задаёт границу слова, поэтому `Bash(ls *)` совпадает с `ls -la`, но не с `lsof`, тогда как `Bash(ls*)` совпадает с обеими командами. Суффикс `:*` эквивалентен завершающему ` *` и распознаётся **только в конце шаблона**; в `Bash(git:* push)` двоеточие считается буквальным символом, и такое правило не совпадёт ни с чем.
 
-**Compound commands.** The recognized separators are `&&`, `||`, `;`, `|`, `|&`, `&`, and newlines. A rule must match each subcommand independently, so `Bash(safe *)` does not authorize `safe && rm -rf .`.
+**Составные команды.** Распознаются разделители `&&`, `||`, `;`, `|`, `|&`, `&` и переводы строк. Правило должно совпасть с каждой подкомандой по отдельности, поэтому `Bash(safe *)` не разрешает `safe && rm -rf .`.
 
-**Wrappers stripped before matching.** `timeout`, `time`, `nice`, `nohup`, `stdbuf`, the builtins `command` and `builtin`, zsh's `noglob`, and bare `xargs` with no flags. A rule written for the inner command therefore covers the wrapped form.
+**Обёртки, удаляемые перед сопоставлением.** `timeout`, `time`, `nice`, `nohup`, `stdbuf`, встроенные команды `command` и `builtin`, `noglob` из zsh и голое `xargs` без флагов. Поэтому правило, написанное для внутренней команды, покрывает и её обёрнутую форму.
 
-**Wrappers NOT stripped, which is where holes come from.** `npx`, `docker exec`, `devbox run`, `mise exec`, `direnv exec`, and every interpreter invoked with `-c` or `-e`. These execute their arguments as a command, so a rule like `Bash(devbox run *)` authorizes `devbox run rm -rf .`, and `Bash(bash *)` authorizes `bash -c '<anything>'`. This is the single most important mechanic in this audit.
+**Обёртки, которые НЕ удаляются — именно отсюда берутся дыры.** `npx`, `docker exec`, `devbox run`, `mise exec`, `direnv exec`, а также любой интерпретатор, вызываемый с `-c` или `-e`. Они исполняют свои аргументы как команду, поэтому правило вроде `Bash(devbox run *)` разрешает `devbox run rm -rf .`, а `Bash(bash *)` разрешает `bash -c '<anything>'`. Это самая важная механика во всём аудите.
 
-**Environment variable prefixes.** An `allow` rule does not match past an assignment of a variable outside a known-safe set. A `deny` or `ask` rule matches past any leading assignment, so `Bash(rm *)` in deny still catches `FOO=bar rm -rf tmp/`.
+**Префиксы переменных окружения.** Правило `allow` не срабатывает после присваивания переменной, не входящей в заранее известный безопасный набор. Правило `deny` или `ask` срабатывает после любого начального присваивания, поэтому `Bash(rm *)` в `deny` всё равно перехватывает `FOO=bar rm -rf tmp/`.
 
-**Exec wrappers that always prompt** and cannot be prefix-approved: `watch`, `setsid`, `ionice`, `flock`, and `find` with `-exec` or `-delete`.
+**Обёртки запуска, которые всегда запрашивают подтверждение** и не могут быть предварительно одобрены префиксным правилом: `watch`, `setsid`, `ionice`, `flock` и `find` с `-exec` или `-delete`.
 
-**Built-in read-only set**, never prompted in any mode and not configurable: `ls`, `cat`, `echo`, `pwd`, `head`, `tail`, `grep`, `find`, `wc`, `which`, `diff`, `stat`, `du`, `cd`, and read-only forms of `git`. An `allow` rule for any of these is dead weight, not a risk.
+**Встроенный набор команд только для чтения**, который никогда не запрашивает подтверждение ни в одном режиме и не настраивается: `ls`, `cat`, `echo`, `pwd`, `head`, `tail`, `grep`, `find`, `wc`, `which`, `diff`, `stat`, `du`, `cd` и read-only формы `git`. Правило `allow` для любой из этих команд — балласт, а не риск.
 
-**Protected paths**, never auto-approved outside `bypassPermissions`, and **not** pre-approvable by an `allow` rule in settings: `.git`, `.config/git`, `.vscode`, `.idea`, `.husky`, `.cargo`, `.devcontainer`, `.yarn`, `.mvn`, `.claude` (except `.claude/worktrees`), plus shell rc files, `.npmrc`, `.gitconfig`, `.mcp.json`, `.claude.json`, and similar. The safety check runs before settings are evaluated.
+**Защищённые пути**, которые никогда не одобряются автоматически за пределами `bypassPermissions` и **не могут** быть предварительно одобрены правилом `allow` в настройках: `.git`, `.config/git`, `.vscode`, `.idea`, `.husky`, `.cargo`, `.devcontainer`, `.yarn`, `.mvn`, `.claude` (кроме `.claude/worktrees`), а также rc-файлы оболочки, `.npmrc`, `.gitconfig`, `.mcp.json`, `.claude.json` и подобные. Проверка безопасности выполняется до оценки настроек.
 
-**Auto mode ordering.** Actions matching an `allow`, `ask`, or `deny` rule resolve immediately, **before** the classifier runs. On entering auto mode Claude Code drops only the broad execution grants: blanket `Bash(*)`, wildcarded interpreters, package-manager run commands, and `Agent` allow rules. A narrow rule such as `Bash(git push:*)` survives and therefore removes classifier review from that action. In auto mode, an allow list is not neutral: it subtracts oversight.
+**Порядок работы автоматического режима (auto mode).** Действия, совпавшие с правилом `allow`, `ask` или `deny`, разрешаются немедленно, **до** запуска классификатора. При входе в режим auto Claude Code отбрасывает только широкие разрешения на выполнение: неограниченное `Bash(*)`, интерпретаторы с подстановочными знаками, команды запуска пакетных менеджеров и правила `allow` для `Agent`. Узкое правило вроде `Bash(git push:*)` сохраняется и тем самым выводит это действие из-под проверки классификатором. В режиме auto список `allow` не нейтрален: он убирает контроль.
 
-**Ask rules.** A content-scoped `ask` rule such as `Bash(git push *)` forces a prompt in every mode, including auto mode and including sandboxed commands. A bare `Bash` ask rule is skipped for commands that run sandboxed. Ask rules are the only human checkpoint that survives every other setting.
+**Правила `ask`.** Правило `ask`, привязанное к содержимому команды, например `Bash(git push *)`, принудительно вызывает запрос подтверждения в любом режиме, включая режим auto и включая команды в песочнице. Голое правило `ask` для `Bash` пропускается для команд, выполняемых в песочнице. Правила `ask` — единственная точка контроля человеком, которая сохраняется при любых других настройках.
 
-**Sandbox.** Off unless `sandbox.enabled` is true. Two independent layers. Filesystem: writes limited to the working directory and session temp; reads cover the **entire machine** including `~/.ssh` and `~/.aws`, because there is no built-in credential deny list. Network: no domain pre-allowed, prompt on first use. `autoAllowBashIfSandboxed` auto-approves sandboxed commands, which is what replaces a long allow list. `allowUnsandboxedCommands: false` disables only the `dangerouslyDisableSandbox` retry; it does **not** constrain `excludedCommands`, which remains a full bypass of the OS boundary. The built-in proxy does not terminate TLS, so a broad `allowedDomains` entry such as `github.com` is an egress path, not a restriction.
+**Песочница (sandbox).** Выключена, если `sandbox.enabled` не установлено в `true`. Состоит из двух независимых слоёв. Файловая система: запись ограничена рабочим каталогом и временной директорией сессии; чтение охватывает **всю машину**, включая `~/.ssh` и `~/.aws`, потому что встроенного списка запрещённых путей к учётным данным нет. Сеть: ни один домен не разрешён заранее, при первом обращении выводится запрос подтверждения. `autoAllowBashIfSandboxed` автоматически разрешает команды в песочнице — именно этот механизм заменяет длинный список `allow`. `allowUnsandboxedCommands: false` отключает только повторную попытку с `dangerouslyDisableSandbox`; оно **не** ограничивает `excludedCommands`, которое остаётся полным обходом границы уровня ОС. Встроенный прокси не терминирует TLS, поэтому широкая запись в `allowedDomains`, такая как `github.com`, является каналом исходящего трафика (egress), а не ограничением.
 
-**Scope precedence** for permission arrays: managed, then project local, then project, then user, with array keys merged and deduplicated across every scope rather than replaced. A `deny` added anywhere applies everywhere; no scope can remove another scope's deny. Several keys are deliberately ignored when they come from project settings: `defaultMode: "auto"`, `sandbox.filesystem.disabled`, `sandbox.credentials` `mask` entries, `network.tlsTerminate`, `network.strictAllowlist`, and `allowAppleEvents`.
+**Приоритет областей действия (scope)** для массивов прав доступа: управляемые настройки (managed), затем локальные настройки проекта, затем настройки проекта, затем пользовательские настройки, причём ключи-массивы объединяются и дедуплицируются по всем областям действия, а не перезаписываются. Правило `deny`, добавленное в любом месте, действует везде; ни одна область действия не может удалить `deny` из другой области. Несколько ключей намеренно игнорируются, если они заданы в настройках проекта: `defaultMode: "auto"`, `sandbox.filesystem.disabled`, записи `mask` в `sandbox.credentials`, `network.tlsTerminate`, `network.strictAllowlist` и `allowAppleEvents`.
 
-If you are unsure whether a behavior still holds in the installed version, say so in the report under "Not verified" rather than asserting it. Record the version from `claude --version`.
+Если вы не уверены, сохраняется ли какое-либо поведение в установленной версии, укажите это в отчёте в разделе «Не проверено», а не утверждайте как факт. Зафиксируйте версию из вывода `claude --version`.
 
-## Phase 0. inventory
+## Фаза 0. Инвентаризация
 
-Locate every settings file that applies here and count what is in each. Report the table before analyzing anything.
+Найдите каждый файл настроек, который действует здесь, и подсчитайте его содержимое. Выведите сводную таблицу до того, как приступать к анализу.
 
 ```bash
 claude --version
@@ -128,15 +128,15 @@ PY
 done
 ```
 
-A file that fails to parse is a P0 on its own: Claude Code cannot apply rules it cannot read, and JSON does not accept `//` comments. Report the parse error verbatim and stop analyzing that file.
+Файл, который не удаётся распарсить, сам по себе является проблемой P0: Claude Code не может применить правила, которые не может прочитать, а JSON не допускает комментариев `//`. Приведите ошибку парсинга дословно и прекратите анализ этого файла.
 
-Note which files are git-tracked. A `settings.json` under version control is a team-wide policy; a `settings.local.json` is personal and gitignored. Rules in the wrong one are a finding in Phase 5.
+Отметьте, какие файлы отслеживаются в Git. Файл `settings.json` под контролем версий — это командная политика; `settings.local.json` — личный файл, добавленный в `.gitignore`. Правила, оказавшиеся не в том файле, станут находкой в Фазе 5.
 
-## Phase 1. Blanket execution grants (P0)
+## Фаза 1. Неограниченные разрешения на выполнение (P0)
 
-This phase alone decides whether the rest of the configuration means anything.
+Одна эта фаза определяет, имеет ли остальная конфигурация хоть какой-то смысл.
 
-Search every `allow` array for rules whose specifier resolves to an interpreter, a package manager, an environment runner, or a passthrough. Start from this list and extend it with anything project-specific you find, such as an in-house task runner or a proxy CLI:
+Проверьте каждый массив `allow` на наличие правил, спецификатор которых указывает на интерпретатор, пакетный менеджер, раннер окружения или проксирующую команду (passthrough). Начните со списка ниже и дополните его всем специфичным для проекта, что обнаружите — например, внутренним раннером задач или прокси-CLI:
 
 `bash`, `sh`, `zsh`, `fish`, `dash`, `python`, `python3`, `perl`, `ruby`, `node`, `deno`, `bun`, `npm`, `pnpm`, `yarn`, `npx`, `bunx`, `make`, `just`, `task`, `env`, `xargs`, `eval`, `source`, `docker`, `kubectl`, `ssh`, `devbox`, `mise`, `direnv`, `nix-shell`, `uv`, `poetry`, `cargo run`, `go run`, `dotnet run`.
 
@@ -157,22 +157,22 @@ for p in ("~/.claude/settings.json","~/.claude/settings.local.json",
 PY
 ```
 
-For each hit, decide whether it actually grants arbitrary execution, and say why:
+Для каждого совпадения определите, действительно ли оно даёт право на произвольное выполнение, и объясните почему:
 
-| Verdict | Looks like | Consequence |
+| Вердикт | Как выглядит | Последствие |
 |---|---|---|
-| Arbitrary | `Bash(bash *)`, `Bash(node:*)`, `Bash(env:*)`, `Bash(xargs:*)` | Every other rule in every scope is bypassable |
-| Arbitrary via subcommand | `Bash(npm:*)`, `Bash(pnpm *)`, `Bash(make *)` | `run`, `exec`, and install lifecycle scripts execute arbitrary code |
-| Scoped, acceptable | `Bash(npm run build:*)`, `Bash(pnpm vitest run:*)` | Bounded to a named script |
-| Passthrough | any wrapper CLI that forwards its argv unfiltered | Equivalent to the wrapped shell |
+| Произвольное выполнение | `Bash(bash *)`, `Bash(node:*)`, `Bash(env:*)`, `Bash(xargs:*)` | Любое другое правило в любой области действия можно обойти |
+| Произвольное выполнение через подкоманду | `Bash(npm:*)`, `Bash(pnpm *)`, `Bash(make *)` | Подкоманды `run`, `exec` и lifecycle-скрипты установки выполняют произвольный код |
+| Ограниченное, приемлемо | `Bash(npm run build:*)`, `Bash(pnpm vitest run:*)` | Ограничено конкретным именованным скриптом |
+| Проксирующая команда (passthrough) | любая CLI-обёртка, передающая свой `argv` без фильтрации | Эквивалентно обёрнутой оболочке |
 
-Then prove the consequence rather than asserting it. Pick the strictest `deny` rule in the repository, usually a secret read, and write out the exact command that defeats it through the grant you found. Example shape: given `deny: ["Read(**/.env*)", "Bash(cat .env)"]` and `allow: ["Bash(bash *)"]`, the bypass is `bash -c 'cat .env'`, matched as a `bash` command and never as a `cat`. Name the rule, the grant, and the bypass string. **Do not execute it.**
+Затем докажите последствие, а не просто декларируйте его. Возьмите самое строгое правило `deny` в репозитории — обычно это запрет чтения секретов — и выпишите точную команду, которая обходит его через найденное разрешение. Пример формата: при `deny: ["Read(**/.env*)", "Bash(cat .env)"]` и `allow: ["Bash(bash *)"]` обходом является `bash -c 'cat .env'`, которая сопоставляется как команда `bash` и никогда не проверяется как `cat`. Назовите правило, разрешение и строку обхода. **Не выполняйте её.**
 
-If Phase 1 finds nothing, say so explicitly. That is a genuinely good result and worth stating.
+Если в Фазе 1 ничего не найдено, напишите об этом прямо. Это действительно хороший результат, и его стоит отметить.
 
-## Phase 2. Rule population health
+## Фаза 2. Состояние набора правил
 
-Count, then characterize. Volume is not the problem; what the volume hides is.
+Сначала подсчитайте, затем охарактеризуйте. Проблема не в самом объёме, а в том, что за этим объёмом скрывается.
 
 ```bash
 python3 - <<'PY'
@@ -191,116 +191,116 @@ for p in (".claude/settings.local.json",".claude/settings.json"):
 PY
 ```
 
-Report three things. How many rules are exact matches that will never fire again, the residue of per-invocation approvals. Which command heads have accumulated many near-identical entries that a single prefix rule would replace. And whether any rule is already dead: covered by the built-in read-only set, shadowed by a broader rule in the same or a wider scope, or malformed such as a `:*` that is not at the end.
+Отразите в отчёте три вещи. Сколько правил представляют собой точные совпадения, которые больше никогда не сработают — след от разовых одобрений отдельных запусков. Какие базовые команды накопили множество почти идентичных записей, которые можно заменить одним префиксным правилом. И есть ли уже мёртвые правила: покрытые встроенным набором read-only команд, перекрытые более широким правилом в той же или более широкой области действия, или некорректно оформленные — например, с `:*` не в конце шаблона.
 
-Known matcher quirk worth checking here: commands carrying an environment-variable prefix, for instance `TEST_DB_URL="..." pytest`, never consolidate into a prefix rule, because the allow matcher does not look past an unknown assignment. A cluster of near-identical entries differing only by an env prefix is this bug, not user error.
+Известная особенность сопоставителя, которую стоит проверить здесь: команды с префиксом переменной окружения, например `TEST_DB_URL="..." pytest`, никогда не схлопываются в префиксное правило, потому что сопоставитель `allow` не заглядывает дальше неизвестного присваивания. Скопление почти одинаковых записей, различающихся только env-префиксом, — это проявление данного бага, а не ошибка пользователя.
 
-## Phase 3. Deny and ask coverage
+## Фаза 3. Покрытие правил deny и ask
 
-An empty `ask` array means the configuration contains no human checkpoint anywhere. Say that plainly if it is the case.
+Пустой массив `ask` означает, что в конфигурации вообще нигде нет точки подтверждения человеком. Если это так, скажите об этом прямо.
 
-Check for coverage of the actions that are expensive to undo, and report each as present or absent with the rule text:
+Проверьте покрытие действий, отмена которых обходится дорого, и по каждому укажите, присутствует ли защита или отсутствует, вместе с текстом правила:
 
-History rewriting and destructive git: `git push --force` and its `-f` and `--force-with-lease` forms, refspec forces such as `git push origin +main`, `git reset --hard`, `git clean -fd`, and branch or remote deletion.
+Переписывание истории и разрушительные операции Git: `git push --force`, а также его формы `-f` и `--force-with-lease`, принудительные refspec вроде `git push origin +main`, `git reset --hard`, `git clean -fd`, а также удаление веток или удалённых репозиториев (remotes).
 
-Publication and merge: `npm publish`, `gh pr merge`, `gh repo delete`, `gh repo edit`, registry pushes, and deploy commands specific to this project.
+Публикация и слияние: `npm publish`, `gh pr merge`, `gh repo delete`, `gh repo edit`, отправка в реестры (registry pushes) и команды деплоя, специфичные для этого проекта.
 
-Secret exposure: reads of `.env` and variants, `*.pem`, `*.key`, `~/.ssh`, `~/.aws`, `~/.gnupg`, and any credential directory this project actually uses.
+Утечка секретов: чтение `.env` и его вариантов, `*.pem`, `*.key`, `~/.ssh`, `~/.aws`, `~/.gnupg`, а также любого каталога с учётными данными, который реально используется в этом проекте.
 
-When a `deny` exists, test it against the semantics above rather than accepting it at face value. A pattern anchored on `git push` misses `git -c key=value push --force`, since the command no longer starts with the matched prefix. Report that as a limitation of the rule, and note that pattern matching loses this game: branch protection on the server is the boundary that actually holds. A `deny` rule remains worth keeping as a local guard against accident.
+Когда правило `deny` присутствует, проверяйте его по описанной выше семантике, а не принимайте на веру. Шаблон, привязанный к `git push`, пропустит `git -c key=value push --force`, поскольку команда больше не начинается с указанного префикса. Отразите это как ограничение правила и отметьте, что сопоставление по шаблонам проигрывает в этой игре: настоящей границей, которая действительно держится, является защита веток (branch protection) на сервере. При этом правило `deny` всё равно стоит сохранять как локальную страховку от случайных ошибок.
 
-Finally, name at least one `ask` rule this project should have and does not, chosen from what the repository actually does. Justify it from the code or the CI configuration, not from a generic checklist.
+Наконец, назовите как минимум одно правило `ask`, которое должно быть в этом проекте, но отсутствует, выбрав его исходя из того, чем репозиторий реально занимается. Обоснуйте его на основе кода или конфигурации CI, а не общего чек-листа.
 
-## Phase 4. Sandbox posture
+## Фаза 4. Состояние песочницы
 
-If no scope defines `sandbox`, state that the sandbox is off, then quantify what that costs **here** rather than in the abstract. Base it on Phase 1: with an interpreter grant present and no sandbox, there is no boundary of any kind on Bash. With no interpreter grant and no sandbox, the boundary is the rule list alone, which holds only as long as no future rule opens it.
+Если ни одна область действия не задаёт `sandbox`, укажите, что песочница выключена, а затем оцените, чего это стоит **именно здесь**, а не абстрактно. Опирайтесь на Фазу 1: при наличии разрешения на интерпретатор и отсутствии песочницы для Bash вообще нет никакой границы. Без разрешения на интерпретатор и без песочницы границей служит один лишь список правил, и он работает ровно до тех пор, пока какое-нибудь новое правило не откроет в нём брешь.
 
-If `sandbox` is defined, audit it against these:
+Если `sandbox` задан, проверьте его по следующим пунктам:
 
-`excludedCommands` is a full bypass of the OS boundary, and `allowUnsandboxedCommands: false` does not constrain it. For every entry, ask whether that command can reach the host filesystem. `docker` can, through volume mounts and through the daemon socket. `kubectl`, `ssh`, and `make` typically can. Report each excluded command with what it can still reach, and check whether a `deny` or `ask` rule covers it. Also flag entries whose syntax is unverified for this field: the documented forms are the bare name or `name *`, and a `:*` suffix here is not the same field as the Bash matcher. Verify the resolved configuration in the `/sandbox` Config tab rather than guessing.
+`excludedCommands` — это полный обход границы уровня ОС, и `allowUnsandboxedCommands: false` его не ограничивает. Для каждой записи задайтесь вопросом, может ли эта команда добраться до файловой системы хоста. `docker` может — через монтирование томов и сокет демона. `kubectl`, `ssh` и `make`, как правило, тоже могут. Для каждой исключённой команды укажите, до чего она по-прежнему может дотянуться, и проверьте, прикрыта ли она правилом `deny` или `ask`. Также пометьте записи с неподтверждённым синтаксисом для этого поля: задокументированные формы — это голое имя команды или `name *`, а суффикс `:*` здесь работает не так, как в сопоставителе Bash. Проверяйте итоговую применённую конфигурацию на вкладке Config команды `/sandbox`, а не гадайте.
 
-`network.allowedDomains` is an egress allowlist evaluated on the hostname the client claims, with no TLS inspection by default. Broad entries such as `github.com` or a wildcard on user content domains permit exfiltration. List each domain with the reason it is there; anything you cannot justify is a finding. Recommend `network.strictAllowlist: true` where the version supports it, and note that it must live in user or managed settings because project settings are ignored for that key.
+`network.allowedDomains` — это список разрешённых доменов для исходящего трафика (egress), оцениваемый по имени хоста, которое заявляет клиент, по умолчанию без инспекции TLS. Широкие записи вроде `github.com` или подстановочные знаки на доменах с пользовательским контентом позволяют организовать утечку данных (эксфильтрацию). Перечислите каждый домен вместе с причиной его присутствия; всё, что невозможно обосновать, является находкой. Рекомендуйте `network.strictAllowlist: true` там, где версия это поддерживает, и отметьте, что этот параметр должен располагаться в пользовательских или управляемых настройках, так как в настройках проекта этот ключ игнорируется.
 
-`credentials` absent is a finding whenever the sandbox is on, because the default read policy covers the whole machine. Propose concrete `files` deny entries for the credential paths this machine actually has, and `envVars` entries for the tokens this project actually uses.
+Отсутствие секции `credentials` является находкой всякий раз, когда песочница включена, поскольку политика чтения по умолчанию охватывает всю машину. Предложите конкретные запрещающие записи `files` для путей к учётным данным, которые реально существуют на этой машине, и записи `envVars` для токенов, которые реально использует этот проект.
 
-`filesystem.allowWrite` should be checked against reality. If the project's own workflows write outside the working directory, sibling repositories, a shared build output, a cache directory, those paths must be listed or the sandbox will break the workflow and push someone toward disabling it. Inspect scripts, `package.json`, and CI configuration to find them. Report each as a required entry.
+`filesystem.allowWrite` нужно сверить с реальностью. Если собственные рабочие процессы проекта пишут за пределы рабочего каталога — в соседние репозитории, общий каталог сборки или каталог кэша — эти пути должны быть перечислены, иначе песочница сломает рабочий процесс и подтолкнёт кого-нибудь к её отключению. Изучите скрипты, `package.json` и конфигурацию CI, чтобы найти такие пути. Укажите каждый из них как обязательную запись.
 
-Keys that project settings cannot set are worth flagging if present in a project file, since they are silently ignored: `defaultMode: "auto"`, `filesystem.disabled`, `credentials` `mask` entries, `network.tlsTerminate`, `network.strictAllowlist`, `allowAppleEvents`.
+Ключи, которые настройки проекта не могут задавать, стоит помечать, если они присутствуют в файле проекта, поскольку они молча игнорируются: `defaultMode: "auto"`, `filesystem.disabled`, записи `mask` в `credentials`, `network.tlsTerminate`, `network.strictAllowlist`, `allowAppleEvents`.
 
-## Phase 5. Scope hygiene
+## Фаза 5. Гигиена областей действия (scope hygiene)
 
-Determine, for every rule that matters, whether it lives in the right file.
+Для каждого значимого правила определите, находится ли оно в правильном файле.
 
-A `deny` on credential reads belongs in user settings, because it should follow the operator to every project rather than being re-declared per repository. A rule specific to this project's toolchain belongs in the tracked `.claude/settings.json`, so the team inherits it. A rule that reflects one person's habits belongs in `.claude/settings.local.json`.
+Правило `deny` на чтение учётных данных относится к пользовательским настройкам, потому что оно должно сопровождать оператора в каждом проекте, а не объявляться заново в каждом репозитории. Правило, специфичное для инструментария этого проекта, относится к отслеживаемому в Git `.claude/settings.json`, чтобы его наследовала вся команда. Правило, отражающее привычки одного человека, относится к `.claude/settings.local.json`.
 
-Flag misplacement in both directions. A credential deny that exists only in this project leaves every other project uncovered. A machine-specific absolute path in a tracked file breaks for everyone else. A blanket grant in user settings is the worst case, since it applies to every repository including untrusted ones.
+Отмечайте неверное размещение в обе стороны. Запрет на чтение учётных данных, существующий только в этом проекте, оставляет незащищёнными все остальные проекты. Абсолютный путь, привязанный к конкретной машине, в отслеживаемом файле сломается у всех остальных. Неограниченное разрешение в пользовательских настройках — худший сценарий, так как оно распространяется на каждый репозиторий, включая недоверенные.
 
-Note whether `settings.local.json` is actually gitignored here, and say so if it is not.
+Проверьте, действительно ли `settings.local.json` здесь добавлен в `.gitignore`, и явно сообщите, если это не так.
 
-## Phase 6. Mode interaction
+## Фаза 6. Взаимодействие с режимами
 
-Determine the effective permission mode: `permissions.defaultMode` in the nearest scope that is allowed to set it, otherwise Manual. Remember that `defaultMode: "auto"` is ignored from project and local settings.
+Определите действующий режим прав доступа: `permissions.defaultMode` в ближайшей области действия, которой разрешено его задавать, иначе — ручной режим (Manual). Помните, что `defaultMode: "auto"` игнорируется в проектных и локальных настройках.
 
-Then evaluate the allow list **against that mode**, because the same list has opposite effects in different modes.
+Затем оцените список `allow` **применительно к этому режиму**, потому что один и тот же список даёт противоположный эффект в разных режимах.
 
-In Manual or `acceptEdits`, an allow rule removes a prompt you would otherwise have answered. Broad grants are the risk.
+В ручном режиме (Manual) или `acceptEdits` правило `allow` убирает запрос подтверждения, на который вы иначе отвечали бы вручную. Риск представляют широкие разрешения.
 
-In auto mode, an allow rule removes the classifier from the decision entirely, since allow, ask, and deny resolve before the classifier runs. Rules such as `Bash(git push:*)`, `Bash(git commit:*)`, or `Bash(gh pr:*)` therefore disable exactly the checks the classifier is best at, including whether a push carries secrets outside the repository. If the project runs in auto mode, list every allow rule that suppresses classifier review and recommend moving it to `ask` or deleting it. Note also which broad grants auto mode drops on entry, so the reader knows which Phase 1 findings are neutralized in that mode and which are not.
+В режиме auto правило `allow` полностью исключает классификатор из принятия решения, поскольку `allow`, `ask` и `deny` срабатывают до запуска классификатора. Поэтому правила вроде `Bash(git push:*)`, `Bash(git commit:*)` или `Bash(gh pr:*)` отключают ровно те проверки, с которыми классификатор справляется лучше всего — включая проверку того, не выносит ли push секреты за пределы репозитория. Если проект работает в режиме auto, перечислите каждое правило `allow`, которое подавляет проверку классификатором, и порекомендуйте перенести его в `ask` или удалить. Также отметьте, какие широкие разрешения режим auto отбрасывает при входе, чтобы читатель понимал, какие находки из Фазы 1 нейтрализованы в этом режиме, а какие — нет.
 
-If hooks are configured, check whether a `PreToolUse` hook exits non-zero to block anything. A hook that inspects the resolved command is a harder boundary than a pattern, and it is worth confirming it catches the interpreter forms found in Phase 1 rather than only the literal command names.
+Если настроены хуки, проверьте, завершается ли хук `PreToolUse` с ненулевым кодом возврата для блокировки каких-либо действий. Хук, проверяющий итоговую команду, является более жёсткой границей, чем шаблон, и стоит убедиться, что он перехватывает формы вызова через интерпретаторы, найденные в Фазе 1, а не только буквальные имена команд.
 
-## Output
+## Формат вывода
 
-Produce, in this order.
+Сформируйте отчёт строго в следующем порядке.
 
-**Posture score out of 100**, with the breakdown visible so the reader can argue with it:
+**Оценка состояния защиты из 100 баллов** с прозрачной разбивкой, чтобы читатель мог поспорить с каждым пунктом:
 
-| Dimension | Points | Basis |
+| Измерение | Баллы | Основание |
 |---|---:|---|
-| No blanket execution grant | 30 | Any arbitrary grant scores 0 here, whatever else is right |
-| Deny coverage on destructive and secret actions | 20 | Presence and robustness against the documented semantics |
-| At least one meaningful `ask` rule | 10 | An empty `ask` array scores 0 |
-| Sandbox enabled and coherently configured | 20 | Off scores 0; on with an unjustified bypass scores partial |
-| Scope hygiene | 10 | Right rule, right file, gitignore correct |
-| Rule population health | 10 | Dead, shadowed, and malformed rules |
+| Отсутствие неограниченных разрешений на выполнение | 30 | Любое разрешение на произвольное выполнение даёт 0 баллов здесь, независимо от всего остального |
+| Покрытие `deny` для разрушительных действий и секретов | 20 | Наличие правил и их устойчивость в рамках задокументированной семантики |
+| Хотя бы одно осмысленное правило `ask` | 10 | Пустой массив `ask` даёт 0 баллов |
+| Песочница включена и согласованно настроена | 20 | Выключена — 0 баллов; включена с необоснованным обходом — частичный балл |
+| Гигиена областей действия | 10 | Правильное правило, правильный файл, корректный `.gitignore` |
+| Состояние набора правил | 10 | Мёртвые, перекрытые и некорректно оформленные правила |
 
-**Ranked findings**, worst first. Each one carries: severity, the file and rule, what an attacker or an accident does with it, the reproduction command, and the fix. No finding without a reproduction step.
+**Ранжированный список находок**, от самых серьёзных к менее серьёзным. Каждая находка содержит: критичность, файл и правило, что с этим может сделать злоумышленник или случайная ошибка, команду для воспроизведения и способ исправления. Ни одной находки без шага воспроизведения.
 
-**A ready-to-apply patch**, as a JSON block per file, showing only what changes and stating which scope it belongs in. Do not apply it.
+**Готовый к применению патч** в виде JSON-блока для каждого файла, показывающий только изменения и указывающий, к какой области действия он относится. Не применяйте патч.
 
-**Not verified**, listing everything you could not confirm: version-dependent behavior, fields whose syntax you could not check, anything requiring the `/sandbox` or `/permissions` panel. Being explicit here is worth more than a complete-looking report.
+**Не проверено** — список всего, что вы не смогли подтвердить: поведение, зависящее от версии, поля, синтаксис которых вы не смогли проверить, всё, что требует просмотра панелей `/sandbox` или `/permissions`. Явно указать это ценнее, чем создать видимость полностью исчерпывающего отчёта.
 
-**One sentence** naming the single change with the highest ratio of risk removed to effort spent.
+**Одно предложение**, называющее единственное изменение с наилучшим соотношением снятого риска к затраченным усилиям.
 
-## Rules for your report
+## Правила составления отчёта
 
-Be specific or say nothing. "Consider tightening permissions" is not a finding; "`Bash(node:*)` in `.claude/settings.local.json` line 412 makes the `Read(**/.env*)` deny in `.claude/settings.json` line 5 bypassable via `node -e 'console.log(require("fs").readFileSync(".env","utf8"))'`" is.
+Будьте конкретны или не пишите ничего. «Рассмотрите возможность ужесточить права доступа» — это не находка; «`Bash(node:*)` в `.claude/settings.local.json`, строка 412, позволяет обойти правило `deny` `Read(**/.env*)` из `.claude/settings.json`, строка 5, с помощью `node -e 'console.log(require("fs").readFileSync(".env","utf8"))'`» — вот это находка.
 
-Do not pad the report to look thorough. If a phase finds nothing, one line saying so is the correct output.
+Не раздувайте отчёт ради видимости основательности. Если фаза ничего не обнаружила, одна строка с констатацией этого — правильный вывод.
 
-Do not recommend `bypassPermissions` or `--dangerously-skip-permissions` as a remedy for prompt fatigue. The sandbox with `autoAllowBashIfSandboxed` is the mechanism that removes prompts while keeping a boundary.
+Не рекомендуйте `bypassPermissions` или `--dangerously-skip-permissions` в качестве лекарства от усталости от запросов подтверждения. Песочница с `autoAllowBashIfSandboxed` — вот механизм, который убирает лишние запросы, сохраняя границу безопасности.
 
-State plainly when a configuration is good. An audit that manufactures findings to justify itself is worse than no audit.
+Прямо говорите, когда конфигурация хороша. Аудит, который выдумывает проблемы ради самооправдания, хуже отсутствия аудита.
 
-# PROMPT ENDS HERE
+# КОНЕЦ ПРОМПТА
 
 ---
 
-## Reading the score
+## Как интерпретировать оценку
 
-A score above 80 with the sandbox off is possible and means the rule list is genuinely disciplined. It also means the boundary depends on that discipline holding for every future rule someone adds.
+Оценка выше 80 при выключенной песочнице возможна и означает, что список правил действительно поддерживается в дисциплине. Она также означает, что граница безопасности держится ровно до тех пор, пока эта дисциплина соблюдается для каждого нового правила, которое кто-либо добавит в будущем.
 
-A score below 40 almost always traces to a single line. Phase 1 usually finds it, and removing it moves the score more than anything else in the report.
+Оценка ниже 40 почти всегда сводится к одной-единственной строке. Фаза 1 обычно находит её, и её удаление поднимает оценку сильнее, чем что-либо ещё в отчёте.
 
-The dimension weights are deliberately lopsided. An arbitrary execution grant zeroes 30 points on its own, because a configuration containing one is not a weaker boundary than a configuration without it: it is not a boundary.
+Веса измерений намеренно перекошены. Одно разрешение на произвольное выполнение обнуляет сразу 30 баллов, потому что конфигурация с ним — это не более слабая граница по сравнению с конфигурацией без него: это вообще не граница.
 
-## Related
+## Связанные инструменты
 
-| Tool | Scope |
+| Инструмент | Область охвата |
 |---|---|
-| `tools/audit-prompt.md` | Whole setup, eight dimensions, memory and skills and agents included |
-| `/security-audit` | Project secrets, injection surface, dependencies |
-| `/security-check` | Fast config check against the threat database |
-| `/fewer-permission-prompts` | Built-in skill that proposes a read-only allowlist from your transcripts |
+| `tools/audit-prompt.md` | Вся настройка целиком: восемь измерений, включая память, скиллы и агентов |
+| `/security-audit` | Секреты проекта, поверхность для инъекций, зависимости |
+| `/security-check` | Быстрая проверка конфигурации по базе угроз |
+| `/fewer-permission-prompts` | Встроенный скилл, предлагающий список `allow` для операций чтения на основе ваших транскриптов |
 
-Run this one after `/fewer-permission-prompts`, not before. That skill adds rules; this prompt tells you whether the rules you now have still form a boundary.
+Запускайте этот промпт после `/fewer-permission-prompts`, а не до него. Тот скилл добавляет правила; этот промпт показывает, образуют ли получившиеся у вас правила реальную границу безопасности.

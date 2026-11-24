@@ -1,59 +1,62 @@
-# Contributor Covenant Code of Conduct
+# Кодекс поведения Contributor Covenant
 
-## Our Pledge
+## Наше обязательство
 
-We as members, contributors, and leaders pledge to make participation in our
-community a harassment-free experience for everyone, regardless of age, body
-size, visible or invisible disability, ethnicity, sex characteristics, gender
-identity and expression, level of experience, education, socio-economic status,
-nationality, personal appearance, race, religion, or sexual identity
-and orientation.
+Мы, как участники, контрибьюторы и руководители сообщества, обязуемся сделать
+участие в нашем сообществе свободным от притеснений и травли для каждого,
+независимо от возраста, телосложения, видимой или невидимой инвалидности,
+этнической принадлежности, половых признаков, гендерной идентичности и
+самовыражения, уровня опыта, образования, социально-экономического статуса,
+национальности, внешности, расы, религии, а также сексуальной идентичности и
+ориентации.
 
-We pledge to act and interact in ways that contribute to an open, welcoming,
-diverse, inclusive, and healthy community.
+Мы обязуемся действовать и взаимодействовать так, чтобы способствовать
+формированию открытого, доброжелательного, разнообразного, инклюзивного и
+здорового сообщества.
 
-## Our Standards
+## Наши стандарты
 
-Examples of behavior that contributes to a positive environment:
+Примеры поведения, способствующего созданию позитивной атмосферы:
 
-* Using welcoming and inclusive language
-* Being respectful of differing viewpoints and experiences
-* Gracefully accepting constructive criticism
-* Focusing on what is best for the community
-* Showing empathy towards other community members
+* Использование доброжелательного и инклюзивного языка
+* Уважительное отношение к различным точкам зрения и опыту
+* Достойное принятие конструктивной критики
+* Фокус на том, что лучше для сообщества
+* Проявление эмпатии к другим участникам сообщества
 
-Examples of unacceptable behavior:
+Примеры неприемлемого поведения:
 
-* The use of sexualized language or imagery and unwelcome sexual attention
-* Trolling, insulting/derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information without explicit permission
-* Other conduct which could reasonably be considered inappropriate
+* Использование сексуализированных выражений или образов, а также нежелательное внимание сексуального характера
+* Троллинг, оскорбительные или уничижительные комментарии, а также личные или политические нападки
+* Публичные или личные домогательства и травля
+* Публикация личной информации других людей без их явного разрешения
+* Иное поведение, которое можно обоснованно считать неподобающим
 
-## Enforcement Responsibilities
+## Обязанности по обеспечению соблюдения
 
-Community leaders are responsible for clarifying and enforcing our standards of
-acceptable behavior and will take appropriate and fair corrective action in
-response to any behavior that they deem inappropriate, threatening, offensive,
-or harmful.
+Руководители сообщества несут ответственность за разъяснение и обеспечение
+соблюдения наших стандартов приемлемого поведения и будут принимать
+соответствующие и справедливые корректирующие меры в ответ на любое поведение,
+которое они сочтут неподобающим, угрожающим, оскорбительным или вредным.
 
-## Scope
+## Область применения
 
-This Code of Conduct applies within all community spaces, and also applies when
-an individual is officially representing the community in public spaces.
+Настоящий Кодекс поведения применяется во всех пространствах сообщества, а также
+в случаях, когда человек официально представляет сообщество в публичном
+пространстве.
 
-## Enforcement
+## Обеспечение соблюдения
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
+О случаях оскорбительного поведения, травли или иных неприемлемых действий можно
+сообщить руководителям сообщества, ответственным за соблюдение Кодекса, по адресу
 [florian.bruniaux@gmail.com](mailto:florian.bruniaux@gmail.com).
 
-All complaints will be reviewed and investigated promptly and fairly.
+Все жалобы будут рассмотрены и расследованы оперативно и справедливо.
 
-## Attribution
+## Указание авторства
 
-This Code of Conduct is adapted from the [Contributor Covenant][homepage],
-version 2.1, available at
+Настоящий Кодекс поведения адаптирован на основе [Contributor Covenant][homepage]
+версии 2.1, доступного по адресу
 [https://www.contributor-covenant.org/version/2/1/code_of_conduct.html][v2.1].
 
 [homepage]: https://www.contributor-covenant.org

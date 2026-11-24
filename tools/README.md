@@ -1,35 +1,35 @@
-# Interactive tools
+# Интерактивные инструменты
 
-Prompts and utilities for Claude Code setup and optimization.
+Промпты и утилиты для настройки и оптимизации Claude Code.
 
-## Contents
+## Содержание
 
-| File | Description | Usage |
+| Файл | Описание | Использование |
 |------|-------------|-------|
-| [audit-prompt.md](./audit-prompt.md) | Comprehensive setup audit with personalized recommendations (8 dimensions, score /100) | `cat audit-prompt.md \| claude` |
-| [permissions-audit-prompt.md](./permissions-audit-prompt.md) | Audit whether your permission rules still form a boundary: blanket execution grants, deny and ask coverage, sandbox posture (6 phases, score /100, fleet sweep included) | `cat permissions-audit-prompt.md \| claude` |
-| [context-audit-prompt.md](./context-audit-prompt.md) | Measure and improve your context architecture | `cat context-audit-prompt.md \| claude` |
-| [spec-completeness-audit.md](./spec-completeness-audit.md) | Audit how well a project is specified for safe agent delegation (5 spec layers, score /100) | `cat spec-completeness-audit.md \| claude` |
-| [audit-cheatsheet-prompt.md](./audit-cheatsheet-prompt.md) | Evaluate whether a project needs a cheatsheet, and audit existing ones | `cat audit-cheatsheet-prompt.md \| claude` |
-| [onboarding-prompt.md](./onboarding-prompt.md) | Personalized guided tour based on your profile | `cat onboarding-prompt.md \| claude` |
-| [mobile-access.md](./mobile-access.md) | Setup guide for mobile access via ttyd + Tailscale | Step-by-step |
+| [audit-prompt.md](./audit-prompt.md) | Комплексный аудит настройки с персонализированными рекомендациями (8 направлений, оценка из 100) | `cat audit-prompt.md \| claude` |
+| [permissions-audit-prompt.md](./permissions-audit-prompt.md) | Аудит того, всё ли ещё ваши правила разрешений образуют защитную границу: широкие разрешения на выполнение, покрытие правил deny и ask, состояние песочницы (sandbox) (6 этапов, оценка из 100, включая массовую проверку проектов) | `cat permissions-audit-prompt.md \| claude` |
+| [context-audit-prompt.md](./context-audit-prompt.md) | Измерение и улучшение архитектуры контекста | `cat context-audit-prompt.md \| claude` |
+| [spec-completeness-audit.md](./spec-completeness-audit.md) | Аудит полноты спецификации проекта для безопасного делегирования задач агенту (5 слоёв спецификации, оценка из 100) | `cat spec-completeness-audit.md \| claude` |
+| [audit-cheatsheet-prompt.md](./audit-cheatsheet-prompt.md) | Оценка необходимости шпаргалки для проекта и аудит уже существующих | `cat audit-cheatsheet-prompt.md \| claude` |
+| [onboarding-prompt.md](./onboarding-prompt.md) | Персонализированный вводный тур с учётом вашего профиля | `cat onboarding-prompt.md \| claude` |
+| [mobile-access.md](./mobile-access.md) | Руководство по настройке мобильного доступа через ttyd + Tailscale | Пошагово |
 
-## Which audit when
+## Какой аудит и когда использовать
 
-| Question | Tool |
+| Вопрос | Инструмент |
 |----------|------|
-| Is my whole setup healthy? | `audit-prompt.md` |
-| Do my permission rules actually gate anything? | `permissions-audit-prompt.md` |
-| Am I wasting context? | `context-audit-prompt.md` |
-| Can I safely delegate work to an agent here? | `spec-completeness-audit.md` |
-| Are there secrets or injection surfaces in this repo? | `/security-audit` (slash command) |
+| Всё ли в порядке со всей моей настройкой? | `audit-prompt.md` |
+| Действительно ли мои правила разрешений что-либо ограничивают? | `permissions-audit-prompt.md` |
+| Не трачу ли я контекст впустую? | `context-audit-prompt.md` |
+| Можно ли здесь безопасно делегировать работу агенту? | `spec-completeness-audit.md` |
+| Есть ли в этом репозитории секреты или поверхности для инъекций? | `/security-audit` (слэш-команда) |
 
-## Quick audit
+## Быстрый аудит
 
-For a fast automated scan, use the script instead:
+Для быстрого автоматического сканирования используйте скрипт:
 
 ```bash
-# Pinned to a reviewed commit: download, read, then run, instead of piping a moving branch into bash
+# Зафиксировано на проверенном коммите: скачайте, прочитайте и только затем запускайте вместо передачи меняющейся ветки напрямую в bash
 AUDIT_SCAN_REF=eab8adc215822f67629b6a0f9366f60a1db9b03c
 curl -fsSL "https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/${AUDIT_SCAN_REF}/examples/scripts/audit-scan.sh" -o audit-scan.sh
 less audit-scan.sh
@@ -38,4 +38,4 @@ bash audit-scan.sh
 
 ---
 
-*Back to [main README](../README.md)*
+*Вернуться к [главному README](../README.md)*

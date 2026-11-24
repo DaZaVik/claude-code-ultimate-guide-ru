@@ -1,68 +1,68 @@
-# Security Policy
+# Политика безопасности
 
-## Scope
+## Область действия
 
-This repository contains **documentation and educational templates** for Claude Code. It does not include executable code that processes user input or runs in production environments.
+Этот репозиторий содержит **документацию и учебные шаблоны** для Claude Code. Он не включает исполняемый код, обрабатывающий пользовательский ввод или работающий в продакшн-средах.
 
-**Security concerns specific to this repository:**
-- Documentation accuracy for security practices
-- Template code quality and security patterns
-- Threat database integrity ([`examples/commands/resources/threat-db.yaml`](./examples/commands/resources/threat-db.yaml))
+**Вопросы безопасности, относящиеся к этому репозиторию:**
+- Точность документации по практикам безопасности
+- Качество кода шаблонов и паттерны безопасности
+- Целостность базы угроз ([`examples/commands/resources/threat-db.yaml`](./examples/commands/resources/threat-db.yaml))
 
-**Out of scope:**
-- Security vulnerabilities in Claude Code CLI itself → Report to [Anthropic](https://github.com/anthropics/claude-code/security)
-- Security issues in MCP servers → Report to respective server maintainers
+**Вне области действия:**
+- Уязвимости безопасности в самом Claude Code CLI → Сообщайте в [Anthropic](https://github.com/anthropics/claude-code/security)
+- Проблемы безопасности в MCP-серверах → Сообщайте мейнтейнерам соответствующих серверов
 
-## Reporting a Security Issue
+## Как сообщить о проблеме безопасности
 
-If you discover a security concern related to this guide (examples: malicious template, incorrect security advice, threat database inaccuracies), please:
+Если вы обнаружили проблему безопасности, связанную с этим руководством (например: вредоносный шаблон, некорректная рекомендация по безопасности, неточности в базе угроз), пожалуйста:
 
-1. **Email**: florian.bruniaux@methode-aristote.fr
-   - Subject: `[SECURITY] Claude Code Guide - Brief Description`
-   - Include: Affected file/section, description, impact assessment
+1. **Электронная почта**: florian.bruniaux@methode-aristote.fr
+   - Тема: `[SECURITY] Claude Code Guide - Brief Description`
+   - Укажите: затронутый файл или раздел, описание и оценку влияния
 
-2. **GitHub Private Disclosure**: Use [Security Advisories](../../security/advisories/new) for sensitive issues
+2. **Приватное раскрытие на GitHub**: используйте [Security Advisories](../../security/advisories/new) для чувствительных проблем
 
-**Response SLA**: We aim to respond within 48 hours and issue fixes within 7 days for critical issues.
+**SLA по времени ответа**: мы стремимся отвечать в течение 48 часов и выпускать исправления в течение 7 дней для критических проблем.
 
-## Security Resources
+## Ресурсы по безопасности
 
-This guide maintains comprehensive security documentation:
+В этом руководстве поддерживается подробная документация по безопасности:
 
-- **[Security Hardening Guide](./guide/security/security-hardening.md):** MCP vetting, injection defense, audit workflows
-- **[Threat Database](./examples/commands/resources/threat-db.yaml):** 18 CVEs, 341 malicious skills
-- **[Security Hooks](./examples/hooks/):** 30 production hooks (bash + PowerShell)
-- **[Security Commands](./examples/skills/):** `/security-check`, `/security-audit`, `/update-threat-db`
+- **[Руководство по усилению безопасности](./guide/security/security-hardening.md):** проверка MCP, защита от инъекций, рабочие процессы аудита
+- **[База угроз](./examples/commands/resources/threat-db.yaml):** 18 CVE, 341 вредоносный скилл
+- **[Хуки безопасности](./examples/hooks/):** 30 продакшн-хуков (bash + PowerShell)
+- **[Команды безопасности](./examples/skills/):** `/security-check`, `/security-audit`, `/update-threat-db`
 
-## Security Maintenance
+## Поддержка безопасности
 
-**Threat Database Updates**: The threat intelligence database is updated based on:
-- CVE announcements and security advisories
-- Community reports of malicious skills/MCP servers
-- Anthropic security bulletins
-- Academic research (e.g., prompt injection papers)
+**Обновления базы угроз**: база данных об угрозах обновляется на основе:
+- Публикаций CVE и бюллетеней безопасности (security advisories)
+- Сообщений сообщества о вредоносных скиллах и MCP-серверах
+- Бюллетеней безопасности Anthropic
+- Академических исследований (например, научных работ о промпт-инъекциях)
 
-**Audit Schedule**:
-- Weekly review of new MCP servers and skills
-- Monthly audit of security documentation accuracy
-- Quarterly full threat database refresh
+**График аудитов**:
+- Еженедельная проверка новых MCP-серверов и скиллов
+- Ежемесячный аудит точности документации по безопасности
+- Ежеквартальное полное обновление базы угроз
 
-**Last Updated**: 2026-02-11 (v3.26.0)
+**Последнее обновление**: 2026-02-11 (v3.26.0)
 
-## Coordinated Disclosure
+## Скоординированное раскрытие уязвимостей
 
-If you're a security researcher and find issues affecting multiple repositories in the Claude Code ecosystem:
+Если вы исследователь безопасности и обнаружили проблемы, затрагивающие несколько репозиториев в экосистеме Claude Code:
 
-1. Email us first (coordinated disclosure preferred)
-2. We'll coordinate with other maintainers if needed
-3. Public disclosure timing: 90 days or after fix, whichever comes first
+1. Сначала напишите нам по электронной почте (предпочтительно скоординированное раскрытие)
+2. При необходимости мы скоординируем действия с другими мейнтейнерами
+3. Сроки публичного раскрытия: 90 дней или после выпуска исправления — в зависимости от того, что наступит раньше
 
-## Acknowledgments
+## Благодарности
 
-We thank security researchers who have contributed to improving this guide's security content through responsible disclosure.
+Мы благодарим исследователей безопасности, которые помогли улучшить материалы этого руководства по безопасности посредством ответственного раскрытия.
 
 ---
 
-**Author**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Fractional Chief AI Officer
+**Автор**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Приглашённый директор по ИИ (Fractional Chief AI Officer)
 
-**Guide License**: [CC BY-SA 4.0](./LICENSE)
+**Лицензия руководства**: [CC BY-SA 4.0](./LICENSE)

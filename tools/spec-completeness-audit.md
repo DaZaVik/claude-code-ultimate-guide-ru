@@ -1,56 +1,56 @@
-# Spec completeness audit for coding agents
+# Аудит полноты спецификации для агентов разработки
 
-> Self-contained prompt that audits how well a codebase is specified for agent delegation.
-> Based on the 5-layer framework from Hamidreza Saghir's "Your coding agent is under-specified".
+> Автономный промпт для аудита того, насколько полно кодовая база специфицирована для делегирования задач агентам.
+> Основан на пятислойном фреймворке из статьи Hamidreza Saghir «Your coding agent is under-specified».
 
-**Use case**: Run on any project before heavy agent delegation to detect specification gaps that will cause silent architectural drift.
+**Сценарий использования**: запускайте на любом проекте перед масштабным делегированием задач агентам, чтобы выявить пробелы в спецификации, которые приведут к незаметному архитектурному дрейфу.
 
-**Time**: ~3–5 min. No changes made without explicit approval.
+**Время**: ~3–5 мин. Никакие изменения не вносятся без явного подтверждения.
 
 ---
 
-## How to use
+## Как использовать
 
 ```bash
 cd your-project-directory
 claude
 ```
 
-Paste the prompt below and press Enter.
+Вставьте промпт ниже и нажмите Enter.
 
 ---
 
-## The prompt
+## Промпт
 
 ````markdown
-# Spec Completeness Audit — v1.0
+# Аудит полноты спецификации — v1.0
 
-You are auditing how well this project is specified for safe agent delegation.
+Вы проводите аудит того, насколько хорошо этот проект специфицирован для безопасного делегирования задач агентам.
 
-The goal: find gaps that will cause an agent to silently fill in architectural,
-lifecycle, and cultural decisions from training priors instead of project intent.
+Цель: найти пробелы, из-за которых агент будет неявно заполнять решения по архитектуре,
+жизненному циклу и инженерной культуре на основе априорных паттернов из обучающих данных вместо замысла проекта.
 
-Do NOT modify any files. Do NOT make changes. Audit and report only.
-
----
-
-## Framework: 5 Specification Layers
-
-Every coding task requires spec across 5 layers. Agents fill missing layers silently.
-
-| Layer | What it covers | Missing → agent fills with |
-|-------|---------------|---------------------------|
-| 1. Behavioral | What the code does (features, endpoints, flows) | Training-data guesses on behavior |
-| 2. Interface | Types, error contracts, invariants, I/O shapes | Optimistic error handling, loose types |
-| 3. Architectural | What NOT to create, module boundaries, reuse constraints | Duplication, broken boundaries |
-| 4. Lifecycle | How code ages, what's deferred and why, maintenance intent | Short-term fixes, band-aids |
-| 5. Cultural | Team conventions, what "good" means here, taste | Average public code quality |
+НЕ изменяйте никакие файлы. НЕ вносите никаких правок. Только аудит и отчёт.
 
 ---
 
-## Phase 1 — Project Inventory (bash)
+## Фреймворк: 5 слоёв спецификации
 
-Run this block. Store the full output for scoring.
+Каждая задача разработки требует спецификации на 5 слоях. Недостающие слои агенты заполняют неявно.
+
+| Слой | Что охватывает | Если отсутствует → агент подставляет |
+|------|----------------|--------------------------------------|
+| 1. Поведенческий | Что делает код (фичи, эндпоинты, сценарии) | Догадки о поведении из обучающих данных |
+| 2. Интерфейсный | Типы, контракты ошибок, инварианты, форматы ввода/вывода | Оптимистичную обработку ошибок, слабую типизацию |
+| 3. Архитектурный | Что НЕ создавать, границы модулей, ограничения переиспользования | Дублирование, нарушение границ |
+| 4. Жизненный цикл | Как код стареет, что отложено и почему, намерения по сопровождению | Временные правки, «костыли» |
+| 5. Культурный | Соглашения команды, что здесь считается «хорошим», инженерный вкус | Усреднённое качество публичного кода |
+
+---
+
+## Фаза 1 — Инвентаризация проекта (bash)
+
+Выполните этот блок. Сохраните полный вывод для расчёта оценки.
 
 ```bash
 bash -c '
@@ -91,18 +91,18 @@ echo "  TypeScript files: $ts_files"
 zod=$(grep -rl "z\.\|zod\|Zod" . --include="*.ts" 2>/dev/null | grep -v node_modules | wc -l | tr -d " ")
 echo "  Zod schemas: $zod files"
 
-# OpenAPI / swagger
+# OpenAPI / Swagger
 for f in openapi.yaml openapi.json swagger.yaml swagger.json api.yaml; do
   [ -f "$f" ] && echo "  ✅ API spec: $f"
 done
 
-# Error handling
+# Обработка ошибок
 error_files=$(grep -rl "catch\|Error\|exception\|throw" . --include="*.ts" --include="*.py" --include="*.rs" 2>/dev/null | grep -v node_modules | wc -l | tr -d " ")
 echo "  Files with error handling: $error_files"
 
 echo ""
 echo "=== ARCHITECTURAL CONSTRAINTS ==="
-# Negative constraints (what NOT to do)
+# Негативные ограничения (чего НЕ делать)
 negatives=0
 for f in CLAUDE.md .claude/CLAUDE.md .claude/rules/*.md; do
   [ -f "$f" ] && count=$(grep -ci "don.t\|avoid\|never\|do not\|forbidden\|prohibited\|not allowed\|no \(mocks\|stubs\|placeholders\)\|pas de\|jamais\|éviter\|ne pas\|interdit" "$f" 2>/dev/null || echo 0)
@@ -110,55 +110,55 @@ for f in CLAUDE.md .claude/CLAUDE.md .claude/rules/*.md; do
 done
 echo "  Negative constraints found: $negatives"
 
-# ADR (architecture decision records)
+# ADR (записи об архитектурных решениях)
 adr_count=0
 for d in docs/adr docs/ADR .adr adr; do
   [ -d "$d" ] && adr_count=$(find "$d" -name "*.md" 2>/dev/null | wc -l | tr -d " ") && echo "  ✅ ADR directory: $d ($adr_count records)"
 done
 [ $adr_count -eq 0 ] && echo "  ❌ No ADR directory"
 
-# Module boundary docs
+# Документация границ модулей
 boundary=$(grep -ril "boundary\|module\|layer\|package\|service\|domain" . --include="*.md" 2>/dev/null | grep -v node_modules | grep -v ".git" | head -5)
 [ -n "$boundary" ] && echo "  Module boundary docs:" && echo "$boundary" | sed "s/^/    /" || echo "  ❌ No module boundary documentation"
 
 echo ""
 echo "=== LIFECYCLE SPEC ==="
-# Technical debt tracking
+# Отслеживание технического долга
 td=$(grep -rl "TODO\|FIXME\|HACK\|DEBT\|technical.debt" . --include="*.ts" --include="*.py" --include="*.rs" --include="*.md" 2>/dev/null | grep -v node_modules | wc -l | tr -d " ")
 echo "  Files with TODO/FIXME/HACK/DEBT: $td"
 
-# Changelog
+# Журнал изменений (Changelog)
 for f in CHANGELOG.md CHANGELOG.rst docs/CHANGELOG.md; do
   [ -f "$f" ] && wc -l "$f" | awk "{print \"  ✅ Changelog: \" \$1 \" lines\"}"
 done
 
-# Migration guides
+# Руководства по миграции
 migrations=$(find . -name "*.md" 2>/dev/null | xargs grep -l "migration\|migrate\|upgrade\|breaking" 2>/dev/null | grep -v node_modules | wc -l | tr -d " ")
 echo "  Migration/upgrade docs: $migrations files"
 
 echo ""
 echo "=== CULTURAL SPEC ==="
-# Linters
+# Линтеры
 for f in .eslintrc* .eslintrc.json .eslintrc.js eslint.config.* .pylintrc pyproject.toml .rubocop.yml; do
   [ -f "$f" ] && echo "  ✅ Linter config: $f"
 done
 
-# Formatting
+# Форматирование
 for f in .prettierrc* biome.json .editorconfig rustfmt.toml; do
   [ -f "$f" ] && echo "  ✅ Formatter: $f"
 done
 
-# Naming / convention docs
+# Документация по именованию и соглашениям
 naming=$(grep -rl "naming\|convention\|camelCase\|snake_case\|kebab" . --include="*.md" 2>/dev/null | grep -v node_modules | head -3)
 [ -n "$naming" ] && echo "  Convention docs: $naming" || echo "  ❌ No naming/convention documentation"
 
 echo ""
 echo "=== REUSE CONSTRAINTS ==="
-# Does the agent know what already exists?
+# Знает ли агент, что уже существует?
 reuse=$(grep -ril "already exists\|use existing\|reuse\|don.t create\|see \|refer to" CLAUDE.md .claude/CLAUDE.md .claude/rules/*.md 2>/dev/null | wc -l | tr -d " ")
 echo "  Reuse/existing-code references in specs: $reuse"
 
-# Map of what exists (README sections, module index)
+# Карта существующего кода (разделы README, индекс модулей)
 index_quality=0
 [ -f README.md ] && index_quality=$(wc -l < README.md | tr -d " ")
 echo "  README lines: $index_quality"
@@ -167,199 +167,199 @@ echo "  README lines: $index_quality"
 
 ---
 
-## Phase 2 — Layer-by-Layer Scoring
+## Фаза 2 — Послойная оценка
 
-Score each layer. Use Phase 1 output. Read key files where needed.
+Оцените каждый слой. Используйте вывод Фазы 1. При необходимости прочитайте ключевые файлы.
 
-### Layer 1 — Behavioral Spec (15 pts)
+### Слой 1 — Поведенческая спецификация (15 баллов)
 
-**What to check**: Can an agent understand what this project should do — features, user flows, acceptance criteria — without guessing?
+**Что проверять**: может ли агент понять, что должен делать этот проект — фичи, пользовательские сценарии, критерии приёмки — без догадок?
 
-Read README.md top-level section if it exists.
+Прочитайте вводный раздел README.md, если он существует.
 
-Scoring:
-- README with purpose + key features: 5 pts (3 if minimal, 0 if absent)
-- CLAUDE.md covers what the project does: 3 pts
-- Acceptance criteria or feature contracts exist (tests-as-spec, test descriptions, feature files): 4 pts
-- Task/issue tracking linked or summarized somewhere the agent can see: 3 pts
+Критерии оценки:
+- В README описаны назначение и ключевые фичи: 5 баллов (3, если минимально; 0, если отсутствует)
+- В CLAUDE.md описано, что делает проект: 3 балла
+- Есть критерии приёмки или контракты фич (тесты как спецификация, описания тестов, feature-файлы): 4 балла
+- Ссылки на трекер задач/issues или их сводка доступны там, где агент может их увидеть: 3 балла
 
-### Layer 2 — Interface Spec (20 pts)
+### Слой 2 — Интерфейсная спецификация (20 баллов)
 
-**What to check**: Are input/output shapes, error contracts, and invariants machine-readable or documented?
+**Что проверять**: представлены ли форматы ввода/вывода, контракты ошибок и инварианты в машиночитаемом виде или в документации?
 
 ```bash
-# Sample 3 key files for type coverage quality
+# Выбрать 3 ключевых файла для оценки качества типизации
 find . -name "*.ts" -o -name "*.tsx" 2>/dev/null | grep -v node_modules | grep -v ".git" | \
   shuf 2>/dev/null | head -3 | xargs grep -l "interface\|type\|z\.\|Schema" 2>/dev/null | head -3
 ```
 
-Read 1-2 of the sampled files briefly to assess typing quality.
+Бегло прочитайте 1–2 из выбранных файлов, чтобы оценить качество типизации.
 
-Scoring:
-- TypeScript strict mode OR typed Python (mypy/pyright) OR Rust (automatic): 6 pts (3 if partial)
-- Zod/Pydantic/Joi or equivalent schema validation at boundaries: 4 pts
-- Error handling is explicit with typed errors (not just generic catch): 4 pts
-- API contracts documented (OpenAPI, tRPC, GraphQL schema, Protobuf): 4 pts
-- Invariants documented (pre/post conditions, state transitions): 2 pts
+Критерии оценки:
+- Строгий режим TypeScript ИЛИ типизированный Python (mypy/pyright) ИЛИ Rust (автоматически): 6 баллов (3 при частичном покрытии)
+- Валидация схем на границах с помощью Zod/Pydantic/Joi или аналога: 4 балла
+- Обработка ошибок явная, с типизированными ошибками (а не просто общий catch): 4 балла
+- Контракты API задокументированы (OpenAPI, tRPC, схема GraphQL, Protobuf): 4 балла
+- Инварианты задокументированы (предусловия/постусловия, переходы состояний): 2 балла
 
-### Layer 3 — Architectural Spec (30 pts)
+### Слой 3 — Архитектурная спецификация (30 баллов)
 
-**This is the most commonly missing layer. Weight reflects that.**
+**Это слой, который отсутствует чаще всего. Его вес отражает эту значимость.**
 
-**What to check**: Does the agent know what NOT to create, how things fit together, and what already exists?
+**Что проверять**: знает ли агент, что НЕ нужно создавать, как части системы связаны между собой и что уже существует в проекте?
 
-Read CLAUDE.md architectural sections if present. Check for ADRs.
+Прочитайте архитектурные разделы CLAUDE.md, если они есть. Проверьте наличие ADR.
 
 ```bash
-# Check CLAUDE.md for architectural content depth
+# Проверить глубину архитектурного описания в CLAUDE.md
 [ -f CLAUDE.md ] && grep -n "not\|avoid\|don.t\|never\|boundary\|module\|reuse\|exist\|pattern\|structure" CLAUDE.md | head -20
 ```
 
-Scoring:
-- CLAUDE.md has explicit negative constraints ("never create X", "don't introduce Y", "reuse Z"): 8 pts (4 if implicit/weak, 0 if absent)
-- Module/service boundaries are documented: 6 pts
-- "What already exists" is surfaced to the agent (index, map, reference.yaml, or similar): 6 pts
-- ADR or equivalent architectural decision log: 5 pts
-- Patterns the codebase uses are named and explained: 5 pts
+Критерии оценки:
+- В CLAUDE.md есть явные негативные ограничения («никогда не создавай X», «не добавляй Y», «переиспользуй Z»): 8 баллов (4, если неявные/слабые; 0, если отсутствуют)
+- Границы модулей/сервисов задокументированы: 6 баллов
+- Информация о том, «что уже существует», явно доступна агенту (индекс, карта, reference.yaml или аналог): 6 баллов
+- Есть ADR или аналогичный журнал архитектурных решений: 5 баллов
+- Используемые в кодовой базе паттерны названы и объяснены: 5 баллов
 
-### Layer 4 — Lifecycle Spec (20 pts)
+### Слой 4 — Спецификация жизненного цикла (20 баллов)
 
-**What to check**: Does the agent know what's intentionally deferred, what's debt, and what future changes to anticipate?
+**Что проверять**: знает ли агент, что отложено намеренно, что является техническим долгом и какие будущие изменения следует учитывать?
 
-Scoring:
-- CHANGELOG.md exists and is maintained: 4 pts
-- TODO/FIXME/DEBT markers are meaningful (have context, not just "fix later"): 4 pts (check a sample)
-- Breaking change policy documented: 3 pts
-- Known technical debt is documented with rationale: 5 pts
-- Planned changes or roadmap visible to the agent: 4 pts
+Критерии оценки:
+- CHANGELOG.md существует и поддерживается в актуальном состоянии: 4 балла
+- Маркеры TODO/FIXME/DEBT содержательны (содержат контекст, а не просто «поправить потом»): 4 балла (проверьте выборку)
+- Задокументирована политика критических (breaking) изменений: 3 балла
+- Известный технический долг задокументирован с обоснованием: 5 баллов
+- Планируемые изменения или дорожная карта (roadmap) видны агенту: 4 балла
 
-### Layer 5 — Cultural Spec (15 pts)
+### Слой 5 — Культурная спецификация (15 баллов)
 
-**What to check**: Does the agent know what "good" looks like here, specifically for this codebase?
+**Что проверять**: знает ли агент, как выглядит «хороший» код именно в этой кодовой базе?
 
-Scoring:
-- Linter config enforces code style: 3 pts
-- Formatter config enforces formatting: 2 pts
-- Naming conventions explicitly documented: 3 pts
-- Code review criteria or quality bar documented: 3 pts
-- Examples of "good" code referenced or present: 2 pts
-- Prohibited patterns encoded (in linter or CLAUDE.md): 2 pts
-
----
-
-## Phase 3 — Gap-Fill Risk Assessment
-
-For each layer below 60% score, estimate what an agent will silently fill in.
-
-```
-Layer X (N/max pts) — RISK: [low/medium/high/critical]
-Silent fills: [list 2-3 specific decisions the agent will make from training priors]
-Most dangerous: [the one most likely to cause irreversible architectural drift]
-```
-
-Concrete examples:
-- Missing L3 + unfamiliar codebase = agent creates a new auth module instead of finding the existing one
-- Missing L2 error contracts = agent writes optimistic error handling, returns 200 on partial failure
-- Missing L4 lifecycle = agent "fixes" intentional shortcuts, breaking the known-debt contract
-- Missing L5 culture = agent uses its most common training pattern, not yours
+Критерии оценки:
+- Конфигурация линтера обеспечивает соблюдение стиля кода: 3 балла
+- Конфигурация форматтера обеспечивает соблюдение форматирования: 2 балла
+- Соглашения об именовании явно задокументированы: 3 балла
+- Критерии код-ревью или планка качества задокументированы: 3 балла
+- Присутствуют или указаны ссылки на примеры «хорошего» кода: 2 балла
+- Запрещённые паттерны зафиксированы (в линтере или в CLAUDE.md): 2 балла
 
 ---
 
-## Phase 4 — Unified Report
+## Фаза 3 — Оценка риска неявного заполнения пробелов
 
-### Executive Summary
-
-```
-Total Score: X/100
-Risk Tier: Safe (80+) | Supervised (60-79) | Risky (40-59) | Unsafe (<40)
-
-Gap-Fill Risk: [which layers will generate the most dangerous silent decisions]
-Top 3 Highest-ROI Fixes: [sorted by: impact × time to implement]
-```
-
-### Layer Scorecard
-
-| Layer | Name | Score | Max | Risk | Key Gap |
-|-------|------|-------|-----|------|---------|
-| 1 | Behavioral | X | 15 | 🟢/🟡/🔴 | one line |
-| 2 | Interface | X | 20 | 🟢/🟡/🔴 | one line |
-| 3 | Architectural | X | 30 | 🟢/🟡/🔴 | one line |
-| 4 | Lifecycle | X | 20 | 🟢/🟡/🔴 | one line |
-| 5 | Cultural | X | 15 | 🟢/🟡/🔴 | one line |
-| | **TOTAL** | **X** | **100** | | |
-
-Risk: 🟢 ≥80% | 🟡 50–79% | 🔴 <50%
-
-### Detailed Findings
-
-For each 🔴 and 🟡 gap:
+Для каждого слоя с оценкой ниже 60% определите, что именно агент подставит неявно.
 
 ```
-[Layer N — Name]
-Gap: what is missing
-Silent fill: what the agent will invent to fill it
-Fix: specific file to create or section to add (with example content)
-Effort: <30min / 1h / half-day
+Слой X (N/макс. баллов) — РИСК: [низкий/средний/высокий/критический]
+Неявные подстановки: [перечислите 2–3 конкретных решения, которые агент примет из обучающих данных]
+Наиболее опасное: [решение с наибольшим риском необратимого архитектурного дрейфа]
 ```
 
-### Delegation Verdict
-
-Based on total score, state explicitly:
-
-- **Score ≥80**: Safe for broad delegation. Document remaining gaps in CLAUDE.md before each task.
-- **Score 60–79**: Delegate with constraints. Specify architectural layer per prompt. Review every commit.
-- **Score 40–59**: High-supervision mode. Define L3 before each delegation. Use plan-mode + review agent.
-- **Score <40**: Do not delegate architectural work. Code tasks only with exhaustive per-task specs.
+Конкретные примеры:
+- Отсутствует Слой 3 + незнакомая кодовая база = агент создаёт новый модуль аутентификации вместо поиска существующего
+- Отсутствуют контракты ошибок Слоя 2 = агент пишет оптимистичную обработку ошибок, возвращает 200 при частичном сбое
+- Отсутствует жизненный цикл Слоя 4 = агент «чинит» намеренные упрощения, нарушая договорённость об известном техдолге
+- Отсутствует культура Слоя 5 = агент использует самый частый паттерн из обучающих данных, а не ваш
 
 ---
 
-## Phase 5 — Quick Wins
+## Фаза 4 — Сводный отчёт
 
-List the 3 highest-ROI improvements, each with:
+### Краткое резюме
 
-1. Exact file to create or modify
-2. Minimal template to add right now
-3. Estimated effort
+```
+Итоговая оценка: X/100
+Уровень риска: Безопасно (80+) | Под контролем (60–79) | Рискованно (40–59) | Небезопасно (<40)
 
-Then ask:
+Риск заполнения пробелов: [какие слои будут порождать наиболее опасные неявные решения]
+Топ-3 исправления с максимальным ROI: [отсортированы по: влияние × время реализации]
+```
 
-"Implement these quick wins?
-- **yes** → implement all three
-- **1, 3** → specific items
-- **none** → keep report, no changes"
+### Таблица оценок по слоям
 
-Wait for explicit user response before taking any action.
+| Слой | Название | Баллы | Макс. | Риск | Ключевой пробел |
+|------|----------|-------|-------|------|-----------------|
+| 1 | Поведенческий | X | 15 | 🟢/🟡/🔴 | одна строка |
+| 2 | Интерфейсный | X | 20 | 🟢/🟡/🔴 | одна строка |
+| 3 | Архитектурный | X | 30 | 🟢/🟡/🔴 | одна строка |
+| 4 | Жизненный цикл | X | 20 | 🟢/🟡/🔴 | одна строка |
+| 5 | Культурный | X | 15 | 🟢/🟡/🔴 | одна строка |
+| | **ИТОГО** | **X** | **100** | | |
+
+Риск: 🟢 ≥80% | 🟡 50–79% | 🔴 <50%
+
+### Подробные находки
+
+Для каждого пробела уровня 🔴 и 🟡:
+
+```
+[Слой N — Название]
+Пробел: чего не хватает
+Неявная подстановка: что агент придумает, чтобы закрыть этот пробел
+Исправление: конкретный файл для создания или раздел для добавления (с примером содержимого)
+Трудозатраты: <30 мин / 1 ч / полдня
+```
+
+### Вердикт по делегированию
+
+На основе итоговой оценки укажите явно:
+
+- **Оценка ≥80**: безопасно для широкого делегирования. Документируйте оставшиеся пробелы в CLAUDE.md перед каждой задачей.
+- **Оценка 60–79**: делегируйте с ограничениями. Задавайте архитектурный слой в каждом промпте. Проводите ревью каждого коммита.
+- **Оценка 40–59**: режим усиленного контроля. Определяйте Слой 3 перед каждым делегированием. Используйте plan-mode + агента-ревьюера.
+- **Оценка <40**: не делегируйте архитектурные задачи. Только задачи по написанию кода с исчерпывающими спецификациями на каждую задачу.
+
+---
+
+## Фаза 5 — Быстрые улучшения (Quick Wins)
+
+Перечислите 3 улучшения с максимальным ROI, для каждого укажите:
+
+1. Точный файл для создания или изменения
+2. Минимальный шаблон, который можно добавить прямо сейчас
+3. Оценку трудозатрат
+
+Затем спросите:
+
+«Внедрить эти быстрые улучшения?
+- **yes** → внедрить все три
+- **1, 3** → конкретные пункты
+- **none** → оставить только отчёт, без изменений»
+
+Дождитесь явного ответа пользователя, прежде чем предпринимать какие-либо действия.
 ````
 
 ---
 
-## Understanding results
+## Интерпретация результатов
 
-### Risk tiers
+### Уровни риска
 
-| Score | Tier | Agent delegation posture |
-|-------|------|--------------------------|
-| 80–100 | Safe | Broad delegation OK. Brief architectural reminder per task. |
-| 60–79 | Supervised | Delegate with explicit L3 constraints per task. Review every commit. |
-| 40–59 | Risky | Plan-mode + reviewer agent. Specify arch before each session. |
-| <40 | Unsafe | Code tasks only, never architectural. Exhaust per-task specs. |
+| Баллы | Уровень | Подход к делегированию агенту |
+|-------|---------|-------------------------------|
+| 80–100 | Безопасно | Широкое делегирование допустимо. Краткое архитектурное напоминание для каждой задачи. |
+| 60–79 | Под контролем | Делегировать с явными ограничениями Слоя 3 для каждой задачи. Проводить ревью каждого коммита. |
+| 40–59 | Рискованно | Plan-mode + агент-ревьюер. Задавать архитектуру перед каждой сессией. |
+| <40 | Небезопасно | Только задачи по коду, никогда — архитектурные. Исчерпывающие спецификации на каждую задачу. |
 
-### The layer that matters most
+### Слой, который важнее всего
 
-**Layer 3 (Architectural, 30 pts)** is weighted highest because it's both the most commonly missing and the hardest to detect when wrong. An agent that gets L1 right but fails L3 writes code that works today and rots next month. No test catches it.
+**Слой 3 (Архитектурный, 30 баллов)** имеет наибольший вес, потому что он одновременно отсутствует чаще всего и сложнее всего выявляется при ошибках. Агент, который верно понял Слой 1, но провалил Слой 3, пишет код, который работает сегодня и начинает разваливаться в следующем месяце. Ни один тест этого не поймает.
 
-### What "Safe" means
+### Что означает «Безопасно»
 
-A project scoring 80+ still requires layer-specific prompt augmentation for each task. "Safe" means the agent has enough context to avoid the worst silent fills — not that you can delegate and walk away.
-
----
-
-## Related
-
-- [`tools/audit-prompt.md`](audit-prompt.md) — Claude Code setup audit (security, rules, memory, MCP)
-- [`tools/context-audit-prompt.md`](context-audit-prompt.md) — token budget and context engineering
-- Source: Hamidreza Saghir, "Your coding agent is under-specified" (May 2026)
+Проект с оценкой 80+ всё равно требует дополнения промпта спецификой нужных слоёв под каждую задачу. «Безопасно» означает, что у агента достаточно контекста, чтобы избежать самых опасных неявных подстановок, — а не то, что задачу можно делегировать и не возвращаться к ней.
 
 ---
 
-*Version 1.0 — spec-completeness-audit*
+## Связанные материалы
+
+- [`tools/audit-prompt.md`](audit-prompt.md) — аудит настройки Claude Code (безопасность, правила, память, MCP)
+- [`tools/context-audit-prompt.md`](context-audit-prompt.md) — бюджет токенов и инженерия контекста
+- Источник: Hamidreza Saghir, «Your coding agent is under-specified» (май 2026)
+
+---
+
+*Версия 1.0 — spec-completeness-audit*

@@ -1,107 +1,107 @@
-# Audit your Claude Code setup
+# Аудит вашей настройки Claude Code
 
-> A self-contained prompt that audits your Claude Code configuration — project memory, rules hygiene, skills, agents/commands, security, MCP, workflow commands, and freshness — in one pass.
+> Автономный промпт, который за один проход проводит аудит вашей конфигурации Claude Code — памяти проекта, гигиены правил, скиллов, агентов/команд, безопасности, MCP, команд рабочих процессов и актуальности.
 
-**Author**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Fractional Chief AI Officer
+**Автор**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Приглашённый директор по ИИ (Fractional Chief AI Officer)
 
-**Reference**: [The Ultimate Claude Code Guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md)
+**Источник**: [Полное руководство по Claude Code (The Ultimate Claude Code Guide)](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/ultimate-guide.md)
 
 ---
 
-## 1. What this does
+## 1. Что делает этот промпт
 
-This prompt turns Claude into an **audit orchestrator** across 8 weighted dimensions (100 pts total). It runs a fast bash inventory, then delegates each domain to a specialized skill or command if one is installed, falling back to inline checks when not.
+Этот промпт превращает Claude в **оркестратор аудита** по 8 взвешенным измерениям (всего 100 баллов). Он выполняет быструю инвентаризацию через bash, а затем делегирует каждую область специализированному скиллу или команде, если они установлены, либо переключается на встроенные проверки в резервном режиме (фолбэк).
 
-| What it audits | How |
+| Что проверяется | Как |
 |---|---|
-| Memory & Context (CLAUDE.md, rules, token budget) | Delegates to `/token-audit` if installed, otherwise bash estimate |
-| Rules Hygiene (`.claude/rules/`, `paths:` validity) | Delegates to `/eval-rules` if installed, otherwise bash scan |
-| Skills Quality (frontmatter, effort, allowed-tools) | Delegates to `/eval-skills` if installed, otherwise quick check |
-| Agents/Commands Quality (16 criteria, grades A-F) | Delegates to `/audit-agents-skills` if installed, otherwise check |
-| Security Posture (permissions, hooks, sandbox) | Delegates to `/security-check` if installed, otherwise bash check |
-| MCP Ecosystem (servers, DB risk, version safety) | Inline bash (no dedicated skill needed) |
-| Workflow Commands (/investigate, /qa, /canary…) | Inline bash scan |
-| Freshness & Best Practices (stale refs, cache bugs) | Inline bash + pattern checks |
+| Память и контекст (CLAUDE.md, правила, бюджет токенов) | Делегирует `/token-audit`, если установлен, иначе оценка через bash |
+| Гигиена правил (`.claude/rules/`, валидность `paths:`) | Делегирует `/eval-rules`, если установлен, иначе сканирование через bash |
+| Качество скиллов (frontmatter, effort, allowed-tools) | Делегирует `/eval-skills`, если установлен, иначе быстрая проверка |
+| Качество агентов/команд (16 критериев, оценки A-F) | Делегирует `/audit-agents-skills`, если установлен, иначе базовая проверка |
+| Состояние безопасности (разрешения, хуки, песочница) | Делегирует `/security-check`, если установлен, иначе проверка через bash |
+| Экосистема MCP (серверы, риски БД, безопасность версий) | Встроенный bash (отдельный скилл не требуется) |
+| Команды рабочих процессов (/investigate, /qa, /canary…) | Встроенное сканирование через bash |
+| Актуальность и лучшие практики (устаревшие ссылки, баги кэша) | Встроенный bash + проверка паттернов |
 
-**What this does NOT do**: replace the deep-dive tools it delegates to. Use `/security-audit`, `/token-audit`, `/eval-rules` directly when you want full detail on a specific dimension.
+**Чего он НЕ делает**: не заменяет глубокие инструменты анализа, которым делегирует задачи. Используйте `/security-audit`, `/token-audit`, `/eval-rules` напрямую, когда вам нужна полная детализация по конкретному измерению.
 
-**Time**: ~5-8 min if all audit skills are installed, ~3-4 min in fallback mode.
+**Время**: ~5–8 мин, если установлены все скиллы аудита, и ~3–4 мин в резервном режиме.
 
-**Important**: Claude will NOT make any changes without your explicit approval.
+**Важно**: Claude НЕ будет вносить никаких изменений без вашего явного одобрения.
 
 ---
 
-## 2. Who this is for
+## 2. Для кого это предназначено
 
-| Level | What You'll Get |
+| Уровень | Что вы получите |
 |-------|-----------------|
-| **Beginner** | Discover what you're missing and get starter templates |
-| **Intermediate** | Identify optimization opportunities and advanced patterns |
-| **Power User** | Validate your setup and find edge cases to polish |
+| **Начинающий** | Узнаете, чего вам не хватает, и получите стартовые шаблоны |
+| **Средний** | Выявите возможности для оптимизации и продвинутые паттерны |
+| **Продвинутый пользователь** | Проверите свою конфигурацию и найдёте крайние случаи для доработки |
 
-**Prerequisites**:
-- Claude Code installed and working
-- A project directory to analyze (or just global config)
-- Bash shell (native on macOS/Linux, WSL on Windows)
+**Предварительные требования**:
+- Установленный и работающий Claude Code
+- Директория проекта для анализа (или только глобальная конфигурация)
+- Оболочка Bash (нативная в macOS/Linux, WSL в Windows)
 
-**Optional** (richer results): `/token-audit`, `/eval-rules`, `/eval-skills`, `/audit-agents-skills`, `/security-check` installed. See Section 8 for install commands.
+**Опционально** (для более детальных результатов): установленные `/token-audit`, `/eval-rules`, `/eval-skills`, `/audit-agents-skills`, `/security-check`. Команды установки см. в разделе 8.
 
 ---
 
-## 3. How to use it
+## 3. Как использовать
 
-### Step 1: Copy the prompt
+### Шаг 1: Скопируйте промпт
 
-Copy everything inside the code block in [Section 4](#4-the-prompt) below.
+Скопируйте всё содержимое внутри блока кода в [разделе 4](#4-the-prompt) ниже.
 
-### Step 2: Run Claude Code
+### Шаг 2: Запустите Claude Code
 
 ```bash
 cd your-project-directory
 claude
 ```
 
-### Step 3: Paste and execute
+### Шаг 3: Вставьте и выполните
 
-Paste the prompt and press Enter. To also audit your global `~/.claude/` config, append `--include-global` after the paste.
+Вставьте промпт и нажмите Enter. Чтобы также провести аудит глобальной конфигурации `~/.claude/`, добавьте `--include-global` после вставленного текста.
 
-### Step 4: Review results
+### Шаг 4: Просмотрите результаты
 
-Claude presents the 8-dimension scorecard and asks for validation before making any changes.
+Claude представит сводную таблицу оценок по 8 измерениям и запросит подтверждение перед внесением каких-либо изменений.
 
-### Platform note
+### Примечание по платформам
 
-| Platform | Global Config Path |
+| Платформа | Путь к глобальной конфигурации |
 |----------|-------------------|
 | **macOS/Linux** | `~/.claude/` |
 | **Windows** | `%USERPROFILE%\.claude\` |
 
 ---
 
-## 4. The prompt
+## 4. Промпт
 
 ````markdown
-# Audit My Claude Code Setup — v5.0
+# Аудит моей настройки Claude Code — v5.0
 
-## Scope Detection
+## Определение области проверки
 
-Check if the user appended `--include-global` to this prompt.
-- **Default (project only)**: audit `.` + `.claude/` in the current directory.
-- **With `--include-global`**: also audit `~/.claude/` and `~/.claude.json`.
+Проверь, добавил ли пользователь флаг `--include-global` к этому промпту.
+- **По умолчанию (только проект)**: проверяй `.` + `.claude/` в текущей директории.
+- **С флагом `--include-global`**: также проверяй `~/.claude/` и `~/.claude.json`.
 
-Set SCOPE accordingly. All bash blocks below note which paths apply per scope.
+Установи SCOPE соответствующим образом. Во всех bash-блоках ниже указано, какие пути применяются в зависимости от области проверки.
 
-## Instructions
+## Инструкции
 
-Do NOT modify any files. Do NOT make any changes. Audit and report only.
+НЕ изменяй никакие файлы. НЕ вноси никаких правок. Только аудит и отчёт.
 
-Use efficient bash commands for discovery. Only read file content when needed for scoring.
+Используй эффективные bash-команды для первичного сбора данных. Читай содержимое файлов только тогда, когда это необходимо для выставления оценки.
 
 ---
 
-## Phase 1 — Inventory (30 seconds, bash-only)
+## Фаза 1 — Инвентаризация (30 секунд, только bash)
 
-Run this single block to gather all structural data at once:
+Выполни этот единый блок, чтобы собрать все структурные данные за один раз:
 
 ```bash
 bash -c '
@@ -192,25 +192,25 @@ grep -rl "disableSkillShellExecution\|--resume" .claude/ ~/.claude/ 2>/dev/null 
 ' "$@"
 ```
 
-Store this full output. Use it for all dimension scoring below.
+Сохрани весь этот вывод. Используй его для оценки всех измерений ниже.
 
 ---
 
-## Phase 2 — Dimension Audit
+## Фаза 2 — Аудит по измерениям
 
-Score each dimension. For dimensions with a delegated skill, check if that skill is available (per Phase 1 output). If ✅: invoke the skill and use its output for scoring. If ❌: run the inline fallback bash and apply the simplified heuristic.
+Оцени каждое измерение. Для измерений с делегируемым скиллом проверь, доступен ли этот скилл (по выводу фазы 1). Если ✅: вызови скилл и используй его вывод для выставления оценки. Если ❌: выполни встроенный резервный bash-скрипт и примени упрощённую эвристику.
 
-### Dimension 1 — Memory & Context (20 pts)
+### Измерение 1 — Память и контекст (20 баллов)
 
-**Full audit** (if `/token-audit` is available):
-Invoke: `/token-audit`
-Use the Token Audit output:
-- Fixed context <20K tokens → 18-20 pts
-- 20-40K tokens → 12-17 pts
-- 40-60K tokens → 6-11 pts
-- >60K tokens → 0-5 pts. Deduct 2 pts if CLAUDE.md is missing, 3 pts if global CLAUDE.md is missing.
+**Полный аудит** (если доступен `/token-audit`):
+Вызови: `/token-audit`
+Используй вывод Token Audit:
+- Фиксированный контекст <20K токенов → 18–20 баллов
+- 20–40K токенов → 12–17 баллов
+- 40–60K токенов → 6–11 баллов
+- >60K токенов → 0–5 баллов. Вычти 2 балла, если отсутствует CLAUDE.md, и 3 балла, если отсутствует глобальный CLAUDE.md.
 
-**Fallback** (if `/token-audit` is not installed):
+**Резервный режим** (если `/token-audit` не установлен):
 
 ```bash
 GLOBAL=$(cat ~/.claude/CLAUDE.md ~/.claude/*.md 2>/dev/null | wc -c || echo 0)
@@ -220,19 +220,19 @@ TOTAL=$(( (GLOBAL + PROJECT + RULES) / 4 + 7500 ))
 echo "Estimated fixed context: ~$TOTAL tokens (~$(( TOTAL * 100 / 200000 ))% of 200K window)"
 ```
 
-Fallback scoring (max 14 pts):
-- Global CLAUDE.md exists and non-empty: 3 pts
-- Project CLAUDE.md exists: 3 pts
-- Rules count reasonable (<15 files): 2 pts
-- Token estimate <20K: 6 pts | 20-40K: 3 pts | >40K: 0 pts
+Оценка в резервном режиме (максимум 14 баллов):
+- Глобальный CLAUDE.md существует и не пуст: 3 балла
+- Проектный CLAUDE.md существует: 3 балла
+- Разумное количество правил (<15 файлов): 2 балла
+- Оценка токенов <20K: 6 баллов | 20–40K: 3 балла | >40K: 0 баллов
 
-### Dimension 2 — Rules Hygiene (10 pts)
+### Измерение 2 — Гигиена правил (10 баллов)
 
-**Full audit** (if `/eval-rules` is available):
-Invoke: `/eval-rules`
-Take the average score across all rules files (12 pts each). Map to 10 pts proportionally.
+**Полный аудит** (если доступен `/eval-rules`):
+Вызови: `/eval-rules`
+Возьми средний балл по всем файлам правил (из 12 баллов на файл). Пропорционально пересчитай в шкалу до 10 баллов.
 
-**Fallback** (if `/eval-rules` is not installed):
+**Резервный режим** (если `/eval-rules` не установлен):
 
 ```bash
 RULES_DIR=".claude/rules"
@@ -248,19 +248,19 @@ done
 echo "Total: $total | With frontmatter: $with_front | With paths: $with_paths | Valid patterns: $valid_patterns"
 ```
 
-Fallback scoring (max 8 pts):
-- Rules directory exists: 1 pt
-- All files have YAML frontmatter: 2 pts
-- At least half have `paths:` field: 3 pts
-- No file >150 lines (check with `wc -l`): 2 pts
+Оценка в резервном режиме (максимум 8 баллов):
+- Директория правил существует: 1 балл
+- Все файлы содержат YAML frontmatter: 2 балла
+- Не менее половины содержат поле `paths:`: 3 балла
+- Ни один файл не превышает 150 строк (проверить через `wc -l`): 2 балла
 
-### Dimension 3 — Skills Quality (10 pts)
+### Измерение 3 — Качество скиллов (10 баллов)
 
-**Full audit** (if `/eval-skills` is available):
-Invoke: `/eval-skills`
-Take the average score across all skill files (14 pts each). Map to 10 pts proportionally.
+**Полный аудит** (если доступен `/eval-skills`):
+Вызови: `/eval-skills`
+Возьми средний балл по всем файлам скиллов (из 14 баллов на файл). Пропорционально пересчитай в шкалу до 10 баллов.
 
-**Fallback** (if `/eval-skills` is not installed):
+**Резервный режим** (если `/eval-skills` не установлен):
 
 ```bash
 SKILLS_DIR=".claude/skills"
@@ -272,19 +272,19 @@ with_desc=$(grep -rl "^description:" "$SKILLS_DIR"/*/SKILL.md 2>/dev/null | wc -
 echo "Skills: $total | effort field: $with_effort | allowed-tools: $with_tools | description: $with_desc"
 ```
 
-Fallback scoring (max 8 pts):
-- Skills directory exists: 1 pt
-- All SKILL.md have `description:` field: 2 pts
-- All SKILL.md have `effort:` field: 3 pts
-- All SKILL.md have `allowed-tools:` field: 2 pts
+Оценка в резервном режиме (максимум 8 баллов):
+- Директория скиллов существует: 1 балл
+- Все SKILL.md содержат поле `description:`: 2 балла
+- Все SKILL.md содержат поле `effort:`: 3 балла
+- Все SKILL.md содержат поле `allowed-tools:`: 2 балла
 
-### Dimension 4 — Agents/Commands Quality (10 pts)
+### Измерение 4 — Качество агентов/команд (10 баллов)
 
-**Full audit** (if `/audit-agents-skills` is available):
-Invoke: `/audit-agents-skills`
-Take the overall score from its report (score/100). Multiply by 0.10 to get pts on 10.
+**Полный аудит** (если доступен `/audit-agents-skills`):
+Вызови: `/audit-agents-skills`
+Возьми итоговую оценку из его отчёта (балл/100). Умножь на 0.10, чтобы получить балл по 10-балльной шкале.
 
-**Fallback** (if `/audit-agents-skills` is not installed):
+**Резервный режим** (если `/audit-agents-skills` не установлен):
 
 ```bash
 agents=$(find .claude/agents -name "*.md" 2>/dev/null | wc -l | tr -d " ")
@@ -299,22 +299,22 @@ echo "Agents: $agents | Commands: $commands | Skills: $skills | With frontmatter
 echo "Commands using \$ARGUMENTS: $uses_args | With argument-hint: $with_hint"
 ```
 
-Fallback scoring (max 8 pts):
-- Has agents, commands, or skills: 2 pts
-- All have YAML frontmatter: 2 pts
-- All have `description:` field: 2 pts
-- `argument-hint:` present in all legacy commands that use `$ARGUMENTS`: 2 pts
+Оценка в резервном режиме (максимум 8 баллов):
+- Есть агенты, команды или скиллы: 2 балла
+- Все содержат YAML frontmatter: 2 балла
+- Все содержат поле `description:`: 2 балла
+- Поле `argument-hint:` присутствует во всех устаревших командах, использующих `$ARGUMENTS`: 2 балла
 
-### Dimension 5 — Security Posture (20 pts)
+### Измерение 5 — Состояние безопасности (20 баллов)
 
-**Full audit** (if `/security-check` is available):
-Invoke: `/security-check`
-Map its findings to 20 pts:
-- No critical findings: 18-20 pts
-- 1-2 medium findings: 12-17 pts
-- 3+ findings or any critical: 0-11 pts
+**Полный аудит** (если доступен `/security-check`):
+Вызови: `/security-check`
+Преобразуй его находки в шкалу до 20 баллов:
+- Нет критических находок: 18–20 баллов
+- 1–2 находки средней критичности: 12–17 баллов
+- 3+ находок или любая критическая находка: 0–11 баллов
 
-**Fallback** (if `/security-check` is not installed):
+**Резервный режим** (если `/security-check` не установлен):
 
 ```bash
 # permissions.deny check
@@ -343,16 +343,16 @@ echo "=== Dangerous Patterns ==="
 grep -rn "sk-\|ghp_\|xox[baprs]-\|AKIA" .claude/ CLAUDE.md 2>/dev/null | grep -v "example\|sample\|template" | head -5 || echo "  No obvious secrets found"
 ```
 
-Fallback scoring (max 17 pts):
-- `.env*` blocked in `permissions.deny`: 4 pts
-- `*.pem` and `credentials*` also blocked: 3 pts
-- At least one `PreToolUse` hook exists: 4 pts
-- Sandbox configured (`failIfUnavailable`): 3 pts
-- No hardcoded secrets in config: 3 pts
+Оценка в резервном режиме (максимум 17 баллов):
+- Файлы `.env*` заблокированы в `permissions.deny`: 4 балла
+- Файлы `*.pem` и `credentials*` также заблокированы: 3 балла
+- Существует хотя бы один хук `PreToolUse`: 4 балла
+- Настроена песочница (`failIfUnavailable`): 3 балла
+- В конфигурации нет захардкоженных секретов: 3 балла
 
-### Dimension 6 — MCP Ecosystem (10 pts)
+### Измерение 6 — Экосистема MCP (10 баллов)
 
-Inline bash only (no dedicated skill for this dimension):
+Только встроенный bash (отдельного скилла для этого измерения нет):
 
 ```bash
 CURRENT_DIR=$(pwd)
@@ -379,13 +379,13 @@ else
 fi
 ```
 
-Scoring (max 10 pts):
-- At least 1 MCP configured: 3 pts
-- Documentation MCP present (Context7 or similar): 2 pts
-- No DB MCP, or DB MCP is clearly scoped to dev/staging: 3 pts
-- Guide MCP installed: 2 pts
+Оценка (максимум 10 баллов):
+- Настроен хотя бы 1 MCP: 3 балла
+- Присутствует MCP для документации (Context7 или аналогичный): 2 балла
+- Отсутствует MCP для БД, либо MCP для БД явно ограничен средами dev/staging: 3 балла
+- Установлен Guide MCP: 2 балла
 
-### Dimension 7 — Workflow Commands (10 pts)
+### Измерение 7 — Команды рабочих процессов (10 баллов)
 
 ```bash
 echo "=== Core Workflow Skills/Commands ==="
@@ -410,9 +410,9 @@ for cmd in ship commit release-notes diagnose; do
 done
 ```
 
-Scoring: 2 pts per core command present (`/investigate`, `/qa`, `/canary`, `/land-and-deploy`, `/review-pr`). Max 10 pts.
+Оценка: по 2 балла за каждую присутствующую базовую команду (`/investigate`, `/qa`, `/canary`, `/land-and-deploy`, `/review-pr`). Максимум 10 баллов.
 
-### Dimension 8 — Freshness & Best Practices (10 pts)
+### Измерение 8 — Актуальность и лучшие практики (10 баллов)
 
 ```bash
 echo "=== Deprecated Model References ==="
@@ -446,262 +446,262 @@ echo "=== Hook Profiles (env vars) ==="
 grep -rn "CLAUDE_HOOK_PROFILE\|HOOK_PROFILE" .claude/ CLAUDE.md 2>/dev/null | head -3 | sed "s/^/  /" || echo "  No hook profiles configured"
 ```
 
-Scoring (max 10 pts):
-- No deprecated model names: 3 pts
-- Git activity in last 90 days (or not a git repo): 2 pts
-- `disableSkillShellExecution: false` OR not using `--resume` pattern: 3 pts
-- All commands using `$ARGUMENTS` have `argument-hint:`: 2 pts
+Оценка (максимум 10 баллов):
+- Нет упоминаний устаревших названий моделей: 3 балла
+- Активность в Git за последние 90 дней (или это не git-репозиторий): 2 балла
+- Задано `disableSkillShellExecution: false` ИЛИ паттерн `--resume` не используется: 3 балла
+- Все команды, использующие `$ARGUMENTS`, имеют поле `argument-hint:`: 2 балла
 
 ---
 
-## Phase 3 — Unified Report
+## Фаза 3 — Единый отчёт
 
-Produce the report in this exact structure:
+Сформируй отчёт строго в этой структуре:
 
-### Executive Summary
+### Краткое резюме
 
-State:
-- **Total Score**: X/100
-- **Maturity Tier**: Starter (<40) | Growing (40-59) | Established (60-79) | Optimized (80+)
-- **Detected Stack**: [from Phase 1]
-- **Top 3 Quick Wins**: highest-ROI gaps that can be fixed in <15 min each
-- **Top 3 Critical Gaps**: highest-severity missing items
+Укажи:
+- **Итоговый балл**: X/100
+- **Уровень зрелости**: Начальный (<40) | Развивающийся (40–59) | Устоявшийся (60–79) | Оптимизированный (80+)
+- **Обнаруженный стек**: [из фазы 1]
+- **Топ-3 быстрых улучшения**: пробелы с наибольшей отдачей, каждый из которых можно исправить менее чем за 15 минут
+- **Топ-3 критических пробела**: отсутствующие элементы с наивысшей степенью критичности
 
-### Dimension Scorecard
+### Сводная таблица по измерениям
 
-| # | Dimension | Score | Max | Status | Key Finding |
+| # | Измерение | Балл | Макс. | Статус | Ключевая находка |
 |---|-----------|-------|-----|--------|-------------|
-| 1 | Memory & Context | X | 20 | ✅/⚠️/❌ | one-line finding |
-| 2 | Rules Hygiene | X | 10 | ✅/⚠️/❌ | one-line finding |
-| 3 | Skills Quality | X | 10 | ✅/⚠️/❌ | one-line finding |
-| 4 | Agents/Commands Quality | X | 10 | ✅/⚠️/❌ | one-line finding |
-| 5 | Security Posture | X | 20 | ✅/⚠️/❌ | one-line finding |
-| 6 | MCP Ecosystem | X | 10 | ✅/⚠️/❌ | one-line finding |
-| 7 | Workflow Commands | X | 10 | ✅/⚠️/❌ | one-line finding |
-| 8 | Freshness & Best Practices | X | 10 | ✅/⚠️/❌ | one-line finding |
-| | **TOTAL** | **X** | **100** | | |
+| 1 | Память и контекст | X | 20 | ✅/⚠️/❌ | вывод в одну строку |
+| 2 | Гигиена правил | X | 10 | ✅/⚠️/❌ | вывод в одну строку |
+| 3 | Качество скиллов | X | 10 | ✅/⚠️/❌ | вывод в одну строку |
+| 4 | Качество агентов/команд | X | 10 | ✅/⚠️/❌ | вывод в одну строку |
+| 5 | Состояние безопасности | X | 20 | ✅/⚠️/❌ | вывод в одну строку |
+| 6 | Экосистема MCP | X | 10 | ✅/⚠️/❌ | вывод в одну строку |
+| 7 | Команды рабочих процессов | X | 10 | ✅/⚠️/❌ | вывод в одну строку |
+| 8 | Актуальность и лучшие практики | X | 10 | ✅/⚠️/❌ | вывод в одну строку |
+| | **ИТОГО** | **X** | **100** | | |
 
-Status thresholds: ✅ ≥80% of max, ⚠️ 50-79%, ❌ <50%.
+Пороги статусов: ✅ ≥80% от максимума, ⚠️ 50–79%, ❌ <50%.
 
-### Detailed Findings
+### Детальные находки
 
-Group by dimension. For each gap (❌ or ⚠️):
-
-```
-**[Dimension N — Name]**
-Gap: [what is missing or suboptimal]
-Impact: [what breaks or degrades without it]
-Fix: [concrete action with file path]
-```
-
-### Stack-Specific Templates
-
-Propose at most 3 templates, chosen for the highest-impact gaps on the detected stack. Include only file path + starter content. Do not repeat existing content.
-
-### Deepen Your Audit
-
-List which audit skills are not installed and what they would unlock:
+Сгруппируй по измерениям. Для каждого пробела (❌ или ⚠️):
 
 ```
-Skills not installed — install for deeper analysis:
+**[Измерение N — Название]**
+Пробел: [чего не хватает или что настроено неоптимально]
+Влияние: [что ломается или деградирует без этого]
+Исправление: [конкретное действие с указанием пути к файлу]
+```
 
-# token-audit (Dimension 1 — adds rule classification, hook overhead analysis)
+### Шаблоны под конкретный стек
+
+Предложи не более 3 шаблонов, выбранных для наиболее значимых пробелов обнаруженного стека. Включи только путь к файлу + стартовое содержимое. Не дублируй уже существующее содержимое.
+
+### Углубление аудита
+
+Перечисли, какие скиллы аудита не установлены и какие возможности они откроют:
+
+```
+Неустановленные скиллы — установите для более глубокого анализа:
+
+# token-audit (Измерение 1 — добавляет классификацию правил, анализ накладных расходов хуков)
 mkdir -p ~/.claude/skills/token-audit
 curl -sL https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/main/examples/skills/token-audit/SKILL.md \
   > ~/.claude/skills/token-audit/SKILL.md
 
-# eval-rules (Dimension 2 — adds glob validation, interactive review)
+# eval-rules (Измерение 2 — добавляет валидацию glob-паттернов, интерактивное ревью)
 mkdir -p ~/.claude/skills/eval-rules
 curl -sL https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/main/examples/skills/eval-rules/SKILL.md \
   > ~/.claude/skills/eval-rules/SKILL.md
 
-# eval-skills (Dimension 3 — adds 14-pt scoring per skill)
+# eval-skills (Измерение 3 — добавляет 14-балльную оценку для каждого скилла)
 mkdir -p ~/.claude/skills/eval-skills
 curl -sL https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/main/examples/skills/eval-skills/SKILL.md \
   > ~/.claude/skills/eval-skills/SKILL.md
 
-# audit-agents-skills (Dimension 4 — adds grades A-F, comparative analysis)
+# audit-agents-skills (Измерение 4 — добавляет оценки A-F, сравнительный анализ)
 mkdir -p ~/.claude/skills/audit-agents-skills
 curl -sL https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/main/examples/skills/audit-agents-skills/SKILL.md \
   > ~/.claude/skills/audit-agents-skills/SKILL.md
 
-# security-check (Dimension 5 — scans against threat-db, 55 CVEs, 24 techniques)
+# security-check (Измерение 5 — сканирование по threat-db, 55 CVE, 24 техникам)
 mkdir -p ~/.claude/skills/security-check
 curl -sL https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/main/examples/skills/security-check/SKILL.md \
   > ~/.claude/skills/security-check/SKILL.md
 
-# Alternative for dimension 1 — context-evaluator.ai
-# Zero-install LLM-native audit: 17 AI evaluators for CLAUDE.md/AGENTS.md,
-# automated .patch remediation. Complements /token-audit with deeper rule analysis.
-# Visit: https://context-evaluator.ai
+# Альтернатива для измерения 1 — context-evaluator.ai
+# LLM-нативный аудит без установки: 17 ИИ-оценщиков для CLAUDE.md/AGENTS.md,
+# автоматические исправления в формате .patch. Дополняет /token-audit более глубоким анализом правил.
+# Сайт: https://context-evaluator.ai
 ```
 
 ---
 
-## Phase 4 — Validation Request
+## Фаза 4 — Запрос подтверждения
 
-After presenting the report, ask:
+После представления отчёта спроси:
 
-"Implement the top 3 quick wins? Reply:
-- **yes** → I'll implement all three
-- **high** → only critical gaps (Dimensions 5 and 1 if ❌)
-- **1, 3** → specific items by number from findings
-- **none** → keep the report, no changes"
+«Реализовать топ-3 быстрых улучшения? Ответьте:
+- **yes** → я реализую все три
+- **high** → только критические пробелы (измерения 5 и 1, если они отмечены ❌)
+- **1, 3** → конкретные пункты по номерам из списка находок
+- **none** → оставить отчёт без изменений»
 
-Wait for explicit user response before taking any action.
+Дождись явного ответа пользователя, прежде чем предпринимать какие-либо действия.
 ````
 
 ---
 
-## 5. What to expect
+## 5. Чего ожидать
 
-### Example executive summary
+### Пример краткого резюме (Executive Summary)
 
 ```
-## Executive Summary
+## Краткое резюме (Executive Summary)
 
-Total Score: 52/100 — Growing
+Итоговая оценка: 52/100 — Развивающийся (Growing)
 
-Detected Stack: TypeScript + Next.js + Prisma
+Обнаруженный стек: TypeScript + Next.js + Prisma
 
-Top 3 Quick Wins:
-- Add permissions.deny for .env* (15 min) → fixes Dimension 5 critical gap
-- Install /investigate and /qa commands (5 min) → +4 pts on Dimension 7
-- Add paths: frontmatter to 3 always-on rules (20 min) → reduces fixed context ~3K tokens
+Топ-3 быстрых улучшения (Quick Wins):
+- Добавить permissions.deny для .env* (15 мин) → закрывает критический пробел по измерению 5
+- Установить команды /investigate и /qa (5 мин) → +4 балла по измерению 7
+- Добавить frontmatter paths: в 3 постоянно загружаемых правила (20 мин) → сокращает фиксированный контекст на ~3K токенов
 
-Top 3 Critical Gaps:
-1. ❌ Security — no permissions.deny, no PreToolUse hooks (0/20)
-2. ⚠️ Memory — project CLAUDE.md missing, global is 22K tokens (8/20)
-3. ❌ Workflow — 3/5 core commands absent (4/10)
+Топ-3 критических пробела:
+1. ❌ Безопасность — нет permissions.deny, нет хуков PreToolUse (0/20)
+2. ⚠️ Память — отсутствует проектный CLAUDE.md, глобальный занимает 22K токенов (8/20)
+3. ❌ Рабочий процесс — отсутствуют 3 из 5 основных команд (4/10)
 ```
 
-### Example dimension scorecard
+### Пример оценочной таблицы по измерениям
 
-| # | Dimension | Score | Max | Status | Key Finding |
-|---|-----------|-------|-----|--------|-------------|
-| 1 | Memory & Context | 8 | 20 | ⚠️ | 22K fixed tokens, no project CLAUDE.md |
-| 2 | Rules Hygiene | 7 | 10 | ⚠️ | 4 rules, none have paths: field |
-| 3 | Skills Quality | 8 | 10 | ✅ | 3 skills, all have effort + allowed-tools |
-| 4 | Agents/Commands Quality | 6 | 10 | ⚠️ | 8 commands, 2 missing argument-hint |
-| 5 | Security Posture | 0 | 20 | ❌ | No deny rules, no hooks |
-| 6 | MCP Ecosystem | 7 | 10 | ✅ | Context7 + Sequential configured |
-| 7 | Workflow Commands | 4 | 10 | ⚠️ | /investigate ✅ /qa ❌ /canary ❌ |
-| 8 | Freshness & Best Practices | 12 | 10 | — | capped at max |
-| | **TOTAL** | **52** | **100** | ⚠️ | |
-
----
-
-## 6. Understanding results
-
-### Glossary
-
-| Term | Definition |
-|------|------------|
-| **Memory Files** | CLAUDE.md files that provide persistent context to Claude across sessions |
-| **Context Budget** | Total always-on token cost before any task begins. Seuils: green <20K, yellow 20-40K, red >40K |
-| **Rules (auto-loaded)** | `.claude/rules/*.md` files that load at every session start. Files with `paths:` only load when a matching file is read |
-| **paths: frontmatter** | Field in rule YAML that scopes a rule to specific file patterns — reduces always-on overhead |
-| **Eval Skill** | Specialized skill that audits one domain: `eval-skills`, `eval-rules`, `token-audit`, `audit-agents-skills` |
-| **Single Source of Truth** | Pattern where conventions are documented once and referenced via `@path` |
-| **Tool SEO** | Writing agent/command descriptions so Claude selects the right tool automatically |
-| **MCP Servers** | Model Context Protocol — external tools that extend Claude's capabilities. Config stored in `~/.claude.json` per project |
-| **Hook Profiles** | minimal/standard/strict security levels for hooks, switched via env var (added v3.38.0) |
-| **PreToolUse** | Hook that fires BEFORE Claude executes a tool — used for security checks and approval gates |
-| **effort: field** | Skill frontmatter for low/medium/high complexity signal — used by Claude to allocate thinking budget |
-| **argument-hint** | Frontmatter field showing placeholder text in slash command menu for commands using `$ARGUMENTS` |
-| **Threat Database** | `examples/commands/resources/threat-db.yaml` — versioned CVEs, attack techniques, IOC records, and minimum safe versions |
-| **Cache Bug #40524** | Bug 2 (HIGH): `--resume` causes full context re-announcement (87-118K tokens rebuilt per resume) |
-| **Scope Drift** | When a PR changes files outside the stated plan intent. Detected by comparing `~/.claude/plans/` vs `git diff --stat` |
-| **Fix-First Heuristic** | Review pattern: auto-fix mechanical issues, ask for judgment calls on security/design decisions |
-| **LLM Output Trust Boundary** | Review category for AI-generated values written to DB without format validation |
-| **managed-settings.d/** | Enterprise drop-in directory for governance rules that override user settings (added v2.1.83) |
-| **Routines** | Cloud-hosted scheduled tasks with 3 trigger types: schedule, API, GitHub events (launched April 2026) |
-| **Context Zones** | <70% optimal, 75% auto-compact trigger, 85% handoff recommended |
-| **Sandbox** | OS-level isolation (Docker container or native process-level). Configured in settings.json |
-| **Iron Law** | Debugging principle: no fixes without root cause investigation first. See `/investigate` |
-
-### Score thresholds
-
-| Score | Tier | What it means |
-|-------|------|----------------|
-| 80-100 | Optimized | Config is solid. Focus on Freshness and edge cases |
-| 60-79 | Established | Good foundation. Fill the ⚠️ dimensions |
-| 40-59 | Growing | Core pieces exist but several gaps. Follow Quick Wins |
-| <40 | Starter | Start with Dimension 5 (Security) and 1 (Memory) |
-
-### Status icons
-
-| Icon | Meaning |
-|------|---------|
-| ✅ | ≥80% of max pts for this dimension |
-| ⚠️ | 50-79% of max pts |
-| ❌ | <50% of max pts |
+| # | Измерение | Балл | Макс. | Статус | Ключевая находка |
+|---|-----------|------|-------|--------|------------------|
+| 1 | Память и контекст (Memory & Context) | 8 | 20 | ⚠️ | 22K фиксированных токенов, нет проектного CLAUDE.md |
+| 2 | Гигиена правил (Rules Hygiene) | 7 | 10 | ⚠️ | 4 правила, ни в одном нет поля paths: |
+| 3 | Качество скиллов (Skills Quality) | 8 | 10 | ✅ | 3 скилла, у всех указаны effort + allowed-tools |
+| 4 | Качество агентов и команд (Agents/Commands Quality) | 6 | 10 | ⚠️ | 8 команд, у 2 отсутствует argument-hint |
+| 5 | Состояние безопасности (Security Posture) | 0 | 20 | ❌ | Нет правил deny, нет хуков |
+| 6 | Экосистема MCP (MCP Ecosystem) | 7 | 10 | ✅ | Настроены Context7 + Sequential |
+| 7 | Команды рабочего процесса (Workflow Commands) | 4 | 10 | ⚠️ | /investigate ✅ /qa ❌ /canary ❌ |
+| 8 | Актуальность и лучшие практики (Freshness & Best Practices) | 12 | 10 | — | ограничено максимумом |
+| | **ИТОГО** | **52** | **100** | ⚠️ | |
 
 ---
 
-## 7. Common issues
+## 6. Как интерпретировать результаты
 
-### "Audit skills not installed"
+### Глоссарий
 
-**Cause**: The specialized skills are optional and not globally available by default.
+| Термин | Определение |
+|--------|-------------|
+| **Файлы памяти (Memory Files)** | Файлы CLAUDE.md, обеспечивающие постоянный контекст для Claude между сессиями |
+| **Бюджет контекста (Context Budget)** | Суммарный постоянный расход токенов до начала любой задачи. Пороги: зелёный <20K, жёлтый 20–40K, красный >40K |
+| **Правила (автозагружаемые / Rules)** | Файлы `.claude/rules/*.md`, загружаемые при каждом запуске сессии. Файлы с `paths:` загружаются только при чтении подходящего файла |
+| **Frontmatter paths:** | Поле в YAML-заголовке правила, ограничивающее область его действия конкретными шаблонами файлов — снижает постоянный расход токенов |
+| **Скилл оценки (Eval Skill)** | Специализированный скилл для аудита одной области: `eval-skills`, `eval-rules`, `token-audit`, `audit-agents-skills` |
+| **Единый источник истины (Single Source of Truth)** | Паттерн, при котором соглашения документируются в одном месте и подключаются через `@path` |
+| **Tool SEO** | Написание описаний агентов и команд так, чтобы Claude автоматически выбирал нужный инструмент |
+| **MCP-серверы (MCP Servers)** | Model Context Protocol — внешние инструменты, расширяющие возможности Claude. Конфигурация хранится в `~/.claude.json` для каждого проекта |
+| **Профили хуков (Hook Profiles)** | Уровни безопасности minimal/standard/strict для хуков, переключаемые через переменную окружения (добавлено в v3.38.0) |
+| **PreToolUse** | Хук, срабатывающий ДО того, как Claude выполнит инструмент — используется для проверок безопасности и порогов подтверждения (approval gates) |
+| **Поле effort:** | Поле в frontmatter скилла, задающее сигнал сложности low/medium/high — используется Claude для выделения бюджета на рассуждения (thinking budget) |
+| **argument-hint** | Поле frontmatter, отображающее текст-подсказку в меню слэш-команд для команд, использующих `$ARGUMENTS` |
+| **База угроз (Threat Database)** | `examples/commands/resources/threat-db.yaml` — версионированные CVE, техники атак, записи IOC и минимальные безопасные версии |
+| **Баг кэша #40524 (Cache Bug #40524)** | Баг 2 (HIGH): `--resume` вызывает полное повторное объявление контекста (87–118K токенов пересобирается при каждом возобновлении) |
+| **Дрейф области изменений (Scope Drift)** | Ситуация, когда PR изменяет файлы за пределами заявленного плана. Выявляется сравнением `~/.claude/plans/` с `git diff --stat` |
+| **Эвристика Fix-First (Fix-First Heuristic)** | Паттерн ревью: автоматическое исправление механических проблем и запрос решения человека по вопросам безопасности и дизайна |
+| **Граница доверия к выводу LLM (LLM Output Trust Boundary)** | Категория ревью для сгенерированных ИИ значений, записываемых в БД без валидации формата |
+| **managed-settings.d/** | Корпоративная drop-in директория для правил управления (governance), переопределяющих пользовательские настройки (добавлено в v2.1.83) |
+| **Routines** | Облачные задачи по расписанию с 3 типами триггеров: расписание, API, события GitHub (запущены в апреле 2026 года) |
+| **Зоны контекста (Context Zones)** | <70% — оптимально, 75% — триггер автокомпакции, 85% — рекомендуется передача контекста (handoff) |
+| **Песочница (Sandbox)** | Изоляция на уровне ОС (контейнер Docker или нативная изоляция на уровне процессов). Настраивается в settings.json |
+| **Железный закон (Iron Law)** | Принцип отладки: никаких исправлений без предварительного поиска первопричины. См. `/investigate` |
 
-**What happens**: The prompt runs in fallback mode for that dimension. Scores are capped lower (8 pts instead of 10 for some dimensions). Results are still actionable, just less detailed.
+### Пороги оценок
 
-**Fix**: Use the install commands in the "Deepen Your Audit" section of the report. Each skill takes ~1 min to install and immediately improves future audits.
+| Баллы | Уровень | Что это означает |
+|-------|---------|------------------|
+| 80–100 | Оптимизированный (Optimized) | Конфигурация надёжна. Сосредоточьтесь на актуальности (Freshness) и пограничных случаях |
+| 60–79 | Устоявшийся (Established) | Хорошая база. Закройте пробелы в измерениях со статусом ⚠️ |
+| 40–59 | Развивающийся (Growing) | Основные элементы есть, но остаётся ряд пробелов. Начните с быстрых улучшений (Quick Wins) |
+| <40 | Начальный (Starter) | Начните с измерения 5 (Безопасность) и измерения 1 (Память) |
 
-### "Claude didn't find my files"
+### Значки статусов
 
-**Cause**: Wrong working directory or platform path differences.
-
-**Fix**:
-- Ensure you run `claude` from your project root
-- On Windows, paths use `%USERPROFILE%\.claude\` not `~/.claude/`
-
-### "Score seems off"
-
-**Cause**: Fallback mode scoring is simplified — it can't verify glob validity, run 14-pt skill checks, or scan against the threat database.
-
-**Fix**: Install the relevant audit skills (see "Deepen Your Audit"). Re-run to get accurate dimension scores.
-
-### "Too many recommendations"
-
-**Cause**: First-time audit on a project without Claude Code config.
-
-**Fix**: Use the Quick Wins from the Executive Summary. Implement those three. Re-audit. Build incrementally.
-
-### "Claude made changes without asking"
-
-**Cause**: Phase 4 validation wasn't reached or was skipped.
-
-**Fix**: Ensure you copied the complete prompt including Phase 4. Use Plan Mode (`Shift+Tab` twice) for extra safety before pasting.
-
----
-
-## 8. Related resources
-
-**Complementary audit tools** (go deeper on specific dimensions):
-
-| Tool | Dimension | Install |
-|------|-----------|---------|
-| `/token-audit` | Memory & Context | `mkdir -p ~/.claude/skills/token-audit && curl -sL .../examples/skills/token-audit/SKILL.md > ...` |
-| `/eval-rules` | Rules Hygiene | Same pattern |
-| `/eval-skills` | Skills Quality | Same pattern |
-| `/audit-agents-skills` | Agents/Commands | Same pattern |
-| `/security-check` | Security Posture (quick, ~30s) | `mkdir -p ~/.claude/skills/security-check && curl -sL ...` |
-| `/security-audit` | Security Posture (full, 2-5 min, scored /100) | Same pattern |
-| [`tools/context-audit-prompt.md`](context-audit-prompt.md) | Deep-dive on context engineering | Self-contained prompt, no install needed |
-| [`tools/onboarding-prompt.md`](onboarding-prompt.md) | Setup from scratch | Self-contained prompt, no install needed |
-| [context-evaluator.ai](https://context-evaluator.ai) | Memory & Context (alternative) — LLM-native, 17 evaluators, auto `.patch` | Zero-install web tool |
-
-**Reference docs**:
-- [The Ultimate Claude Code Guide](../guide/ultimate-guide.md) — full reference
-- [Cheatsheet](../guide/cheatsheet.md) — quick daily reference
-- [Security Hardening](../guide/security/security-hardening.md) — production security patterns
-- [Context Engineering](../guide/core/architecture.md) — token budget strategies
-- [Claude Code Official Docs](https://docs.anthropic.com/en/docs/claude-code) — Anthropic documentation
-
-**For CI/CD integration** (JSON output, batch mode): [`examples/scripts/audit-scan.sh`](../examples/scripts/audit-scan.sh)
+| Значок | Значение |
+|--------|----------|
+| ✅ | ≥80% от максимума баллов по этому измерению |
+| ⚠️ | 50–79% от максимума баллов |
+| ❌ | <50% от максимума баллов |
 
 ---
 
-*Version 5.2 (guide v3.41.0+) | v5.2: skill detection updated for CC 2.1.3 skills-commands unification — Dimension 4/7/8 bash now checks both `.claude/skills/` and `.claude/commands/`; security-check install path fixed to canonical SKILL.md. v5.1: context-evaluator.ai added. v5.0: refactored from checklist to orchestrator with 8 weighted dimensions.*
+## 7. Частые проблемы
+
+### «Скиллы аудита не установлены» ("Audit skills not installed")
+
+**Причина**: специализированные скиллы являются опциональными и по умолчанию не доступны глобально.
+
+**Что происходит**: промпт запускается в резервном режиме (fallback) для этого измерения. Максимальные баллы ограничиваются ниже (8 баллов вместо 10 для некоторых измерений). Результаты всё равно практичны и применимы, просто менее детализированы.
+
+**Решение**: используйте команды установки из раздела «Deepen Your Audit» («Углублённый аудит») в отчёте. Установка каждого скилла занимает ~1 минуту и сразу повышает точность последующих аудитов.
+
+### «Claude не нашёл мои файлы» ("Claude didn't find my files")
+
+**Причина**: неверная рабочая директория или различия в путях между платформами.
+
+**Решение**:
+- Убедитесь, что запускаете `claude` из корня проекта
+- В Windows используются пути `%USERPROFILE%\.claude\`, а не `~/.claude/`
+
+### «Оценка кажется неточной» ("Score seems off")
+
+**Причина**: оценка в резервном режиме (fallback) упрощена — она не может проверить валидность glob-шаблонов, выполнить 14-балльную проверку скиллов или просканировать конфигурацию по базе угроз.
+
+**Решение**: установите соответствующие скиллы аудита (см. «Deepen Your Audit»). Запустите аудит повторно, чтобы получить точные оценки по измерениям.
+
+### «Слишком много рекомендаций» ("Too many recommendations")
+
+**Причина**: первый аудит проекта без конфигурации Claude Code.
+
+**Решение**: возьмите быстрые улучшения (Quick Wins) из краткого резюме (Executive Summary). Реализуйте эти три пункта. Проведите аудит повторно. Улучшайте конфигурацию постепенно.
+
+### «Claude внёс изменения без спроса» ("Claude made changes without asking")
+
+**Причина**: фаза 4 (валидация) не была достигнута или была пропущена.
+
+**Решение**: убедитесь, что вы скопировали полный промпт, включая фазу 4. Перед вставкой промпта переключитесь в Plan Mode (`Shift+Tab` дважды) для дополнительной безопасности.
+
+---
+
+## 8. Связанные ресурсы
+
+**Дополнительные инструменты аудита** (для более глубокого анализа отдельных измерений):
+
+| Инструмент | Измерение | Установка |
+|------------|-----------|-----------|
+| `/token-audit` | Память и контекст (Memory & Context) | `mkdir -p ~/.claude/skills/token-audit && curl -sL .../examples/skills/token-audit/SKILL.md > ...` |
+| `/eval-rules` | Гигиена правил (Rules Hygiene) | Тот же шаблон |
+| `/eval-skills` | Качество скиллов (Skills Quality) | Тот же шаблон |
+| `/audit-agents-skills` | Агенты и команды (Agents/Commands) | Тот же шаблон |
+| `/security-check` | Состояние безопасности (быстрая проверка, ~30 с) | `mkdir -p ~/.claude/skills/security-check && curl -sL ...` |
+| `/security-audit` | Состояние безопасности (полный аудит, 2–5 мин, оценка /100) | Тот же шаблон |
+| [`tools/context-audit-prompt.md`](context-audit-prompt.md) | Глубокий разбор инженерии контекста | Автономный промпт, установка не требуется |
+| [`tools/onboarding-prompt.md`](onboarding-prompt.md) | Настройка с нуля | Автономный промпт, установка не требуется |
+| [context-evaluator.ai](https://context-evaluator.ai) | Память и контекст (альтернатива) — LLM-native, 17 оценщиков, авто-`.patch` | Веб-инструмент без установки |
+
+**Справочная документация**:
+- [Полное руководство по Claude Code](../guide/ultimate-guide.md) — полный справочник
+- [Шпаргалка](../guide/cheatsheet.md) — краткий справочник на каждый день
+- [Усиление безопасности (Security Hardening)](../guide/security/security-hardening.md) — паттерны безопасности для продакшена
+- [Инженерия контекста](../guide/core/architecture.md) — стратегии управления бюджетом токенов
+- [Официальная документация Claude Code](https://docs.anthropic.com/en/docs/claude-code) — документация Anthropic
+
+**Для интеграции в CI/CD** (вывод в JSON, пакетный режим): [`examples/scripts/audit-scan.sh`](../examples/scripts/audit-scan.sh)
+
+---
+
+*Версия 5.2 (руководство v3.41.0+) | v5.2: обнаружение скиллов обновлено под унификацию скиллов и команд в CC 2.1.3 — bash-скрипты для измерений 4/7/8 теперь проверяют и `.claude/skills/`, и `.claude/commands/`; путь установки security-check исправлен на канонический SKILL.md. v5.1: добавлен context-evaluator.ai. v5.0: переработан из чек-листа в оркестратор с 8 взвешенными измерениями.*

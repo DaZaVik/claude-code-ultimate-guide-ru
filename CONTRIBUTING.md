@@ -1,62 +1,62 @@
-# Contributing to Claude Code Ultimate Guide
+# Как внести вклад в Claude Code Ultimate Guide
 
-**Welcome!** Whether you're fixing a typo or adding a new section, every contribution helps developers worldwide master Claude Code.
+**Добро пожаловать!** Исправляете ли вы опечатку или добавляете новый раздел — любой вклад помогает разработчикам по всему миру освоить Claude Code.
 
-## Quick links
+## Быстрые ссылки
 
-- [Report an Issue](../../issues/new)
-- [Start a Discussion](../../discussions)
-- [Code of Conduct](./CODE_OF_CONDUCT.md)
-
----
-
-## Ways to contribute
-
-| Type | Examples | Effort |
-|------|----------|--------|
-| **Report** | Bugs, outdated info, broken links | 2 min |
-| **Improve** | Fix typos, clarify explanations | 5-15 min |
-| **Add Examples** | New templates, workflows, hooks | 15-60 min |
-| **Translate** | Help reach non-English speakers | Varies |
-| **Share** | Your workflows, success stories | 5 min |
-
-**Not sure where to start?** Check [issues labeled `good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+- [Сообщить о проблеме](../../issues/new)
+- [Начать обсуждение](../../discussions)
+- [Кодекс поведения](./CODE_OF_CONDUCT.md)
 
 ---
 
-## Reporting issues
+## Способы внести вклад
 
-Found something wrong or have a suggestion?
+| Тип | Примеры | Затраты времени |
+|-----|---------|-----------------|
+| **Сообщить о проблеме** | Баги, устаревшая информация, битые ссылки | 2 мин |
+| **Улучшить** | Исправить опечатки, уточнить объяснения | 5–15 мин |
+| **Добавить примеры** | Новые шаблоны, рабочие процессы, хуки | 15–60 мин |
+| **Перевести** | Помочь неанглоязычным читателям | Зависит от объёма |
+| **Поделиться** | Ваши рабочие процессы, истории успеха | 5 мин |
 
-1. **Search existing issues**: Someone may have reported it
-2. **Open a new issue** with:
-   - Clear description
-   - Location (file, section, line)
-   - Your platform (macOS/Linux/Windows)
-   - For Windows: PowerShell version
+**Не знаете, с чего начать?** Посмотрите [задачи с меткой `good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
 ---
 
-## Pull request process
+## Как сообщать о проблемах
 
-### 1. Fork & clone
+Нашли ошибку или есть предложение?
+
+1. **Проверьте существующие issues**: возможно, кто-то уже сообщил об этом
+2. **Откройте новый issue**, указав:
+   - Понятное описание
+   - Расположение (файл, раздел, строка)
+   - Вашу платформу (macOS/Linux/Windows)
+   - Для Windows: версию PowerShell
+
+---
+
+## Процесс создания Pull Request
+
+### 1. Сделайте форк и клонируйте репозиторий
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/claude-code-ultimate-guide.git
 cd claude-code-ultimate-guide
 ```
 
-### 2. Create a branch
+### 2. Создайте ветку
 
 ```bash
 git checkout -b fix/typo-in-section-3
-# or
+# или
 git checkout -b feature/add-debugging-guide
 ```
 
-### 2.5. Install pre-commit hooks
+### 2.5. Установите pre-commit хуки
 
-This repository uses pre-commit hooks to enforce quality gates (markdown lint, YAML validation, version consistency, etc.). Set them up once:
+В этом репозитории используются pre-commit хуки для контроля качества (линтинг Markdown, валидация YAML, согласованность версий и т. д.). Настройте их один раз:
 
 ```bash
 # macOS/Linux
@@ -68,68 +68,68 @@ pip install pre-commit
 pre-commit install
 ```
 
-Pre-commit will now run automatically on `git commit`. You can also run manually:
+Теперь pre-commit будет запускаться автоматически при каждом `git commit`. Вы также можете запустить проверку вручную:
 
 ```bash
 pre-commit run --all-files
 ```
 
-**What the hooks check:**
-- ✓ Markdown formatting consistency
-- ✓ YAML syntax validity
-- ✓ VERSION file consistency across the repo
-- ✓ No broken symlinks or sensitive files
+**Что проверяют хуки:**
+- ✓ Единообразие форматирования Markdown
+- ✓ Корректность синтаксиса YAML
+- ✓ Согласованность файла VERSION по всему репозиторию
+- ✓ Отсутствие битых символических ссылок и конфиденциальных файлов
 
-### 3. Make changes
+### 3. Внесите изменения
 
-Follow [Content Guidelines](#content-guidelines) below.
+Следуйте [рекомендациям по оформлению контента](#content-guidelines) ниже.
 
-### 4. Test your changes
+### 4. Проверьте изменения
 
-- Preview markdown rendering
-- Test code snippets on your platform
-- Verify all links work
+- Проверьте отображение Markdown в предпросмотре
+- Протестируйте фрагменты кода на своей платформе
+- Убедитесь, что все ссылки работают
 
-### 5. Submit PR
+### 5. Отправьте PR
 
-Include:
-- Clear description of changes
-- Why the change is needed
-- What you tested
+Укажите в описании:
+- Понятное описание изменений
+- Зачем нужно это изменение
+- Что именно вы проверили
 
 ---
 
-## Content guidelines
+## Рекомендации по оформлению контента
 
-### Writing style
+### Стиль изложения
 
-- **Concise**: Bullet points > long paragraphs
-- **Practical**: Include examples for every concept
-- **Cross-platform**: Support macOS/Linux AND Windows
-- **Accurate**: Test all code before submitting
+- **Краткость**: маркированные списки лучше длинных абзацев
+- **Практичность**: добавляйте примеры для каждой концепции
+- **Кроссплатформенность**: поддерживайте macOS/Linux И Windows
+- **Точность**: проверяйте весь код перед отправкой
 
-### Documentation structure
+### Структура документации
 
 ```markdown
-## Section Title
+## Заголовок раздела
 
-Brief intro (1-2 sentences).
+Краткое введение (1–2 предложения).
 
-### Subsection
+### Подраздел
 
-| Column 1 | Column 2 |
-|----------|----------|
-| Data     | Data     |
+| Столбец 1 | Столбец 2 |
+|-----------|-----------|
+| Данные    | Данные    |
 
-**Example:**
+**Пример:**
 ```bash
-code example here
+пример кода здесь
 ```
 ```
 
-### Platform-specific code
+### Платформозависимый код
 
-Always provide both when commands differ:
+Всегда приводите оба варианта, если команды различаются:
 
 ```bash
 # macOS/Linux
@@ -141,58 +141,58 @@ Always provide both when commands differ:
 
 ---
 
-## Quality checklist
+## Чек-лист качества
 
-Before submitting:
+Перед отправкой проверьте:
 
-- [ ] Markdown renders correctly (preview on GitHub)
-- [ ] All links work
-- [ ] Code snippets tested on your platform
-- [ ] Windows equivalents provided (if applicable)
-- [ ] Spell-checked
-- [ ] Follows existing style
-
----
-
-## Windows contributions (especially welcome!)
-
-The maintainer works on macOS. If you're a Windows user:
-
-- Test PowerShell scripts with PS 5.1+
-- Verify path handling
-- Report Windows-specific issues
-- Add batch file alternatives when possible
-
-**Your contributions are especially valuable!**
+- [ ] Markdown отображается корректно (предпросмотр на GitHub)
+- [ ] Все ссылки работают
+- [ ] Фрагменты кода протестированы на вашей платформе
+- [ ] Добавлены эквиваленты для Windows (если применимо)
+- [ ] Выполнена проверка орфографии
+- [ ] Соблюдён принятый стиль оформления
 
 ---
 
-## What we don't accept
+## Вклад пользователей Windows (особенно приветствуется!)
 
-- Marketing language or promotional content
-- Unverified or speculative claims
-- Large structural changes without prior discussion
-- Breaking changes to existing examples
+Мейнтейнер работает на macOS. Если вы пользуетесь Windows:
 
----
+- Тестируйте скрипты PowerShell на PS 5.1+
+- Проверяйте обработку путей
+- Сообщайте о проблемах, специфичных для Windows
+- По возможности добавляйте альтернативы в виде batch-файлов
 
-## Recognition
-
-Contributors are recognized through:
-
-- **Git history**: Your commits are permanently attributed
-- **GitHub contributors**: Visible on repository page
-
-Significant contributions may be highlighted in release notes.
+**Ваш вклад особенно ценен!**
 
 ---
 
-## Questions?
+## Что мы не принимаем
 
-- **General questions**: [GitHub Discussions](../../discussions)
-- **Bug reports**: [Issues](../../issues)
-- **Direct contact**: [LinkedIn](https://www.linkedin.com/in/florian-bruniaux-43408b83/)
+- Маркетинговые формулировки или рекламный контент
+- Непроверенные или спекулятивные утверждения
+- Крупные структурные изменения без предварительного обсуждения
+- Ломающие изменения в существующих примерах
 
 ---
 
-**Thank you for helping improve this guide!**
+## Признание вклада
+
+Вклад участников отмечается следующими способами:
+
+- **История Git**: авторство ваших коммитов сохраняется навсегда
+- **Участники на GitHub**: отображаются на странице репозитория
+
+Значительный вклад может быть отдельно отмечен в заметках к релизам (release notes).
+
+---
+
+## Остались вопросы?
+
+- **Общие вопросы**: [GitHub Discussions](../../discussions)
+- **Сообщения об ошибках**: [Issues](../../issues)
+- **Прямой контакт**: [LinkedIn](https://www.linkedin.com/in/florian-bruniaux-43408b83/)
+
+---
+
+**Спасибо, что помогаете делать это руководство лучше!**

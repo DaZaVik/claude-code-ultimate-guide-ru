@@ -1,284 +1,284 @@
-# Claude Code Ultimate Guide - Project Context
+# Claude Code Ultimate Guide — Контекст проекта
 
-## Purpose
+## Назначение
 
-This repository is the **comprehensive documentation for Claude Code** (Anthropic's CLI tool). It teaches users how to use Claude Code effectively through guides, examples, and templates.
+Этот репозиторий — **исчерпывающая документация по Claude Code** (CLI-инструменту от Anthropic). Он учит пользователей эффективно работать с Claude Code через руководства, примеры и шаблоны.
 
-**Meta-note**: This repo documents Claude Code, so its own configuration should be exemplary.
+**Мета-замечание**: этот репозиторий документирует Claude Code, поэтому его собственная конфигурация должна быть образцовой.
 
-## Repository Structure
+## Структура репозитория
 
 ```
-guide/                    # Core documentation
-├── ultimate-guide.md     # Main guide (~26K lines, the reference)
-├── cheatsheet.md         # 1-page printable summary
-├── cowork.md             # Cowork redirect page
-├── core/                 # Architecture, methodologies, releases, known-issues, visual-reference
+guide/                    # Основная документация
+├── ultimate-guide.md     # Главное руководство (~26K строк, основной справочник)
+├── cheatsheet.md         # Шпаргалка на 1 страницу для печати
+├── cowork.md             # Страница перенаправления на Cowork
+├── core/                 # Архитектура, методологии, релизы, известные проблемы, визуальный справочник
 ├── security/             # security-hardening, sandbox-isolation, sandbox-native, production-safety, data-privacy
 ├── ecosystem/            # ai-ecosystem, mcp-servers-ecosystem, third-party-tools, remarkable-ai
 ├── roles/                # ai-roles, adoption-approaches, learning-with-ai, agent-evaluation
 ├── ops/                  # devops-sre, observability, ai-traceability
-├── diagrams/             # Mermaid visual diagrams
-└── workflows/            # Step-by-step workflow guides
+├── diagrams/             # Визуальные диаграммы Mermaid
+└── workflows/            # Пошаговые руководства по рабочим процессам
 
-examples/                 # Production-ready templates
-├── agents/               # Custom agent templates
-├── commands/             # Slash command templates
-├── hooks/                # Event hook examples (bash/powershell)
-├── skills/               # Skill module templates
-└── scripts/              # Utility scripts (audit, health check)
+examples/                 # Готовые к продакшену шаблоны
+├── agents/               # Шаблоны пользовательских агентов
+├── commands/             # Шаблоны слэш-команд
+├── hooks/                # Примеры хуков событий (bash/powershell)
+├── skills/               # Шаблоны модулей скиллов
+└── scripts/              # Вспомогательные скрипты (аудит, проверка состояния)
 
-machine-readable/         # For LLM consumption
-├── reference.yaml        # Condensed index (~43K tokens)
-└── llms.txt              # AI indexation file
+machine-readable/         # Для потребления LLM
+├── reference.yaml        # Сжатый индекс (~43K токенов)
+└── llms.txt              # Файл индексации для ИИ
 
-whitepapers/              # Focused whitepapers (FR + EN)
-├── fr/                   # 10 source files in French (.qmd)
-└── en/                   # 10 translated files in English (.qmd)
-# Published at: https://cc.bruniaux.com/whitepapers/
+whitepapers/              # Тематические аналитические обзоры (вайтпейперы, FR + EN)
+├── fr/                   # 10 исходных файлов на французском (.qmd)
+└── en/                   # 10 переведённых файлов на английском (.qmd)
+# Опубликовано по адресу: https://cc.bruniaux.com/whitepapers/
 
-tools/                    # Interactive utilities
-├── audit-prompt.md       # Setup audit prompt
-└── onboarding-prompt.md  # Personalized learning prompt
+tools/                    # Интерактивные утилиты
+├── audit-prompt.md       # Промпт для аудита настройки
+└── onboarding-prompt.md  # Персонализированный промпт для обучения
 
-docs/                     # Public documentation (tracked)
-└── resource-evaluations/ # External resource evaluations (167 files)
+docs/                     # Публичная документация (отслеживается в Git)
+└── resource-evaluations/ # Оценки внешних ресурсов (167 файлов)
 
-claudedocs/               # Claude working documents (gitignored)
-├── resource-evaluations/ # Research working docs (prompts, private audits)
-└── *.md                  # Analysis reports, plans, working docs
+claudedocs/               # Рабочие документы Claude (в .gitignore)
+├── resource-evaluations/ # Рабочие исследовательские документы (промпты, приватные аудиты)
+└── *.md                  # Аналитические отчёты, планы, рабочие документы
 ```
 
-## Key Files
+## Ключевые файлы
 
-| File | Purpose |
-|------|---------|
-| `VERSION` | Single source of truth for version (currently 3.41.3) |
-| `guide/ultimate-guide.md` | The main reference (search here first) |
-| `guide/cheatsheet.md` | Quick reference for daily use |
-| `machine-readable/reference.yaml` | LLM-optimized index with line numbers |
-| `CHANGELOG.md` | All changes with detailed descriptions |
+| Файл | Назначение |
+|------|------------|
+| `VERSION` | Единый источник истины для версии (текущая — 3.46.0) |
+| `guide/ultimate-guide.md` | Основной справочник (искать в первую очередь здесь) |
+| `guide/cheatsheet.md` | Быстрый справочник для ежедневной работы |
+| `machine-readable/reference.yaml` | Оптимизированный для LLM индекс с номерами строк |
+| `CHANGELOG.md` | Все изменения с подробными описаниями |
 
-## Commands
+## Команды
 
-### Version Management
+### Управление версиями
 ```bash
-# Check version consistency across all docs
+# Проверить согласованность версий во всей документации
 ./scripts/sync-version.sh --check
 
-# Fix version mismatches (updates from VERSION file)
+# Исправить несоответствия версий (обновляет из файла VERSION)
 ./scripts/sync-version.sh
 
-# Bump version
+# Повысить версию
 echo "3.7.0" > VERSION && ./scripts/sync-version.sh
 ```
 
-### Whitepaper, Recap Cards & Guide Export
+### Аналитические обзоры (вайтпейперы), карточки-памятки и экспорт руководства
 
-Full build commands (PDF/EPUB/recap-card), stack details, ebook versioning, and Typst template sync rules:
+Полные команды сборки (PDF/EPUB/карточка-памятка), детали стека, версионирование электронных книг и правила синхронизации шаблонов Typst:
 
 @docs/workflows/whitepaper-build.md
 
-### Before Committing
+### Перед коммитом
 ```bash
-# Verify versions are synchronized
+# Убедиться, что версии синхронизированы
 ./scripts/sync-version.sh --check
 ```
 
-### Slash Commands (Maintenance)
+### Слэш-команды (обслуживание)
 
-Custom slash commands available in this project:
+Пользовательские слэш-команды, доступные в этом проекте:
 
-| Command | Description |
-|---------|-------------|
-| `/release <bump-type>` | Release guide version (CHANGELOG + VERSION + sync + commit + push) |
-| `/update-infos-release [bump-type]` | Update Claude Code releases tracking + optional guide version bump |
-| `/version` | Display current guide and Claude Code versions with stats |
-| `/changelog [count]` | View recent CHANGELOG entries (default: 5) |
-| `/sync` | Check guide/landing synchronization status |
-| `/audit-agents-skills [path]` | Audit quality of agents, skills, and commands in .claude/ config |
-| `/security-check` | Quick config check against known threats database (~30s) |
-| `/security-audit` | Full 6-phase security audit with score /100 (2-5min) |
-| `/update-threat-db` | Research & update threat intelligence database |
+| Команда | Описание |
+|---------|----------|
+| `/release <bump-type>` | Выпустить версию руководства (CHANGELOG + VERSION + синхронизация + commit + push) |
+| `/update-infos-release [bump-type]` | Обновить отслеживание релизов Claude Code + опциональное повышение версии руководства |
+| `/version` | Показать текущие версии руководства и Claude Code со статистикой |
+| `/changelog [count]` | Показать последние записи CHANGELOG (по умолчанию: 5) |
+| `/sync` | Проверить статус синхронизации руководства и лендинга |
+| `/audit-agents-skills [path]` | Провести аудит качества агентов, скиллов и команд в конфигурации .claude/ |
+| `/security-check` | Быстрая проверка конфигурации по базе известных угроз (~30 с) |
+| `/security-audit` | Полный 6-этапный аудит безопасности с оценкой /100 (2–5 мин) |
+| `/update-threat-db` | Исследовать и обновить базу данных угроз (threat intelligence) |
 
-**Examples:**
+**Примеры:**
 ```
-/release patch                 # Bump patch + release (3.20.4 → 3.20.5)
-/release minor                 # Bump minor + release (3.20.4 → 3.21.0)
-/update-infos-release          # Update CC releases only
-/update-infos-release patch    # Update CC + bump guide (3.9.11 → 3.9.12)
-/update-infos-release minor    # Update CC + bump guide (3.9.11 → 3.10.0)
-/version                       # Show versions and content stats
-/changelog 10                  # Last 10 CHANGELOG entries
-/sync                          # Check guide/landing sync status
-/audit-agents-skills           # Audit current project
-/audit-agents-skills --fix     # Audit + fix suggestions
-/audit-agents-skills ~/other   # Audit another project
-/security-check                # Quick scan config vs known threats
-/security-audit                # Full audit with posture score /100
-/update-threat-db              # Research + update threat-db.yaml
+/release patch                 # Повысить patch + релиз (3.20.4 → 3.20.5)
+/release minor                 # Повысить minor + релиз (3.20.4 → 3.21.0)
+/update-infos-release          # Обновить только релизы CC
+/update-infos-release patch    # Обновить CC + повысить версию руководства (3.9.11 → 3.9.12)
+/update-infos-release minor    # Обновить CC + повысить версию руководства (3.9.11 → 3.10.0)
+/version                       # Показать версии и статистику контента
+/changelog 10                  # Последние 10 записей CHANGELOG
+/sync                          # Проверить статус синхронизации руководства и лендинга
+/audit-agents-skills           # Аудит текущего проекта
+/audit-agents-skills --fix     # Аудит + предложения по исправлению
+/audit-agents-skills ~/other   # Аудит другого проекта
+/security-check                # Быстрая проверка конфигурации по известным угрозам
+/security-audit                # Полный аудит с оценкой защищённости /100
+/update-threat-db              # Исследовать + обновить threat-db.yaml
 ```
 
-These commands are defined in `.claude/commands/` and automate:
-- Claude Code releases tracking (YAML + Markdown + Landing badge)
-- Guide version management (VERSION file + sync across all docs)
-- CHANGELOG updates
-- Landing site synchronization verification
-- Git commit and push to both repositories
+Эти команды определены в `.claude/commands/` и автоматизируют:
+- Отслеживание релизов Claude Code (YAML + Markdown + бейдж на лендинге)
+- Управление версиями руководства (файл VERSION + синхронизация во всей документации)
+- Обновления CHANGELOG
+- Проверку синхронизации лендинга
+- Git commit и push в оба репозитория
 
-### Command Naming Conventions
+### Соглашения об именовании команд
 
-Implicit prefixes used in `.claude/commands/`:
+Неявные префиксы, используемые в `.claude/commands/`:
 
-| Prefix | Pattern | Examples |
-|--------|---------|---------|
-| `audit-*` | Quality checks with scored output | `audit-agents-skills`, `audit-deps` |
-| `update-*` | Sync or refresh data from external source | `update-infos-release`, `update-threat-db` |
-| `security-*` | Security scans, ascending depth | `security-check` (quick), `security-audit` (full) |
-| *(no prefix)* | Core guide workflow commands | `release`, `sync`, `version`, `changelog` |
+| Префикс | Паттерн | Примеры |
+|---------|---------|---------|
+| `audit-*` | Проверки качества с балльной оценкой | `audit-agents-skills`, `audit-deps` |
+| `update-*` | Синхронизация или обновление данных из внешнего источника | `update-infos-release`, `update-threat-db` |
+| `security-*` | Проверки безопасности по возрастанию глубины | `security-check` (быстрая), `security-audit` (полная) |
+| *(без префикса)* | Основные команды рабочего процесса руководства | `release`, `sync`, `version`, `changelog` |
 
-When adding a new command, pick the prefix that matches the action type. Avoid creating new prefix categories unless the existing four don't fit.
+При добавлении новой команды выбирайте префикс, соответствующий типу действия. Избегайте создания новых категорий префиксов, если только существующие четыре не подходят.
 
-## Behavioral Rules
+## Правила поведения
 
-These rules come from observed friction patterns in actual sessions on this repo.
+Эти правила выведены из повторяющихся проблем, наблюдавшихся в реальных сессиях работы с этим репозиторием.
 
-### Always update CHANGELOG.md
-After any file modification or feature implementation, update `CHANGELOG.md` under `[Unreleased]`. Never skip this step unless explicitly told to. This is the most common missed step.
+### Всегда обновлять CHANGELOG.md
+После любого изменения файлов или реализации функциональности обновляйте `CHANGELOG.md` в разделе `[Unreleased]`. Никогда не пропускайте этот шаг, если не указано обратное. Это самый часто забываемый шаг.
 
-### Be exhaustive on first pass
-When asked to analyze, audit, or review anything, read every relevant file. Do not do a superficial scan. If unsure of scope, ask rather than delivering shallow results. This applies to resource evaluations, doc audits, and codebase reviews.
+### Быть исчерпывающим с первого прохода
+Когда вас просят что-либо проанализировать, провести аудит или ревью, читайте каждый релевантный файл. Не ограничивайтесь поверхностным просмотром. Если область задачи неясна — лучше уточните, чем выдавать поверхностный результат. Это относится к оценкам ресурсов, аудитам документации и ревью кодовой базы.
 
-### Public content must be portable
+### Публичный контент должен быть переносимым
 
-Apply this rule to guides, evaluations, examples, changelogs, indexes, exports, and landing content, including code blocks, tables, captions, and link targets.
+Применяйте это правило к руководствам, оценкам, примерам, журналам изменений, индексам, экспортам и контенту лендинга — включая блоки кода, таблицы, подписи и адреса ссылок.
 
-1. Use repository-relative paths for files distributed with the project and verified public URLs for external sources. Give commands a clear starting directory, such as the cloned repository root.
-2. Never publish personal home directories, temporary checkout paths, private workspace locations, local file URLs, or private notes and correspondence as reader-accessible evidence. Check copied logs and generated content too. If no public source exists, state the evidence limitation or omit the reference; never invent a replacement URL.
-3. Omit audit bookkeeping such as "Local source" columns and standalone revision-hash tables. Use public source permalinks when provenance matters. Display a version or hash only when readers need it to reproduce a command or understand version-specific behavior.
-4. Use generic placeholders such as `/path/to/project` when an absolute path is necessary for an example. Preserve real system paths when they are the subject of the explanation.
-5. Reserve absolute workstation paths for private task reports and clickable local-file references to the user. They do not belong in committed public content.
+1. Используйте пути относительно репозитория для файлов, распространяемых с проектом, и проверенные публичные URL для внешних источников. Указывайте для команд понятную стартовую директорию — например, корень клонированного репозитория.
+2. Никогда не публикуйте пути к личным домашним директориям, временные пути checkout, расположения приватных рабочих пространств, локальные file-URL, а также личные заметки и переписку в качестве доказательств, доступных читателю. Проверяйте также скопированные логи и сгенерированный контент. Если публичного источника не существует, укажите ограничение доказательности или опустите ссылку; никогда не выдумывайте URL на замену.
+3. Опускайте служебный учёт аудита, такой как столбцы «Local source» и отдельные таблицы хэшей ревизий. Когда важно происхождение источника, используйте публичные постоянные ссылки (permalinks). Показывайте версию или хэш только тогда, когда это нужно читателям для воспроизведения команды или понимания поведения конкретной версии.
+4. Используйте общие плейсхолдеры вроде `/path/to/project`, когда в примере необходим абсолютный путь. Сохраняйте реальные системные пути, когда именно они являются предметом объяснения.
+5. Оставляйте абсолютные пути рабочей станции только для приватных отчётов о задачах и кликабельных ссылок на локальные файлы для пользователя. Им не место в закоммиченном публичном контенте.
 
-Before publishing, run `python3 scripts/check-public-paths.py`. Include the built landing using the script's dist option when applicable. The detector covers path patterns; manually review source accessibility and unnecessary revision metadata.
+Перед публикацией запускайте `python3 scripts/check-public-paths.py`. При необходимости включайте собранный лендинг с помощью опции dist скрипта. Детектор покрывает шаблоны путей; доступность источников и лишние метаданные ревизий проверяйте вручную.
 
-### Closing checklist
-After completing all requested tasks, always confirm unprompted:
-1. Files changed (list them)
-2. CHANGELOG.md updated
-3. Committed and pushed (if applicable): include the commit hash
+### Итоговый чек-лист
+После выполнения всех запрошенных задач всегда подтверждайте без дополнительного напоминания:
+1. Изменённые файлы (перечислите их)
+2. CHANGELOG.md обновлён
+3. Закоммичено и отправлено в удалённый репозиторий (если применимо): укажите хэш коммита
 
-### Bias toward action
-Do not spend extended time in exploration or planning loops. Produce files and concrete output early, then iterate. If stuck for more than 2 attempts on any step, explain the blocker instead of looping.
+### Ориентация на действие
+Не тратьте много времени на циклы исследования или планирования. Создавайте файлы и конкретные результаты как можно раньше, затем итерируйте. Если застряли на каком-либо шаге более чем на 2 попытки, объясните блокер вместо того, чтобы зацикливаться.
 
-## Conventions
+## Соглашения
 
-### Documentation Style
-- **Accuracy over marketing**: No invented percentages or unverified claims
-- **Practical examples**: Every concept has a concrete example
-- **Source attribution**: Credit community contributions with links
-- **Version alignment**: All version numbers must match `VERSION` file
+### Стиль документации
+- **Точность важнее маркетинга**: никаких выдуманных процентов или неподтверждённых утверждений
+- **Практические примеры**: у каждой концепции есть конкретный пример
+- **Указание авторства источников**: отмечайте вклад сообщества со ссылками
+- **Согласованность версий**: все номера версий должны соответствовать файлу `VERSION`
 
-### File Organization
-- New guides → `guide/`
-- New templates → `examples/{agents,commands,hooks,skills}/`
-- Navigation updates → Update both `README.md` and `guide/README.md`
+### Организация файлов
+- Новые руководства → `guide/`
+- Новые шаблоны → `examples/{agents,commands,hooks,skills}/`
+- Обновления навигации → обновляйте и `README.md`, и `guide/README.md`
 
-### Versioning
-- `VERSION` file is the single source of truth
-- Run `./scripts/sync-version.sh` after changing version
-- Files that contain version: README.md, cheatsheet.md, ultimate-guide.md, reference.yaml
-- `CLAUDE.md`/`AGENTS.md` are excluded from `sync-version.sh` on purpose: their command examples cite version bumps illustratively (`3.9.11 → 3.9.12`), and the script's blind `3.x.x` regex would corrupt those examples into nonsense. Fix the standalone "currently X.Y.Z" line by hand when it drifts.
+### Версионирование
+- Файл `VERSION` — единый источник истины
+- Запускайте `./scripts/sync-version.sh` после изменения версии
+- Файлы, содержащие версию: README.md, cheatsheet.md, ultimate-guide.md, reference.yaml
+- `CLAUDE.md`/`AGENTS.md` намеренно исключены из `sync-version.sh`: их примеры команд приводят повышения версий в иллюстративных целях (`3.9.11 → 3.9.12`), и слепое регулярное выражение `3.x.x` в скрипте испортило бы эти примеры, превратив их в бессмыслицу. Исправляйте отдельную строку «текущая — X.Y.Z» («currently X.Y.Z») вручную при её рассинхронизации.
 
-## Current Focus
+## Текущий фокус
 
-Check `IDEAS.md` for planned improvements and `CHANGELOG.md [Unreleased]` for work in progress.
+Проверяйте `IDEAS.md` на предмет запланированных улучшений и `CHANGELOG.md [Unreleased]` на предмет текущей работы.
 
-## Model Configuration
+## Конфигурация моделей
 
-**Recommended mode**: `/model opusplan`
+**Рекомендуемый режим**: `/model opusplan`
 
-**Rationale**: This documentation repository benefits from hybrid intelligence:
-- **Planning phase** (Opus + thinking): Architecture decisions, research synthesis, multi-file analysis
-- **Execution phase** (Sonnet): Doc updates, version syncing, template edits, formatting
+**Обоснование**: этому репозиторию документации выгоден гибридный подход:
+- **Фаза планирования** (Opus + thinking): архитектурные решения, синтез исследований, анализ множества файлов
+- **Фаза выполнения** (Sonnet): обновление документации, синхронизация версий, правка шаблонов, форматирование
 
-**OpusPlan workflow**:
-1. `/model opusplan` → Set hybrid mode
-2. `/plan` or `Shift+Tab × 2` → Plan with Opus (thinking enabled)
-3. `Shift+Tab` → Execute with Sonnet (faster, cheaper)
+**Рабочий процесс OpusPlan**:
+1. `/model opusplan` → включить гибридный режим
+2. `/plan` или `Shift+Tab × 2` → планирование с Opus (режим thinking включён)
+3. `Shift+Tab` → выполнение с Sonnet (быстрее, дешевле)
 
-**Typical task breakdown**:
-| Task Type | Model | Justification |
-|-----------|-------|---------------|
-| Doc edits, typo fixes | Sonnet | Straightforward, no deep reasoning |
-| Version sync, formatting | Sonnet | Mechanical pattern matching |
-| Guide restructuring | Opus (plan) → Sonnet (execute) | Needs architecture thinking first |
-| Research synthesis | Opus (plan) → Sonnet (write) | Complex analysis, then clear writing |
-| Multi-file consistency checks | Opus (plan) → Sonnet (fix) | Dependency analysis, then edits |
+**Типовое распределение задач**:
+| Тип задачи | Модель | Обоснование |
+|------------|--------|-------------|
+| Правки документации, исправление опечаток | Sonnet | Прямолинейная задача, глубокое рассуждение не требуется |
+| Синхронизация версий, форматирование | Sonnet | Механическое сопоставление по шаблону |
+| Реструктуризация руководства | Opus (план) → Sonnet (выполнение) | Сначала требуется архитектурное мышление |
+| Синтез исследований | Opus (план) → Sonnet (написание) | Сложный анализ, затем ясное изложение |
+| Проверки согласованности по множеству файлов | Opus (план) → Sonnet (исправление) | Анализ зависимостей, затем правки |
 
-**Cost optimization**: OpusPlan pays Opus only for planning (typically 10-20% of tokens), Sonnet handles 80-90% of execution work.
+**Оптимизация затрат**: OpusPlan оплачивает Opus только на этапе планирования (обычно 10–20% токенов), а Sonnet выполняет 80–90% работы.
 
-## Landing Site Synchronization
+## Синхронизация лендинга
 
-Sync workflow, trigger conditions, guide reader rebuild, RSS feed, sitemap, and announcement banner:
+Рабочий процесс синхронизации, условия запуска, пересборка ридера руководства, RSS-лента, sitemap и баннер объявлений:
 
 @docs/workflows/landing-sync.md
 
-## Ecosystem (4 Repositories)
+## Экосистема (4 репозитория)
 
-Architecture, repo details, cross-repo sync triggers, relations between repos, and history:
+Архитектура, детали репозиториев, триггеры кросс-репозиторной синхронизации, связи между репозиториями и история:
 
 @docs/ecosystem.md
 
-## Research Resources
+## Ресурсы для исследований
 
-**Perplexity Pro disponible**: Pour toute recherche nécessitant des sources fiables ou des informations récentes sur Claude Code, Anthropic, ou les pratiques de développement assisté par IA:
-- Demande-moi de faire une recherche Perplexity (plus efficace que WebSearch basique)
-- Je te fournirai les résultats avec les sources
-- Utile pour: nouvelles features Claude Code, best practices communauté, comparaisons d'outils, documentation officielle mise à jour
+**Доступен Perplexity Pro**: для любого исследования, требующего надёжных источников или актуальной информации о Claude Code, Anthropic или практиках разработки с помощью ИИ:
+- Попроси меня выполнить поиск в Perplexity (эффективнее базового WebSearch)
+- Я предоставлю результаты вместе с источниками
+- Полезно для: новых функций Claude Code, лучших практик сообщества, сравнений инструментов, обновлённой официальной документации
 
-## Claude Code Releases Tracking
+## Отслеживание релизов Claude Code
 
-Files, update workflow, and YAML entry format:
+Файлы, рабочий процесс обновления и формат записей YAML:
 
 @docs/workflows/releases-tracking.md
 
-## Resource Evaluation Workflow
+## Рабочий процесс оценки ресурсов
 
-External resources (articles, videos, discussions) are evaluated before integration into the guide.
+Внешние ресурсы (статьи, видео, обсуждения) проходят оценку перед интеграцией в руководство.
 
-### Process
+### Процесс
 
-1. **Research**: Initial Perplexity search → Save prompt + results in `claudedocs/resource-evaluations/` (private)
-1b. **Cross-reference**: Si ressource liée à Claude Code, vérifier les claims contre `https://code.claude.com/docs/llms-full.txt` (source officielle ~98KB)
-2. **Evaluation**: Systematic scoring (1-5) → Create evaluation file in `docs/resource-evaluations/` (tracked)
-3. **Challenge**: Technical review by agent to ensure objectivity
-4. **Decision**: Integrate (score 3+), mention (score 2), or reject (score 1)
+1. **Исследование**: первичный поиск в Perplexity → сохранить промпт и результаты в `claudedocs/resource-evaluations/` (приватно)
+1b. **Перекрёстная проверка**: если ресурс связан с Claude Code, проверить утверждения по `https://code.claude.com/docs/llms-full.txt` (официальный источник ~98 КБ)
+2. **Оценка**: систематическая оценка по шкале (1–5) → создать файл оценки в `docs/resource-evaluations/` (отслеживается в Git)
+3. **Проверка на прочность (Challenge)**: техническое ревью агентом для обеспечения объективности
+4. **Решение**: интегрировать (оценка 3+), упомянуть (оценка 2) или отклонить (оценка 1)
 
-### File Organization
+### Организация файлов
 
-| Location | Content | Tracking |
-|----------|---------|----------|
-| `docs/resource-evaluations/` | Final evaluations (167 files) | ✅ Git tracked (public) |
-| `claudedocs/resource-evaluations/` | Working docs, prompts, private audits | ❌ Gitignored (private) |
+| Расположение | Содержимое | Отслеживание |
+|--------------|------------|--------------|
+| `docs/resource-evaluations/` | Итоговые оценки (167 файлов) | ✅ Отслеживается в Git (публично) |
+| `claudedocs/resource-evaluations/` | Рабочие документы, промпты, приватные аудиты | ❌ В .gitignore (приватно) |
 
-### Scoring Grid
+### Шкала оценок
 
-| Score | Action |
-|-------|--------|
-| 5 | Critical - Integrate immediately (<24h) |
-| 4 | High Value - Integrate within 1 week |
-| 3 | Moderate - Integrate when time available |
-| 2 | Marginal - Minimal mention or skip |
-| 1 | Low - Reject |
+| Оценка | Действие |
+|--------|----------|
+| 5 | Критическая важность — интегрировать немедленно (<24 ч) |
+| 4 | Высокая ценность — интегрировать в течение 1 недели |
+| 3 | Умеренная ценность — интегрировать по мере наличия времени |
+| 2 | Незначительная ценность — минимальное упоминание или пропуск |
+| 1 | Низкая ценность — отклонить |
 
-See full methodology: [`docs/resource-evaluations/README.md`](docs/resource-evaluations/README.md)
+Полная методология: [`docs/resource-evaluations/README.md`](docs/resource-evaluations/README.md)
 
-## Quick Lookups
+## Быстрый поиск информации
 
-For answering questions about Claude Code:
-0. **Doc officielle Anthropic (LLM-optimized)**: `https://code.claude.com/docs/llms.txt` (index ~65 pages) ou `https://code.claude.com/docs/llms-full.txt` (doc complète ~98KB) pour les faits officiels
-1. Search `machine-readable/reference.yaml` first (has line numbers to full guide)
-2. Use those line numbers to read relevant sections from `guide/ultimate-guide.md`
-3. Check `examples/` for ready-to-use templates
-4. Check `guide/core/claude-code-releases.md` for recent features/changes
-5. Si info manquante ou incertaine → demander une recherche Perplexity (communauté, comparaisons, retours)
+Чтобы ответить на вопросы о Claude Code:
+0. **Официальная документация Anthropic (оптимизирована для LLM)**: `https://code.claude.com/docs/llms.txt` (индекс ~65 страниц) или `https://code.claude.com/docs/llms-full.txt` (полная документация ~98 КБ) для официальных фактов
+1. Сначала ищите в `machine-readable/reference.yaml` (содержит номера строк в полном руководстве)
+2. Используйте эти номера строк для чтения нужных разделов в `guide/ultimate-guide.md`
+3. Проверьте `examples/` на наличие готовых к использованию шаблонов
+4. Проверьте `guide/core/claude-code-releases.md` на наличие недавних функций и изменений
+5. Если информация отсутствует или вызывает сомнения → запросите поиск в Perplexity (сообщество, сравнения, отзывы)

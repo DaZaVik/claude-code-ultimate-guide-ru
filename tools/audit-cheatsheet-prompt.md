@@ -1,92 +1,92 @@
-# Audit your landing cheatsheet
+# Аудит шпаргалки для лендинга
 
-> A self-contained prompt to evaluate if your project needs a cheatsheet and audit existing ones against the gold standard.
+> Самодостаточный промпт для оценки того, нужна ли вашему проекту шпаргалка, и аудита уже существующих шпаргалок по эталонному стандарту.
 
-**Author**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Fractional Chief AI Officer
+**Автор**: [Florian BRUNIAUX](https://github.com/FlorianBruniaux) | Fractional Chief AI Officer
 
-**Reference**: [Claude Code Ultimate Guide Cheatsheet](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/cheatsheet.md) (gold standard)
-
----
-
-## 1. What this does
-
-This prompt instructs Claude to perform a systematic cheatsheet audit in 4 phases:
-
-1. **Discovery** — Explore the project source + landing to understand scope
-2. **Evaluation** — Score whether the project needs a cheatsheet (objective criteria)
-3. **Audit** — If a cheatsheet exists, grade it against 13 quality checkpoints
-4. **Recommendation** — Go/no-go decision with actionable plan
-
-**Covers 3 scenarios**:
-- No cheatsheet exists → need assessment + go/no-go
-- Partial cheatsheet (HTML only, or MD only) → gap analysis
-- Complete cheatsheet (MD + PDF + HTML) → quality audit
-
-**Time**: ~3-5 minutes depending on project size
+**Эталон**: [Шпаргалка Claude Code Ultimate Guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/cheatsheet.md) (золотой стандарт)
 
 ---
 
-## 2. Who this is for
+## 1. Что делает этот промпт
 
-| Audience | What You'll Get |
-|----------|-----------------|
-| **Project maintainer** | Clear go/no-go on creating a cheatsheet |
-| **Landing page builder** | Quality checklist for cheatsheet pages |
-| **Documentation lead** | Gap analysis and prioritized improvements |
+Этот промпт задаёт Claude систематический аудит шпаргалки в 4 этапа:
 
-**Prerequisites**:
-- Claude Code installed and working
-- Access to the project source code (repo with docs/README)
-- Access to the landing site (if exists)
-- Bash shell (native on macOS/Linux, WSL on Windows)
+1. **Обследование (Discovery)** — изучение исходников проекта и лендинга для понимания масштаба
+2. **Оценка необходимости (Evaluation)** — балльная оценка по объективным критериям, нужна ли проекту шпаргалка
+3. **Аудит (Audit)** — если шпаргалка уже есть, проверка её качества по 13 контрольным пунктам
+4. **Рекомендация (Recommendation)** — решение «делать / не делать» (go/no-go) с конкретным планом действий
+
+**Охватывает 3 сценария**:
+- Шпаргалки нет → оценка необходимости + решение go/no-go
+- Частичная шпаргалка (только HTML или только MD) → анализ пробелов
+- Полная шпаргалка (MD + PDF + HTML) → аудит качества
+
+**Время**: ~3–5 минут в зависимости от размера проекта
 
 ---
 
-## 3. How to use it
+## 2. Для кого это предназначено
 
-### Step 1: Copy the prompt
+| Аудитория | Что вы получите |
+|-----------|-----------------|
+| **Мейнтейнер проекта** | Чёткое решение go/no-go по созданию шпаргалки |
+| **Создатель лендинга** | Чек-лист качества для страниц со шпаргалками |
+| **Руководитель по документации** | Анализ пробелов и приоритизированный список улучшений |
 
-Copy everything inside the code block in [Section 4](#4-the-prompt) below.
+**Требования**:
+- Установленный и работающий Claude Code
+- Доступ к исходному коду проекта (репозиторий с документацией / README)
+- Доступ к лендингу (если он существует)
+- Оболочка Bash (нативно на macOS/Linux, WSL на Windows)
 
-### Step 2: Navigate to your project
+---
+
+## 3. Как использовать
+
+### Шаг 1: Скопируйте промпт
+
+Скопируйте всё содержимое блока кода в [Разделе 4](#4-the-prompt) ниже.
+
+### Шаг 2: Перейдите в каталог вашего проекта
 
 ```bash
 cd your-project-directory
 claude
 ```
 
-### Step 3: Paste and execute
+### Шаг 3: Вставьте и запустите
 
-Paste the prompt and press Enter. Claude will begin the 4-phase audit.
+Вставьте промпт и нажмите Enter. Claude начнёт 4-этапный аудит.
 
-### Step 4: Review results
+### Шаг 4: Изучите результаты
 
-Claude will present findings per phase and a final summary with actionable recommendations.
+Claude представит выводы по каждому этапу и итоговое резюме с практическими рекомендациями.
 
 ---
 
-## 4. The prompt
+## 4. Промпт
 
 ````markdown
-# Cheatsheet Audit
+# Аудит шпаргалки
 
-## Context
+## Контекст
 
-You are a documentation quality auditor. Your job is to evaluate whether this project needs a cheatsheet, and if one exists, audit its quality against a proven gold standard.
+Ты — аудитор качества документации. Твоя задача — оценить, нужна ли этому проекту шпаргалка, а если она уже существует, провести аудит её качества по проверенному золотому стандарту.
 
-**Gold standard reference**: The Claude Code Ultimate Guide cheatsheet — a 527-line Markdown file that condenses a 11K-line guide into 1 printable page, with matching PDF and HTML landing page versions.
+**Эталон золотого стандарта**: шпаргалка Claude Code Ultimate Guide — файл Markdown объёмом 527 строк, который сжимает руководство на 11 тыс. строк до 1 печатной страницы, с соответствующими версиями в PDF и HTML для лендинга.
 
-## Instructions
+## Инструкции
 
-Run all 4 phases sequentially. Report findings after each phase before proceeding.
+Выполни все 4 этапа последовательно. Сообщай результаты после каждого этапа, прежде чем переходить к следующему.
 
 ---
 
-### Phase 1: Discovery
+### Этап 1: Обследование (Discovery)
 
-**Goal**: Understand the project scope, audience, and existing documentation assets.
+**Цель**: понять масштаб проекта, его аудиторию и существующие материалы документации.
 
-#### 1.1 Project Source Scan
+#### 1.1 Сканирование исходников проекта
 
 ```bash
 bash -c '
@@ -119,9 +119,9 @@ done
 '
 ```
 
-#### 1.2 Landing Site Scan
+#### 1.2 Сканирование лендинга
 
-If the project has an associated landing site, scan it:
+Если у проекта есть связанный лендинг, просканируй его:
 
 ```bash
 bash -c '
@@ -140,7 +140,7 @@ find .. -maxdepth 3 -path "*landing*" -name "*cheatsheet*" 2>/dev/null | head -1
 '
 ```
 
-#### 1.3 Content Complexity Assessment
+#### 1.3 Оценка сложности контента
 
 ```bash
 bash -c '
@@ -169,306 +169,306 @@ find . -name "*.md" -not -path "./.git/*" -not -path "*/node_modules/*" | xargs 
 '
 ```
 
-**After running Phase 1, report:**
-- Project name, version, type (CLI tool / library / app / framework)
-- Target audience (developers / non-devs / mixed)
-- Documentation volume (lines, files)
-- Existing cheatsheet assets found (MD, PDF, HTML, none)
-- Complexity indicators summary
+**После выполнения Этапа 1 отчитайся по следующим пунктам:**
+- Название проекта, версия, тип (CLI-инструмент / библиотека / приложение / фреймворк)
+- Целевая аудитория (разработчики / неразработчики / смешанная)
+- Объём документации (строки, файлы)
+- Найденные существующие материалы шпаргалки (MD, PDF, HTML, отсутствуют)
+- Сводка индикаторов сложности
 
 ---
 
-### Phase 2: Need Evaluation
+### Этап 2: Оценка необходимости
 
-**Goal**: Determine objectively whether this project warrants a cheatsheet.
+**Цель**: объективно определить, оправдано ли создание шпаргалки для этого проекта.
 
-Score each criterion 0-2 (0 = no, 1 = partial, 2 = yes):
+Оцени каждый критерий от 0 до 2 (0 = нет, 1 = частично, 2 = да):
 
-| # | Criterion | Score Guide | Score |
-|---|-----------|-------------|-------|
-| 1 | **Command surface** | 2 = 10+ commands, 1 = 5-9, 0 = <5 | |
-| 2 | **Keyboard shortcuts** | 2 = 5+ shortcuts, 1 = 2-4, 0 = 0-1 | |
-| 3 | **Configuration complexity** | 2 = multiple config files/levels, 1 = single config, 0 = minimal | |
-| 4 | **Multi-step workflows** | 2 = documented workflows, 1 = implicit workflows, 0 = none | |
-| 5 | **Decision points** | 2 = multiple modes/options to choose from, 1 = some, 0 = linear | |
-| 6 | **Reference frequency** | 2 = users look up daily, 1 = weekly, 0 = once then done | |
-| 7 | **Documentation volume** | 2 = >2000 lines docs, 1 = 500-2000, 0 = <500 | |
-| 8 | **Audience breadth** | 2 = beginners + advanced, 1 = single level, 0 = niche experts | |
+| # | Критерий | Шкала оценки | Балл |
+|---|----------|--------------|------|
+| 1 | **Поверхность команд** | 2 = 10+ команд, 1 = 5–9, 0 = <5 | |
+| 2 | **Горячие клавиши** | 2 = 5+ сочетаний, 1 = 2–4, 0 = 0–1 | |
+| 3 | **Сложность конфигурации** | 2 = несколько файлов/уровней конфига, 1 = один конфиг, 0 = минимальная | |
+| 4 | **Многошаговые рабочие процессы** | 2 = задокументированные воркфлоу, 1 = неявные воркфлоу, 0 = нет | |
+| 5 | **Точки принятия решений** | 2 = несколько режимов/опций на выбор, 1 = немного, 0 = линейный сценарий | |
+| 6 | **Частота обращений к справке** | 2 = пользователи смотрят ежедневно, 1 = еженедельно, 0 = один раз и готово | |
+| 7 | **Объём документации** | 2 = >2000 строк документации, 1 = 500–2000, 0 = <500 | |
+| 8 | **Широта аудитории** | 2 = новички + продвинутые, 1 = один уровень, 0 = узкие специалисты | |
 
-**Scoring**:
-- **12-16**: Strong need — cheatsheet is high value
-- **8-11**: Moderate need — cheatsheet adds value
-- **4-7**: Low need — consider a "Quick Start" section instead
-- **0-3**: No need — a good README suffices
+**Интерпретация баллов**:
+- **12–16**: Высокая потребность — шпаргалка принесёт большую пользу
+- **8–11**: Умеренная потребность — шпаргалка добавит ценность
+- **4–7**: Низкая потребность — лучше рассмотреть раздел «Быстрый старт» (Quick Start)
+- **0–3**: Нет потребности — достаточно хорошего README
 
-**Report**: Table with scores, total, and verdict (Strong/Moderate/Low/None).
-
----
-
-### Phase 3: Quality Audit (if cheatsheet exists)
-
-**Goal**: Grade the existing cheatsheet against the gold standard's 13 quality checkpoints.
-
-If no cheatsheet was found in Phase 1, skip to Phase 4.
-
-For each checkpoint, grade: Pass / Partial / Fail / N/A.
-
-#### A. Version & Date Sync
-
-Check that version numbers match the project's source of truth:
-- Header/footer version matches `VERSION` file or `package.json`
-- "Last updated" date is current (within 1 month of latest release)
-- HTML: schema.org `dateModified` matches
-- HTML: Open Graph metadata matches
-
-#### B. Factual Accuracy
-
-Spot-check 3-5 factual claims against the source documentation:
-- Are described features still current? (no deprecated items listed as active)
-- Are version requirements accurate?
-- Are any "keywords" or "magic strings" documented that don't actually work?
-
-#### C. Commands Completeness
-
-Compare commands listed vs. actual available commands:
-- Count commands in cheatsheet vs. source docs
-- Flag any missing essential commands
-- Flag any deprecated commands still listed
-
-#### D. Keyboard Shortcuts Completeness
-
-Compare shortcuts listed vs. actual shortcuts:
-- Cross-reference with source documentation
-- Check platform-specific variants (macOS vs Windows/Linux)
-- Verify no deprecated shortcuts
-
-#### E. Feature Tables Accuracy
-
-For each feature table in the cheatsheet:
-- Verify column values against source docs
-- Check for outdated entries
-- Verify links still work
-
-#### F. Decision Trees / Quick Reference
-
-If the cheatsheet includes decision trees or flowcharts:
-- Verify all paths lead to valid recommendations
-- Check that referenced features/commands exist
-- Ensure no dead-end paths
-
-#### G. Folder Structure / Config
-
-If folder structure or config layout is documented:
-- Compare against actual project structure
-- Verify all listed files/dirs exist
-- Flag any missing important paths
-
-#### H. Installation Correctness
-
-If installation instructions are included:
-- Verify package name is correct
-- Check version constraints
-- Test install command mentally against current ecosystem
-
-#### I. Section Coverage (cross-format)
-
-Compare coverage across available formats:
-
-| Section | MD | PDF | HTML |
-|---------|:--:|:---:|:----:|
-| Commands | ? | ? | ? |
-| Shortcuts | ? | ? | ? |
-| Config | ? | ? | ? |
-| Workflows | ? | ? | ? |
-| Troubleshooting | ? | ? | ? |
-
-Flag sections present in one format but missing in another.
-
-#### J. Cost / Pricing Accuracy
-
-If pricing or cost information is included:
-- Verify against current official pricing
-- Check that model names are current
-- Verify any "free tier" claims
-
-#### K. CLI Flags Completeness
-
-If CLI flags are documented:
-- Compare against `--help` output or source docs
-- Flag missing commonly-used flags
-- Flag deprecated flags still listed
-
-#### L. SEO / Schema.org (HTML landing only)
-
-For HTML cheatsheet pages:
-- Verify `<script type="application/ld+json">` schema exists
-- Check `dateModified` is current
-- Verify canonical URL
-- Check Open Graph tags (title, description, image)
-- Check meta description accuracy
-- Verify print CSS exists (cheatsheets get printed)
-
-#### M. PDF Rendering Quality
-
-For PDF cheatsheets:
-- Tables render correctly (no broken columns)
-- Special characters display properly (checkmarks, arrows, emojis)
-- Code blocks are readable (monospace font, syntax highlighting)
-- Fits intended page count (1 page for quick ref, 2-4 for detailed)
-- Print-friendly (no dark backgrounds eating ink)
-
-**Report**: Table with all 13 checkpoints graded, plus notes on critical failures.
+**Отчёт**: таблица с баллами, итоговой суммой и вердиктом (Высокая / Умеренная / Низкая / Нет).
 
 ---
 
-### Phase 4: Recommendation
+### Этап 3: Аудит качества (если шпаргалка существует)
 
-**Goal**: Deliver a clear, actionable verdict.
+**Цель**: оценить существующую шпаргалку по 13 контрольным пунктам золотого стандарта.
 
-#### If no cheatsheet exists (Phase 2 result)
+Если на Этапе 1 шпаргалка не найдена, перейди сразу к Этапу 4.
 
-Based on the need score:
+Для каждого контрольного пункта выставь оценку: Пройдено (Pass) / Частично (Partial) / Провалено (Fail) / Неприменимо (N/A).
 
-**Score 12-16 (Strong need)**:
+#### A. Синхронизация версии и даты
+
+Проверь, что номера версий совпадают с источником истины проекта:
+- Версия в шапке/подвале совпадает с файлом `VERSION` или `package.json`
+- Дата «Последнее обновление» актуальна (в пределах 1 месяца от последнего релиза)
+- HTML: совпадает `dateModified` в schema.org
+- HTML: совпадают метаданные Open Graph
+
+#### B. Фактическая точность
+
+Выборочно проверь 3–5 фактических утверждений по исходной документации:
+- Актуальны ли описанные возможности? (нет ли устаревших функций, указанных как активные)
+- Точны ли требования к версиям?
+- Не задокументированы ли «ключевые слова» или «магические строки», которые на самом деле не работают?
+
+#### C. Полнота списка команд
+
+Сравни перечисленные команды с реально доступными:
+- Подсчитай количество команд в шпаргалке против исходной документации
+- Отметь все отсутствующие важные команды
+- Отметь все устаревшие команды, которые всё ещё указаны
+
+#### D. Полнота горячих клавиш
+
+Сравни перечисленные сочетания клавиш с реальными:
+- Сверь с исходной документацией
+- Проверь платформозависимые варианты (macOS против Windows/Linux)
+- Убедись, что нет устаревших сочетаний клавиш
+
+#### E. Точность таблиц возможностей
+
+Для каждой таблицы возможностей в шпаргалке:
+- Сверь значения в столбцах с исходной документацией
+- Проверь на устаревшие записи
+- Убедись, что ссылки всё ещё работают
+
+#### F. Деревья решений / быстрая справка
+
+Если шпаргалка включает деревья решений или блок-схемы:
+- Убедись, что все ветви ведут к корректным рекомендациям
+- Проверь, что упоминаемые функции и команды существуют
+- Убедись, что нет тупиковых ветвей
+
+#### G. Структура папок / конфигурация
+
+Если задокументирована структура каталогов или схема конфигурации:
+- Сравни с фактической структурой проекта
+- Убедись, что все перечисленные файлы и каталоги существуют
+- Отметь отсутствующие важные пути
+
+#### H. Корректность установки
+
+Если включены инструкции по установке:
+- Проверь правильность имени пакета
+- Проверь ограничения по версиям
+- Мысленно проверь команду установки на соответствие текущей экосистеме
+
+#### I. Покрытие разделов (между форматами)
+
+Сравни покрытие между доступными форматами:
+
+| Раздел | MD | PDF | HTML |
+|--------|:--:|:---:|:----:|
+| Команды | ? | ? | ? |
+| Горячие клавиши | ? | ? | ? |
+| Конфигурация | ? | ? | ? |
+| Рабочие процессы | ? | ? | ? |
+| Устранение неполадок | ? | ? | ? |
+
+Отметь разделы, которые присутствуют в одном формате, но отсутствуют в другом.
+
+#### J. Точность цен / стоимости
+
+Если включена информация о тарифах или стоимости:
+- Сверь с текущими официальными ценами
+- Проверь актуальность названий моделей
+- Проверь любые заявления о «бесплатном тарифе» (free tier)
+
+#### K. Полнота CLI-флагов
+
+Если задокументированы CLI-флаги:
+- Сравни с выводом `--help` или исходной документацией
+- Отметь отсутствующие часто используемые флаги
+- Отметь устаревшие флаги, которые всё ещё указаны
+
+#### L. SEO / Schema.org (только для HTML-лендинга)
+
+Для HTML-страниц со шпаргалкой:
+- Проверь наличие схемы `<script type="application/ld+json">`
+- Проверь актуальность `dateModified`
+- Проверь канонический URL (`canonical`)
+- Проверь теги Open Graph (title, description, image)
+- Проверь точность meta description
+- Проверь наличие CSS для печати (шпаргалки распечатывают)
+
+#### M. Качество рендеринга PDF
+
+Для PDF-шпаргалок:
+- Таблицы отображаются корректно (нет сломанных столбцов)
+- Спецсимволы отображаются правильно (галочки, стрелки, эмодзи)
+- Блоки кода читаемы (моноширинный шрифт, подсветка синтаксиса)
+- Соответствует целевому числу страниц (1 страница для краткой справки, 2–4 для подробной)
+- Удобно для печати (нет тёмных фонов, расходующих чернила)
+
+**Отчёт**: таблица с оценками по всем 13 контрольным пунктам плюс заметки о критических провалах.
+
+---
+
+### Этап 4: Рекомендация
+
+**Цель**: выдать чёткий вердикт с конкретными действиями.
+
+#### Если шпаргалки нет (результат Этапа 2)
+
+На основе оценки необходимости:
+
+**Балл 12–16 (Высокая потребность)**:
 ```
-VERDICT: GO — Create cheatsheet
-Priority: HIGH
-Estimated effort: [S/M/L based on complexity]
-Recommended formats: [MD only / MD+PDF / MD+PDF+HTML]
-Suggested sections (based on Phase 1 findings):
-1. [section] — [why]
-2. [section] — [why]
+ВЕРДИКТ: GO — Создать шпаргалку
+Приоритет: ВЫСОКИЙ
+Оценка трудозатрат: [S/M/L в зависимости от сложности]
+Рекомендуемые форматы: [только MD / MD+PDF / MD+PDF+HTML]
+Предлагаемые разделы (на основе находок Этапа 1):
+1. [раздел] — [почему]
+2. [раздел] — [почему]
 ...
 ```
 
-**Score 8-11 (Moderate need)**:
+**Балл 8–11 (Умеренная потребность)**:
 ```
-VERDICT: CONDITIONAL GO — Create if [condition]
-Priority: MEDIUM
-Condition: [e.g., "if landing site targets beginners"]
-Lighter alternative: [e.g., "expanded Quick Start in README"]
-```
-
-**Score 4-7 (Low need)**:
-```
-VERDICT: NO-GO — Quick Start section recommended instead
-Reason: [specific reasons]
-Alternative: Add a "Quick Start" or "TL;DR" section to README
+ВЕРДИКТ: CONDITIONAL GO — Создать при выполнении [условия]
+Приоритет: СРЕДНИЙ
+Условие: [например, «если лендинг ориентирован на новичков»]
+Более лёгкая альтернатива: [например, «расширенный раздел Quick Start в README»]
 ```
 
-**Score 0-3 (No need)**:
+**Балл 4–7 (Низкая потребность)**:
 ```
-VERDICT: NO-GO — README is sufficient
-Reason: [specific reasons]
+ВЕРДИКТ: NO-GO — Вместо этого рекомендуется раздел Quick Start
+Причина: [конкретные причины]
+Альтернатива: Добавить раздел «Quick Start» или «TL;DR» в README
 ```
 
-#### If cheatsheet exists (Phase 3 result)
+**Балл 0–3 (Нет потребности)**:
+```
+ВЕРДИКТ: NO-GO — Достаточно README
+Причина: [конкретные причины]
+```
+
+#### Если шпаргалка существует (результат Этапа 3)
 
 ```
-AUDIT SCORE: [X/13 passing]
-Critical failures: [list]
-Priority fixes:
-1. [fix] — [impact]
-2. [fix] — [impact]
+ИТОГ АУДИТА: [X/13 пройдено]
+Критические провалы: [список]
+Приоритетные исправления:
+1. [исправление] — [влияние]
+2. [исправление] — [влияние]
 ...
-Missing formats: [list needed: MD / PDF / HTML]
-Estimated effort to reach gold standard: [S/M/L]
+Отсутствующие форматы: [список нужных: MD / PDF / HTML]
+Оценка трудозатрат до золотого стандарта: [S/M/L]
 ```
 
 ---
 
-## Gold Standard Reference
+## Эталон золотого стандарта
 
-The Claude Code cheatsheet serves as the benchmark. Here's what makes it the gold standard:
+Шпаргалка Claude Code служит ориентиром. Вот что делает её золотым стандартом:
 
-### Structure (527 lines, 17 sections)
+### Структура (527 строк, 17 разделов)
 
 ```
-1. Essential Commands (15 commands, table format)
-2. Keyboard Shortcuts (9 shortcuts, table format)
-3. File References (syntax + IDE shortcuts)
-4. Hidden Features (versioned feature table)
-5. Permission Modes (3-mode matrix)
-6. Memory & Settings (2-level config with paths)
-7. .claude/ Folder Structure (tree diagram)
-8. Typical Workflow (numbered step-by-step)
-9. Context Management (thresholds + symptoms + recovery)
-10. Under the Hood (quick facts table)
-11. Plan Mode & Thinking (controls + cost + model switching)
-12. MCP Servers (7 servers, table format)
-13. Creating Custom Components (agent/command/hook templates)
-14. Anti-patterns (do/don't table)
-15. Quick Prompting Formula (template + example)
-16. CLI Flags Quick Reference (13 flags)
-17. Golden Rules (7 rules, numbered)
+1. Основные команды (15 команд, формат таблицы)
+2. Горячие клавиши (9 сочетаний, формат таблицы)
+3. Ссылки на файлы (синтаксис + сочетания клавиш IDE)
+4. Скрытые возможности (таблица функций с указанием версий)
+5. Режимы разрешений (матрица из 3 режимов)
+6. Память и настройки (двухуровневая конфигурация с путями)
+7. Структура папки .claude/ (дерево каталогов)
+8. Типичный рабочий процесс (нумерованные шаги)
+9. Управление контекстом (пороги + симптомы + восстановление)
+10. Под капотом (таблица быстрых фактов)
+11. Режим планирования и размышления (управление + стоимость + переключение моделей)
+12. MCP-серверы (7 серверов, формат таблицы)
+13. Создание пользовательских компонентов (шаблоны агента/команды/хука)
+14. Антипаттерны (таблица «делай / не делай»)
+15. Быстрая формула промптинга (шаблон + пример)
+16. Краткий справочник CLI-флагов (13 флагов)
+17. Золотые правила (7 нумерованных правил)
 ```
 
-### Quality Characteristics
+### Характеристики качества
 
-- **Density**: 527 lines condenses 19,000+ lines (36:1 ratio)
-- **Scannability**: Every section uses tables, code blocks, or numbered lists
-- **Actionability**: Every entry answers "what do I type?" not "what is this?"
-- **Cross-format**: MD (source) + PDF (print) + HTML (landing, with dark theme + print CSS)
-- **Version-synced**: Header, footer, schema.org all match VERSION file
-- **Platform-aware**: macOS + Windows paths where relevant
-- **Anti-pattern section**: Shows what NOT to do (high value for beginners)
-- **Decision tree**: "What should I do?" quick routing
+- **Плотность**: 527 строк сжимают более 19 000 строк (соотношение 36:1)
+- **Удобство беглого просмотра**: каждый раздел использует таблицы, блоки кода или нумерованные списки
+- **Применимость к действию**: каждая запись отвечает на вопрос «что мне ввести?», а не «что это такое?»
+- **Кросс-форматность**: MD (исходник) + PDF (печать) + HTML (лендинг, с тёмной темой + CSS для печати)
+- **Синхронизация версий**: шапка, подвал и schema.org совпадают с файлом VERSION
+- **Учёт платформ**: пути для macOS и Windows там, где это актуально
+- **Раздел антипаттернов**: показывает, чего делать НЕ нужно (высокая ценность для новичков)
+- **Дерево решений**: быстрая маршрутизация «Что мне делать?»
 
-### HTML Landing Patterns
+### Паттерны HTML-лендинга
 
-When evaluating HTML cheatsheet pages, the gold standard includes:
-- Dark theme with syntax highlighting
-- Print-optimized CSS (`@media print`)
-- Schema.org `TechArticle` markup with `dateModified`
-- Open Graph tags for social sharing
-- Responsive design (mobile-friendly tables)
-- Navigation integration (linked from main landing)
-- Download CTA for PDF version
+При оценке HTML-страниц со шпаргалкой золотой стандарт включает:
+- Тёмную тему с подсветкой синтаксиса
+- CSS, оптимизированный для печати (`@media print`)
+- Разметку Schema.org `TechArticle` с полем `dateModified`
+- Теги Open Graph для публикации в соцсетях
+- Адаптивный дизайн (таблицы, удобные для мобильных устройств)
+- Интеграцию в навигацию (ссылка с главного лендинга)
+- Кнопку (CTA) для скачивания PDF-версии
 ````
 
 ---
 
-## 5. Example output
+## 5. Пример вывода
 
-Here's what the audit looks like when run against a real project:
+Вот как выглядит аудит при запуске на реальном проекте:
 
-### Example: Project with no cheatsheet
+### Пример: проект без шпаргалки
 
 ```
-=== PHASE 1: DISCOVERY ===
-Project: cc-copilot-bridge v1.5.3 (CLI tool)
-Audience: Developers (VS Code users)
-Docs: README.md (450 lines), 3 guide files (1200 lines total)
-Cheatsheet: None found
-Complexity: 12 commands, 6 config options, 3 workflows
+=== ЭТАП 1: ОБСЛЕДОВАНИЕ ===
+Проект: cc-copilot-bridge v1.5.3 (CLI-инструмент)
+Аудитория: разработчики (пользователи VS Code)
+Документация: README.md (450 строк), 3 файла руководства (всего 1200 строк)
+Шпаргалка: не найдена
+Сложность: 12 команд, 6 опций конфигурации, 3 рабочих процесса
 
-=== PHASE 2: NEED EVALUATION ===
-| # | Criterion              | Score |
-|---|------------------------|-------|
-| 1 | Command surface        | 2     |
-| 2 | Keyboard shortcuts     | 1     |
-| 3 | Config complexity      | 1     |
-| 4 | Multi-step workflows   | 2     |
-| 5 | Decision points        | 1     |
-| 6 | Reference frequency    | 2     |
-| 7 | Documentation volume   | 1     |
-| 8 | Audience breadth       | 1     |
-|   | **TOTAL**              | **11** |
+=== ЭТАП 2: ОЦЕНКА НЕОБХОДИМОСТИ ===
+| # | Критерий                     | Балл |
+|---|------------------------------|------|
+| 1 | Поверхность команд           | 2    |
+| 2 | Горячие клавиши              | 1    |
+| 3 | Сложность конфигурации       | 1    |
+| 4 | Многошаговые рабочие процессы| 2    |
+| 5 | Точки принятия решений       | 1    |
+| 6 | Частота обращений к справке  | 2    |
+| 7 | Объём документации           | 1    |
+| 8 | Широта аудитории             | 1    |
+|   | **ИТОГО**                    | **11** |
 
-VERDICT: CONDITIONAL GO
-Priority: MEDIUM
-Condition: If landing site is created for broader audience
-Lighter alternative: "Quick Reference" section in README
+ВЕРДИКТ: CONDITIONAL GO
+Приоритет: СРЕДНИЙ
+Условие: если будет создан лендинг для более широкой аудитории
+Более лёгкая альтернатива: раздел «Quick Reference» в README
 
-=== PHASE 3: SKIPPED (no cheatsheet) ===
+=== ЭТАП 3: ПРОПУЩЕН (шпаргалка отсутствует) ===
 
-=== PHASE 4: RECOMMENDATION ===
-If you decide to create a cheatsheet:
-- Start with MD format (1-2 hours)
-- Sections: Commands, Config, Workflows, Troubleshooting
-- Skip PDF/HTML until landing site exists
+=== ЭТАП 4: РЕКОМЕНДАЦИЯ ===
+Если вы решите создать шпаргалку:
+- Начните с формата MD (1–2 часа)
+- Разделы: Команды, Конфигурация, Рабочие процессы, Устранение неполадок
+- Отложите PDF/HTML до появления лендинга
 ```
 
 ---
 
-**Version**: 1.0.0 | **Last Updated**: February 2026
+**Версия**: 1.0.0 | **Последнее обновление**: февраль 2026

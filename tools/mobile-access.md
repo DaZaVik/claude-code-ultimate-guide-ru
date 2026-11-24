@@ -1,114 +1,114 @@
-# Claude Code mobile access
+# Мобильный доступ к Claude Code
 
-> **⚠️ STATUS: WIP / UNTESTED**
+> **⚠️ СТАТУС: В РАЗРАБОТКЕ (WIP) / НЕ ПРОТЕСТИРОВАНО**
 >
-> This guide is a work in progress. The setup has not been fully tested across different environments.
-> Use at your own risk. Contributions and feedback welcome.
+> Это руководство находится в процессе разработки. Настройка не была полностью протестирована в различных окружениях.
+> Используйте на свой страх и риск. Приветствуются доработки и обратная связь.
 
 ---
 
-## The problem
+## Проблема
 
-Claude Code CLI is a **local interactive process**, not a service with a session API. Each instance is autonomous. Even `claude --remote` only offloads execution—it doesn't create a relay system.
+Claude Code CLI — это **локальный интерактивный процесс**, а не сервис с API для управления сессиями. Каждый экземпляр автономен. Даже `claude --remote` лишь переносит выполнение — он не создаёт систему ретрансляции.
 
-**What's missing**: A native `claude --serve` mode that exposes a WebSocket API, allows multiple clients, and maintains the same conversation context.
+**Чего не хватает**: встроенного режима `claude --serve`, который открывал бы WebSocket API, позволял подключать несколько клиентов и сохранял единый контекст диалога.
 
-**The workaround**: Expose your terminal via web browser using `ttyd`, accessible from anywhere via `Tailscale` VPN.
+**Обходное решение**: открыть доступ к вашему терминалу через веб-браузер с помощью `ttyd`, доступный откуда угодно через VPN `Tailscale`.
 
 ---
 
-## Solution: ttyd + Tailscale
+## Решение: ttyd + Tailscale
 
 ```
-YOUR COMPUTER                     YOUR PHONE
+ВАШ КОМПЬЮТЕР                     ВАШ ТЕЛЕФОН
 ┌─────────────────┐               ┌─────────────────┐
-│  Claude Code    │◄──────────────│  Browser        │
-│  (runs here)    │   Tailscale   │  (same session) │
+│  Claude Code    │◄──────────────│  Браузер        │
+│ (работает здесь)│   Tailscale   │ (та же сессия)  │
 │                 │   (VPN)       │                 │
 └─────────────────┘               └─────────────────┘
 ```
 
-- **ttyd**: Exposes your terminal in a web browser
-- **Tailscale**: Free VPN that gives your computer a fixed IP, accessible from anywhere (4G, public WiFi, etc.)
-- **tmux**: Keeps session alive even if you close the browser
+- **ttyd**: открывает доступ к вашему терминалу в веб-браузере
+- **Tailscale**: бесплатный VPN, выдающий вашему компьютеру фиксированный IP, доступный откуда угодно (4G, публичный WiFi и т. д.)
+- **tmux**: сохраняет сессию активной, даже если вы закроете браузер
 
-**Use case**: Follow and continue Claude Code sessions from your phone (commuting, away from desk, etc.)
+**Сценарий использования**: отслеживать и продолжать сессии Claude Code с телефона (в дороге, вдали от рабочего места и т. д.)
 
 ---
 
-## Architecture comparison
+## Сравнение архитектур
 
-### ttyd + Tailscale (self-hosted)
+### ttyd + Tailscale (самостоятельный хостинг)
 
 ```
-YOUR COMPUTER                     YOUR PHONE
+ВАШ КОМПЬЮТЕР                     ВАШ ТЕЛЕФОН
 ┌─────────────────┐               ┌─────────────────┐
-│  Claude Code    │◄──────────────│  Browser        │
-│  (runs here)    │   Tailscale   │  (same session) │
+│  Claude Code    │◄──────────────│  Браузер        │
+│ (работает здесь)│   Tailscale   │ (та же сессия)  │
 │  ┌───────────┐  │   VPN         │                 │
 │  │   ttyd    │  │               └─────────────────┘
 │  └───────────┘  │
 └─────────────────┘
-✅ ToS-Safe: CLI officiel, pas d'intermédiaire cloud
+✅ Безопасно для ToS: официальный CLI, без облачного посредника
 ```
 
-### Happy Coder (App native)
+### Happy Coder (нативное приложение)
 
 ```
-YOUR COMPUTER                     YOUR PHONE
+ВАШ КОМПЬЮТЕР                     ВАШ ТЕЛЕФОН
 ┌─────────────────┐               ┌─────────────────┐
 │  Claude Code    │               │  Happy App      │
-│  (CLI officiel) │◄─────────────►│  (Expo native)  │
-│       ▲         │   Local sync  │                 │
-│  subprocess     │               └─────────────────┘
+│(официальный CLI)│◄─────────────►│  (Expo native)  │
+│       ▲         │  Лок. синхр.  │                 │
+│  подпроцесс     │               └─────────────────┘
 │  ┌───────────┐  │
 │  │ Happy Hub │  │
 │  └───────────┘  │
 └─────────────────┘
-✅ ToS-Safe: Wrapper local, subprocess Node.js
+✅ Безопасно для ToS: локальная обёртка, подпроцесс Node.js
 ```
 
-### Remoto.sh (Cloud relay)
+### Remoto.sh (облачный ретранслятор)
 
 ```
-REMOTO CLOUD                      YOUR PHONE
+ОБЛАКО REMOTO                     ВАШ ТЕЛЕФОН
 ┌─────────────────┐               ┌─────────────────┐
-│  Docker         │◄──────────────│  Browser        │
-│  Container      │   WebSocket   │                 │
+│  Docker         │◄──────────────│  Браузер        │
+│  Контейнер      │   WebSocket   │                 │
 │  ┌───────────┐  │               └─────────────────┘
 │  │ Claude    │  │
 │  │ Code CLI  │  │
 │  └───────────┘  │
 └─────────────────┘
-⚠️ ToS Risk: Cloud wrapping = potentiel "proxy non autorisé"
+⚠️ Риск для ToS: облачная обёртка = потенциальный «неавторизованный прокси»
 ```
 
 ---
 
-## Why this approach?
+## Почему именно этот подход?
 
-### ToS considerations
+### Вопросы соблюдения условий использования (ToS)
 
-Some third-party wrappers (like OpenCode) have been blocked by Anthropic for ToS violations. This approach is **ToS-safe** because:
+Некоторые сторонние обёртки (например, OpenCode) были заблокированы Anthropic за нарушение условий использования (ToS). Данный подход **безопасен с точки зрения ToS**, потому что:
 
-- You're using the **official Claude Code CLI**
-- ttyd just exposes your terminal via browser (no wrapper)
-- Tailscale is just a VPN for secure access
-- No third-party client interacting with Claude's API
-
----
-
-## Prerequisites
-
-- macOS or Linux
-- Claude Code CLI installed and authenticated
-- Tailscale account (free tier works)
+- Вы используете **официальный Claude Code CLI**
+- ttyd просто открывает ваш терминал через браузер (без обёртки)
+- Tailscale — это просто VPN для защищённого доступа
+- Никакой сторонний клиент не взаимодействует с API Claude
 
 ---
 
-## Installation
+## Предварительные требования
 
-### Quick setup script
+- macOS или Linux
+- Установленный и авторизованный Claude Code CLI
+- Учётная запись Tailscale (достаточно бесплатного тарифа)
+
+---
+
+## Установка
+
+### Скрипт быстрой настройки
 
 ```bash
 #!/bin/bash
@@ -118,7 +118,7 @@ set -e
 
 echo "=== Setup Claude Code Mobile ==="
 
-# 1. Install ttyd + tmux
+# 1. Установка ttyd + tmux
 echo "[1/2] Installing ttyd..."
 if [[ "$OSTYPE" == "darwin"* ]]; then
     brew install ttyd tmux
@@ -127,7 +127,7 @@ else
     sudo snap install ttyd --classic
 fi
 
-# 2. Install Tailscale
+# 2. Установка Tailscale
 echo "[2/2] Installing Tailscale..."
 if [[ "$OSTYPE" == "darwin"* ]]; then
     brew install tailscale
@@ -135,7 +135,7 @@ else
     curl -fsSL https://tailscale.com/install.sh | sh
 fi
 
-# 3. Create launcher script
+# 3. Создание скрипта запуска
 mkdir -p ~/.local/bin
 cat > ~/.local/bin/claude-mobile << 'EOF'
 #!/bin/bash
@@ -156,17 +156,17 @@ echo "Open this URL on your phone."
 echo "Press Ctrl+C to stop."
 echo ""
 
-# Kill existing session if any
+# Завершить существующую сессию, если она есть
 tmux kill-session -t cc 2>/dev/null || true
 
-# Start Claude in tmux, expose via ttyd
+# Запустить Claude в tmux и открыть доступ через ttyd
 tmux new-session -d -s cc 'claude'
 exec ttyd -W -p $PORT -c "claude:$PASS" tmux attach -t cc
 EOF
 
 chmod +x ~/.local/bin/claude-mobile
 
-# Add to PATH
+# Добавить в PATH
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
@@ -182,7 +182,7 @@ echo "  3. Run: claude-mobile"
 echo ""
 ```
 
-### Manual installation
+### Ручная установка
 
 ```bash
 # macOS
@@ -196,25 +196,25 @@ curl -fsSL https://tailscale.com/install.sh | sh
 
 ---
 
-## Usage
+## Использование
 
-### First time setup
+### Первичная настройка
 
 ```bash
-# 1. Connect to Tailscale (one-time)
+# 1. Подключитесь к Tailscale (единоразово)
 tailscale up
-# Follow the link to authenticate with Google/GitHub/etc.
+# Перейдите по ссылке для авторизации через Google/GitHub и т. д.
 
-# 2. Install Tailscale on your phone
+# 2. Установите Tailscale на телефон
 # iOS: App Store → Tailscale
 # Android: Play Store → Tailscale
-# Login with same account
+# Войдите под той же учётной записью
 
-# 3. Start Claude Code Mobile
+# 3. Запустите Claude Code Mobile
 claude-mobile
 ```
 
-### Output
+### Вывод
 
 ```
 ══════════════════════════════════
@@ -226,78 +226,78 @@ claude-mobile
 ══════════════════════════════════
 ```
 
-### On your phone
+### На телефоне
 
-1. Open Safari/Chrome
-2. Go to `http://100.78.42.15:7681` (use your actual Tailscale IP)
-3. Login with `claude` / `claude123`
-4. You now have Claude Code in your browser
+1. Откройте Safari/Chrome
+2. Перейдите по адресу `http://100.78.42.15:7681` (используйте ваш фактический IP в Tailscale)
+3. Войдите с учётными данными `claude` / `claude123`
+4. Теперь у вас есть Claude Code прямо в браузере
 
 ---
 
-## Configuration
+## Конфигурация
 
-### Change password
+### Смена пароля
 
 ```bash
 export CLAUDE_MOBILE_PASS="your-secure-password"
 claude-mobile
 ```
 
-Or add to your shell config:
+Или добавьте в конфигурацию вашей оболочки:
 
 ```bash
 echo 'export CLAUDE_MOBILE_PASS="your-secure-password"' >> ~/.zshrc
 ```
 
-### Change port
+### Смена порта
 
-Edit `~/.local/bin/claude-mobile` and change `PORT=7681` to your preferred port.
-
----
-
-## Security
-
-| Layer | Protection |
-|-------|------------|
-| **Network** | Tailscale uses WireGuard encryption |
-| **Authentication** | Basic auth (username:password) via ttyd |
-| **Access** | Only accessible from your Tailscale network |
-
-**Recommendations**:
-- Use a strong password (not the default `claude123`)
-- Don't expose ttyd directly to the internet without Tailscale
-- Keep Tailscale client updated on all devices
+Отредактируйте `~/.local/bin/claude-mobile` и измените `PORT=7681` на нужный вам порт.
 
 ---
 
-## Troubleshooting
+## Безопасность
 
-### "not connected" instead of IP
+| Уровень | Защита |
+|---------|--------|
+| **Сеть** | Tailscale использует шифрование WireGuard |
+| **Аутентификация** | Базовая аутентификация (логин:пароль) через ttyd |
+| **Доступ** | Доступно только из вашей сети Tailscale |
+
+**Рекомендации**:
+- Используйте надёжный пароль (не стандартный `claude123`)
+- Не открывайте ttyd напрямую в интернет без Tailscale
+- Поддерживайте клиент Tailscale в актуальном состоянии на всех устройствах
+
+---
+
+## Устранение неполадок
+
+### «not connected» вместо IP
 
 ```bash
-# Check Tailscale status
+# Проверьте статус Tailscale
 tailscale status
 
-# If disconnected, reconnect
+# Если соединение разорвано, переподключитесь
 tailscale up
 ```
 
-### Can't access from phone
+### Нет доступа с телефона
 
-1. Ensure Tailscale app is installed on phone and connected to same account
-2. Check firewall isn't blocking port 7681
-3. Try accessing locally first: `http://localhost:7681`
+1. Убедитесь, что приложение Tailscale установлено на телефоне и подключено к той же учётной записи
+2. Проверьте, что брандмауэр не блокирует порт 7681
+3. Сначала попробуйте подключиться локально: `http://localhost:7681`
 
-### Session not persisting
+### Сессия не сохраняется
 
-The tmux session should persist. To manually reattach:
+Сессия tmux должна сохраняться. Чтобы подключиться к ней вручную:
 
 ```bash
 tmux attach -t cc
 ```
 
-### ttyd command not found
+### Команда ttyd не найдена
 
 ```bash
 # macOS
@@ -309,78 +309,78 @@ sudo snap install ttyd --classic
 
 ---
 
-## Alternatives comparison
+## Сравнение альтернатив
 
-| Solution | Type | Pros | Cons | ToS | Stars |
-|----------|------|------|------|-----|-------|
-| **ttyd + Tailscale** ✅ | Self-hosted | Gratuit, max contrôle, CLI officiel | Setup manuel, UX terminal | ✅ Safe | N/A |
-| [Happy Coder](https://github.com/slopus/happy) | App native | Voice, encryption, multi-instances, mobile-first | Dépendance projet tiers | ✅ Safe | 7.8K |
-| [Remoto.sh](https://remoto.sh) | Cloud relay | Setup rapide, browser only | Cloud wrapping, latence, coût | ⚠️ Risk | N/A |
-| tmux + SSH | Self-hosted | Zero deps, CLI officiel | Besoin client SSH mobile | ✅ Safe | N/A |
-| [swe-mux](https://github.com/jatoran/swe-mux) | Self-hosted (PWA over Tailscale) | Official CLI in real PTYs, same live sessions on desktop and phone, per-session status, push notifications, dev-server previews, sessions survive restarts, no relay | Windows desktop app; macOS/Linux via browser; young project | ✅ Safe | N/A |
+| Решение | Тип | Плюсы | Минусы | ToS | Звёзды |
+|---------|-----|-------|--------|-----|--------|
+| **ttyd + Tailscale** ✅ | Самостоятельный хостинг | Бесплатно, максимальный контроль, официальный CLI | Ручная настройка, UX терминала | ✅ Безопасно | Н/Д |
+| [Happy Coder](https://github.com/slopus/happy) | Нативное приложение | Голосовой ввод, шифрование, несколько экземпляров, mobile-first | Зависимость от стороннего проекта | ✅ Безопасно | 7.8K |
+| [Remoto.sh](https://remoto.sh) | Облачный ретранслятор | Быстрая настройка, только браузер | Облачная обёртка, задержка, стоимость | ⚠️ Риск | Н/Д |
+| tmux + SSH | Самостоятельный хостинг | Без лишних зависимостей, официальный CLI | Нужен мобильный SSH-клиент | ✅ Безопасно | Н/Д |
+| [swe-mux](https://github.com/jatoran/swe-mux) | Самостоятельный хостинг (PWA поверх Tailscale) | Официальный CLI в настоящих PTY, одни и те же живые сессии на десктопе и телефоне, статус по каждой сессии, push-уведомления, предпросмотр dev-серверов, сессии переживают перезапуски, без ретранслятора | Десктопное приложение для Windows; macOS/Linux через браузер; молодой проект | ✅ Безопасно | Н/Д |
 
-We chose ttyd + Tailscale because:
-- It's just your terminal exposed via browser
-- No third-party wrapper around Claude Code
-- Zero ToS risk—you're using the official CLI
+Мы выбрали ttyd + Tailscale, потому что:
+- Это просто ваш терминал, доступный через браузер
+- Никакой сторонней обёртки вокруг Claude Code
+- Нулевой риск нарушения ToS — вы используете официальный CLI
 
 ---
 
-### Happy Coder - alternative recommandée
+### Happy Coder — рекомендуемая альтернатива
 
-Si vous préférez une **app native** plutôt qu'un terminal web :
+Если вы предпочитаете **нативное приложение** вместо веб-терминала:
 
-- **Repo** : [github.com/slopus/happy](https://github.com/slopus/happy)
-- **Stars** : 7.8K (janvier 2026)
-- **License** : MIT
-- **Stack** : Tauri (desktop) + Expo (mobile)
-- **Providers** : Claude Code, Codex, Gemini
+- **Репозиторий**: [github.com/slopus/happy](https://github.com/slopus/happy)
+- **Звёзды**: 7.8K (январь 2026)
+- **Лицензия**: MIT
+- **Стек**: Tauri (десктоп) + Expo (мобильные устройства)
+- **Провайдеры**: Claude Code, Codex, Gemini
 
-**Pourquoi ToS-safe** : Happy Coder est un wrapper local qui exécute le CLI officiel via subprocess Node.js. Pas d'appels API directs, pas de proxy cloud.
+**Почему безопасно для ToS**: Happy Coder — это локальная обёртка, которая запускает официальный CLI через подпроцесс Node.js. Никаких прямых вызовов API, никакого облачного прокси.
 
-**Installation** :
+**Установка**:
 ```bash
 npm i -g happy-coder && happy
 ```
 
 ---
 
-### Remoto.sh - Alternative Cloud (avec risques)
+### Remoto.sh — облачная альтернатива (с рисками)
 
-**Pourquoi risqué** : Remoto.sh utilise des conteneurs Docker cloud comme relay. Selon les ToS Anthropic (§4.2), les "proxies non autorisés qui masquent l'origine des requêtes" sont interdits. Des suspensions ont été signalées sur Reddit/HN pour usage similaire.
+**Почему это рискованно**: Remoto.sh использует облачные контейнеры Docker в качестве ретранслятора. Согласно условиям использования (ToS) Anthropic (§4.2), «неавторизованные прокси, скрывающие происхождение запросов» запрещены. На Reddit и HN сообщалось о блокировках за аналогичное использование.
 
-> **Recommandation** : Préférer Happy Coder ou ttyd+Tailscale pour éviter les risques ToS.
-
----
-
-## Related resources
-
-- [ttyd GitHub](https://github.com/tsl0922/ttyd) - Terminal web server
-- [Tailscale](https://tailscale.com/) - Zero-config VPN
-- [ttyd + Claude Code Guide](https://aiengineerguide.com/blog/agentic-cli-browser-ttyd/) - Community tutorial
-- [VPS Setup Guide](https://joshualent.com/snippets/claude-phone/) - Alternative: run on VPS
+> **Рекомендация**: отдавайте предпочтение Happy Coder или ttyd+Tailscale, чтобы избежать рисков нарушения ToS.
 
 ---
 
-## Sources
+## Полезные ресурсы
 
-- [Happy Coder GitHub](https://github.com/slopus/happy) - 7.8K ⭐, MIT license
-- [ttyd GitHub](https://github.com/tsl0922/ttyd) - Terminal web server
-- [Tailscale](https://tailscale.com/) - Zero-config VPN
-- [Remoto.sh](https://remoto.sh) - Cloud terminal (ToS risk noted)
-- ToS Anthropic §4.2 - Proxies non autorisés
-
----
-
-## Contributing
-
-This doc is **WIP/UNTESTED**. If you test this setup, please share:
-- Your OS/environment
-- Any issues encountered
-- Suggested improvements
-
-Open an issue or PR on this repo.
+- [ttyd GitHub](https://github.com/tsl0922/ttyd) — веб-сервер для терминала
+- [Tailscale](https://tailscale.com/) — VPN без сложной настройки (zero-config)
+- [Руководство по ttyd + Claude Code](https://aiengineerguide.com/blog/agentic-cli-browser-ttyd/) — туториал от сообщества
+- [Руководство по настройке на VPS](https://joshualent.com/snippets/claude-phone/) — альтернатива: запуск на VPS
 
 ---
 
-*Last updated: January 2026 | Status: WIP/UNTESTED | Data verified: Happy Coder 7.8K ⭐ (2026-01-19)*
+## Источники
+
+- [Happy Coder GitHub](https://github.com/slopus/happy) — 7.8K ⭐, лицензия MIT
+- [ttyd GitHub](https://github.com/tsl0922/ttyd) — веб-сервер для терминала
+- [Tailscale](https://tailscale.com/) — VPN без сложной настройки (zero-config)
+- [Remoto.sh](https://remoto.sh) — облачный терминал (отмечен риск нарушения ToS)
+- ToS Anthropic §4.2 — неавторизованные прокси
+
+---
+
+## Участие в разработке
+
+Этот документ имеет статус **WIP/UNTESTED** (в разработке / не протестировано). Если вы протестируете эту настройку, пожалуйста, поделитесь:
+- Вашей ОС и окружением
+- Всеми возникшими проблемами
+- Предложениями по улучшению
+
+Создайте issue или PR в этом репозитории.
+
+---
+
+*Последнее обновление: январь 2026 | Статус: WIP/UNTESTED | Данные проверены: Happy Coder 7.8K ⭐ (2026-01-19)*

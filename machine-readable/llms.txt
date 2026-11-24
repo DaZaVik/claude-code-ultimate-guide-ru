@@ -1,87 +1,87 @@
 # Claude Code Ultimate Guide
 
-> The most comprehensive documentation for Claude Code CLI by Anthropic. Covers beginner to advanced: hooks, skills, agents, MCP servers, context engineering, memory systems, multi-agent orchestration, and production patterns.
+> Наиболее полная документация по Claude Code CLI от Anthropic. Охватывает путь от начинающего до продвинутого уровня: хуки, скиллы, агенты, MCP-серверы, инженерия контекста, системы памяти, мультиагентная оркестрация и продакшн-паттерны.
 
-Guide version 3.46.0, tracking Claude Code up to v2.1.330 (November 2026).
+Версия руководства 3.46.0, отслеживает Claude Code вплоть до v2.1.330 (ноябрь 2026).
 
-## What is covered
+## Что охвачено
 
-- Getting started: installation, CLAUDE.md setup, vocabulary, first session, 7-module learning path (8-11h)
-- Concept distinctions: guide/core/ai-concept-boundaries.md compares context/window/memory, model/product/harness, assistant/workflow/agent, tool/MCP, instructions/access controls, evaluation/production evidence, and architecture/size/modality/task labels; seven original scenario checks, with attributed selective adaptation from Lexigraph (CC BY 4.0). Source limits: docs/resource-evaluations/lexigraph-ai-lexicon.md.
-- Executable learning: installable learning-path skill with prerequisite gates, local evidence, scheduled reviews, and a tested seven-module companion project
-- Context window management: 1M-token context on Sonnet 5, Opus 5.5, and Fable 5.1, context rot, /compact and /clear thresholds, auto-compact
-- Context engineering: managing what the model sees, when and in what shape; token audit workflow, compression tools, ejection discipline, maturity model
-- Memory systems: native stack (CLAUDE.md levels, auto memory, auto dream, agent frontmatter), memory classified on four axes (content, form, scope, lifecycle) instead of a five-layer stack, local vs repository vs shared scope across Claude Code, Codex, Gemini CLI, Copilot and Kiro, a six-stage pipeline from captured to effective with 2026 usage benchmarks (MemUse), cross-session tools (claude-mem, agentmemory, ICM, Kairn, OpenMemory, memorix, basic-memory), team sharing, file-based experience playbooks, memory poisoning risks
-- Hook system: all 33 hook events with matchers, input schemas, exit-code-2 behavior and decision-control formats; blocking vs non-blocking
-- Event ingestion and safe delegation: Monitor command/WebSocket sources, plugin monitors, MCP Channels, Routines GitHub triggers, and a read-only-first Codex workflow
-- Slash commands: full categorized table of the ~100 built-in commands with aliases, mirroring the official reference at https://code.claude.com/docs/en/commands (the source of truth), plus removed and renamed commands
-- Skills and slash commands: current SKILL.md frontmatter, description-based discovery, progressive disclosure, personal/project/vendor/marketplace ownership scopes, security versus maintenance boundaries, with/without-skill eval evidence, /skill-doctor, lifecycle and retirement, and the judgment-versus-harness decision
-- Current product surfaces: Computer Use, plugin packaging and recommendation hints, Claude mods (in-process plugin handlers), Claude apps gateway, artifact publishing; community terminal rendering mod prismantis in guide/ecosystem/third-party-tools.md (copy to Slack, per-prompt diagramHints cost)
-- Agents: subagent frontmatter, delegation, agent teams, agent evaluation metrics, harness engineering; criterion-specific judges and human calibration (Pennylane via Sciara’s secondhand GenAI Days account, no comparative gain established)
-- AI design patterns: guide/core/ai-design-patterns.md maps 21 classic patterns (GoF, enterprise integration, distributed systems) to the closest Claude Code mechanism, states where each analogy breaks, and adds 8 agent-native patterns and 10 anti-patterns; each card links related workflows, templates, the author's tools and articles. Dataset: machine-readable/ai-design-patterns.json. A work in progress, not a reference.
-- Agent harnesses: model-harness pair evidence, explicit loop and graph contracts, judgment allocation, durable execution, reviewer-independence tests, four operating layers plus an outer optimizer layer, a pinned 160-project source directory plus 33 guide supplements, 42 strict runtimes, 16 adjacent control planes, a research meta-harness table, a test-drive protocol, and DeepSeek Harness, Liza, and Multica profiles
-- Multi-agent orchestration: parallel agents, hub-and-spoke coordinators, dynamic workflows (JavaScript-orchestrated pipelines, `ultracode`), agentic software factories, AI executive agents (virtual C-suites and board simulators applying the persona/agent pattern to named business roles)
-- MCP server integration: setup, custom servers, validated community server catalog, MCP vs CLI vs Skills trade-offs, advanced tool design
-- Guide MCP product reference: guide/ecosystem/claude-code-guide-mcp.md covers client installation, published versus candidate capabilities, architecture, privacy, offline behavior, troubleshooting, and dated npm/GSC/GA4 metrics
-- Security and permission model: .claude/settings.json, permission rules, sandbox isolation, threat database, data privacy and retention, enterprise governance (guardrail tiers, MCP approval workflow, audit trails)
-- CI/CD and code review: GitHub Actions patterns, the Code Review feature (Teams/Enterprise), multi-provider review pipelines, reviewable agent changes (per-hunk rationale in git notes)
-- Verification methods: bounded Best-of-N selection, independent review limits, permitted and rejected control cases, frozen evaluation criteria, cost per accepted task, executable checks, and TESTING.md proof records; configuration ablation runners and the sample size a small with/without comparison can support
-- Frugal harnesses: distinguish repeated input billing from session loading, price generated notes against cached prefixes, append working-state snapshots after stable context, and scale plans and handoffs to task needs; Boucard attribution and evidence limits in docs/resource-evaluations/boucard-frugal-agent-harnesses.md
-- Lean and AI flow: an explicitly bounded analogy to Toyota Just-in-Time and jidoka for review-capacity admission, queue measurement, stopping new authoring and testing recurring-defect controls; no measured software-team gain claimed
-- Lean software engineering and methods: guide/core/methodologies.md compares BMAD, SDD, TDD, BDD and agent workflows against demand, WIP, built-in quality, revisable plans and recurring failures; includes Kanban flow metrics and evidence-limited project examples; gstack and Matt Pocock skill packs are assessed as optional controls, not measured Lean outcomes
-- Ops and cost: AI FinOps section (cost regimes, lever map, and a dated, source-checked LLM market snapshot of API prices and subscription quotas), observability and session forensics, API gateway for enterprise cost control (LiteLLM, Portkey), AI unit economics, subscription strategy at team scale (Claude, Codex, Copilot, Gemini, Cursor, Mistral, governed API traffic, and self-hosted inference), team metrics (DORA, SPACE, agentic metrics)
-- Mistral Large 4: October 6, 2026 source evaluation at docs/resource-evaluations/mistral-large-4.md; ecosystem API candidate, promotional versus original pricing, independent benchmark conditions, regional processing, specification discrepancies, and planned weights without a tested Claude Code or self-hosted integration
-- Team knowledge infrastructure: 3-tier framework (Markdown vault, MCP connectors, RAG at scale), Code+Cowork bridge, Atlassian/Notion/GitBook MCP, Onyx/LlamaCloud/Ragie
-- Adoption: L0-L5 maturity scale, the J-curve, empirical data (METR RCT, DeputyDev cohort), roles in AI-assisted teams
-- Internal-tool trials: owned team experiments, compact recoverable test feedback, harness and CI maintenance, documentation/code/data source boundaries, and a proposed idea-to-prototype, business-trial and day-7 review in guide/workflows/spec-first.md. Technical verification, business acceptance and observed use remain separate.
-- Practitioner insights: condensed findings from IFTTD podcast episodes, Devoxx, ByteByteGo, Stanford Online, plus 150+ scored external resource evaluations
-- Production templates: ready-to-use CLAUDE.md, rules, hooks, agents, skills, commands, quizzes, GitHub Actions workflows
-- AI-assisted open source contributions: project policy, reproduction, author comprehension, evidence packets and follow-up; shared review-capacity admission and learning worksheets
+- Начало работы: установка, настройка CLAUDE.md, терминология, первая сессия, учебный маршрут из 7 модулей (8–11 ч)
+- Разграничение понятий: guide/core/ai-concept-boundaries.md сравнивает контекст/контекстное окно/память, модель/продукт/обвязку агента (agent harness), ассистента/рабочий процесс/агента, инструмент/MCP, инструкции/контроль доступа, оценку (eval)/продакшн-доказательства и метки архитектуры/размера/модальности/задачи; семь авторских сценарных проверок с выборочной адаптацией с указанием источника из Lexigraph (CC BY 4.0). Ограничения источника: docs/resource-evaluations/lexigraph-ai-lexicon.md.
+- Исполняемое обучение: устанавливаемый скилл (skill) learning-path с проверками предварительных требований, локальными доказательствами, запланированными повторениями и протестированным сопутствующим проектом из семи модулей
+- Управление контекстным окном: контекст 1M токенов в Sonnet 5, Opus 5.5 и Fable 5.1, деградация контекста (context rot), пороги для /compact и /clear, автоматическое сжатие контекста (auto-compact)
+- Инженерия контекста: управление тем, что, когда и в каком виде видит модель; рабочий процесс аудита токенов, инструменты сжатия, дисциплина вытеснения из контекста, модель зрелости
+- Системы памяти: встроенный стек (уровни CLAUDE.md, auto memory, auto dream, frontmatter агента), классификация памяти по четырём осям (содержание, форма, область видимости, жизненный цикл) вместо пятиуровневого стека, сравнение локальной, репозиторной и общей областей видимости в Claude Code, Codex, Gemini CLI, Copilot и Kiro, шестиэтапный конвейер от фиксации до эффективного применения с бенчмарками использования 2026 года (MemUse), кросс-сессионные инструменты (claude-mem, agentmemory, ICM, Kairn, OpenMemory, memorix, basic-memory), совместное использование в команде, файловые плейбуки опыта, риски отравления памяти
+- Система хуков: все 33 события хуков с матчерами, схемами входных данных, поведением при коде выхода 2 (exit code 2) и форматами управления решениями; блокирующие и неблокирующие хуки
+- Приём событий и безопасное делегирование: источники команд/WebSocket для Monitor, мониторы плагинов, MCP Channels, GitHub-триггеры Routines и рабочий процесс Codex с приоритетом режима только для чтения (read-only-first)
+- Слэш-команды: полная категоризированная таблица из ~100 встроенных команд с псевдонимами, отражающая официальный справочник по адресу https://code.claude.com/docs/en/commands (первоисточник), а также удалённые и переименованные команды
+- Скиллы и слэш-команды: актуальный frontmatter файла SKILL.md, обнаружение по описанию, прогрессивное раскрытие (progressive disclosure), области владения (личный/проектный/вендорский/маркетплейс), границы между безопасностью и сопровождением, доказательства оценок (eval) со скиллом и без него, /skill-doctor, жизненный цикл и вывод из эксплуатации, а также выбор между суждением модели и обвязкой агента (харнессом)
+- Актуальные поверхности продукта: Computer Use, упаковка плагинов и подсказки рекомендаций, Claude mods (внутрипроцессные обработчики плагинов), шлюз Claude apps, публикация артефактов; мод от сообщества для рендеринга в терминале prismantis в guide/ecosystem/third-party-tools.md (копирование в Slack, затраты на diagramHints в каждом промпте)
+- Агенты: frontmatter субагентов, делегирование, команды агентов (Agent Teams), метрики оценки агентов, инженерия харнессов (harness engineering); судьи по отдельным критериям и калибровка с участием человека (Pennylane по пересказу Sciara с GenAI Days, сравнительный прирост не доказан)
+- Паттерны проектирования для ИИ: guide/core/ai-design-patterns.md сопоставляет 21 классический паттерн (GoF, корпоративная интеграция, распределённые системы) с ближайшим механизмом Claude Code, указывает, где каждая аналогия перестаёт работать, и добавляет 8 агент-нативных паттернов и 10 антипаттернов; каждая карточка ссылается на связанные рабочие процессы, шаблоны, инструменты и статьи автора. Набор данных: machine-readable/ai-design-patterns.json. Работа в процессе, не справочник.
+- Обвязки агентов (agent harnesses): доказательства по парам «модель — харнесс», явные контракты циклов и графов, распределение суждений, отказоустойчивое выполнение (durable execution), тесты независимости ревьюера, четыре операционных слоя плюс внешний слой оптимизатора, зафиксированный каталог из 160 проектов-источников плюс 33 дополнения руководства, 42 строгих рантайма, 16 смежных плоскостей управления (control planes), таблица исследовательских мета-харнессов, протокол тест-драйва, а также профили DeepSeek Harness, Liza и Multica
+- Мультиагентная оркестрация: параллельные агенты, координаторы по схеме «звезда» (hub-and-spoke), динамические рабочие процессы (конвейеры с оркестрацией на JavaScript, `ultracode`), агентные фабрики ПО, ИИ-агенты уровня руководителей (виртуальные C-suite и симуляторы советов директоров, применяющие паттерн персоны/агента к конкретным бизнес-ролям)
+- Интеграция MCP-серверов: настройка, собственные серверы, каталог проверенных серверов сообщества, компромиссы между MCP, CLI и скиллами, продвинутое проектирование инструментов
+- Справочник по продукту Guide MCP: guide/ecosystem/claude-code-guide-mcp.md охватывает установку клиента, опубликованные и планируемые (candidate) возможности, архитектуру, приватность, работу офлайн, устранение неполадок и датированные метрики npm/GSC/GA4
+- Безопасность и модель прав доступа: .claude/settings.json, правила разрешений, изоляция в песочнице (sandbox), база угроз, приватность и хранение данных, корпоративное управление (уровни защитных ограничений (guardrails), рабочий процесс согласования MCP, журналы аудита)
+- CI/CD и ревью кода: паттерны GitHub Actions, функция Code Review (Teams/Enterprise), мультипровайдерные конвейеры ревью, удобные для ревью изменения агентов (обоснование для каждого блока diff в git notes)
+- Методы верификации: ограниченный выбор Best-of-N, пределы независимого ревью, допустимые и отклоняемые контрольные случаи, замороженные критерии оценки, стоимость одной принятой задачи, исполняемые проверки и записи подтверждений в TESTING.md; инструменты запуска абляции конфигураций и размер выборки, который может обосновать небольшое сравнение «с/без»
+- Экономичные харнессы: различение повторной тарификации входных токенов и загрузки сессии, сопоставление цены сгенерированных заметок с кешированными префиксами, добавление снимков рабочего состояния после стабильного контекста и масштабирование планов и передач контекста (handoffs) под потребности задачи; указание авторства Boucard и ограничения доказательности в docs/resource-evaluations/boucard-frugal-agent-harnesses.md
+- Lean и поток работы с ИИ: явно ограниченная аналогия с Toyota Just-in-Time и дзидокой (jidoka) для допуска задач по пропускной способности ревью, измерения очередей, остановки создания нового кода и тестирования мер против повторяющихся дефектов; измеренного прироста в командах разработки ПО не заявляется
+- Бережливая разработка ПО и методологии: guide/core/methodologies.md сравнивает BMAD, SDD, TDD, BDD и агентные рабочие процессы по спросу, WIP, встроенному качеству, пересматриваемым планам и повторяющимся сбоям; включает метрики потока Kanban и примеры проектов с ограниченной доказательностью; наборы скиллов gstack и Matt Pocock оцениваются как опциональные контрольные меры, а не измеренные результаты Lean
+- Эксплуатация и затраты: раздел AI FinOps (режимы затрат, карта рычагов и датированный, сверенный с источниками срез рынка LLM по ценам API и лимитам подписок), наблюдаемость (observability) и форензика сессий, API-шлюз для корпоративного контроля затрат (LiteLLM, Portkey), юнит-экономика ИИ, стратегия подписок в масштабе команды (Claude, Codex, Copilot, Gemini, Cursor, Mistral, управляемый API-трафик и самостоятельный хостинг инференса), командные метрики (DORA, SPACE, агентные метрики)
+- Mistral Large 4: оценка источника от 6 октября 2026 года в docs/resource-evaluations/mistral-large-4.md; кандидат экосистемы по API, промо-цены против базовых цен, условия независимых бенчмарков, региональная обработка, расхождения в спецификациях и планируемые веса без протестированной интеграции с Claude Code или self-hosted развёртывания
+- Командная инфраструктура знаний: 3-уровневый фреймворк (хранилище Markdown, MCP-коннекторы, RAG в масштабе), мост Code+Cowork, Atlassian/Notion/GitBook MCP, Onyx/LlamaCloud/Ragie
+- Внедрение: шкала зрелости L0–L5, J-кривая, эмпирические данные (рандомизированное контролируемое исследование METR, когорта DeputyDev), роли в командах с ИИ-поддержкой
+- Пилоты внутренних инструментов: эксперименты с ответственным владельцем в команде, компактная восстановимая обратная связь по тестам, сопровождение харнесса и CI, границы между источниками документации/кода/данных, а также предлагаемый цикл от идеи к прототипу, бизнес-испытанию и обзору на 7-й день в guide/workflows/spec-first.md. Техническая верификация, бизнес-приёмка и наблюдаемое использование остаются разделёнными.
+- Инсайты практиков: сжатые выводы из выпусков подкаста IFTTD, Devoxx, ByteByteGo, Stanford Online, а также 150+ оценённых разборов внешних ресурсов
+- Продакшн-шаблоны: готовые к использованию CLAUDE.md, правила, хуки, агенты, скиллы, команды, тесты-викторины, рабочие процессы GitHub Actions
+- Open-source-вклады с помощью ИИ: политика проекта, воспроизведение, понимание со стороны автора, пакеты доказательств и сопровождение после отправки; общие рабочие листы по допуску с учётом пропускной способности ревью и по обучению
 
-- Agentic pentesting: guide/security/agentic-pentesting.md compares DarkMoon and Strix, exploit evidence, model data exposure, and evaluation requirements; source inspection and bounded local checks, no shared performance benchmark
+- Агентный пентестинг: guide/security/agentic-pentesting.md сравнивает DarkMoon и Strix, доказательства эксплуатации, утечку данных в модели и требования к оценке (eval); инспекция исходного кода и ограниченные локальные проверки, без общего бенчмарка производительности
 
-- Harness control cases: Walkinglabs and AutoHarness evaluations distinguish structural scores, test coverage, activation and observed effects. The local review-control-demo.py has 13 tests with a simulated destination, not a live merge gate.
-- WikiSkill: persistent proposal history, revisable wiki patterns, strict skill validation and executor-specific transfer. Full skill injection leaves routing untested; production gains are unmeasured. See docs/resource-evaluations/wikiskill-persistent-skill-evolution.md.
-- Human supervision: comprehension, independent judgment, usable evidence, attention and recovery exercises; proposed practices without a local human trial. Three infographic topics are available in English and French.
+- Контрольные случаи харнессов: оценки Walkinglabs и AutoHarness различают структурные баллы, покрытие тестами, активацию и наблюдаемые эффекты. Локальный review-control-demo.py содержит 13 тестов с имитируемой целевой точкой, а не живой гейт слияния (merge gate).
+- WikiSkill: постоянная история предложений, пересматриваемые вики-паттерны, строгая валидация скиллов и перенос с учётом конкретного исполнителя. Полная инъекция скиллов оставляет маршрутизацию непроверенной; продакшн-прирост не измерен. См. docs/resource-evaluations/wikiskill-persistent-skill-evolution.md.
+- Человеческий надзор: понимание, независимое суждение, пригодные доказательства, упражнения на внимание и восстановление; предлагаемые практики без локального испытания с участием людей. Три темы инфографики доступны на английском и французском языках.
 
-- Architect-engineer handoffs: versioned self-contained contracts, ADRs, separate task/run/decision state, live-state reconciliation on resume, and review feedback. See guide/workflows/dual-instance-planning.md; role separation has no guaranteed cost or quality benefit, and Honkonen's eng CLI is custom tooling.
-- Harness improvement: recoverable local quality requirements, semantic ownership, MLD observations before memory promotion, isolated curation candidates and versioned publication, worker requalification and four clocks. Selectively adapted from lopopolo/harness-engineering, an anthology rather than a runtime; no local gains measured.
+- Передачи задач от архитектора к инженеру (handoffs): версионированные самодостаточные контракты, ADR, раздельное состояние задач/запусков/решений, сверка с живым состоянием при возобновлении и обратная связь по ревью. См. guide/workflows/dual-instance-planning.md; разделение ролей не гарантирует выигрыша по стоимости или качеству, а eng CLI от Honkonen — это кастомный инструмент.
+- Улучшение харнессов: восстановимые локальные требования к качеству, семантическое владение, наблюдения MLD перед продвижением в память, изолированные кандидаты на курацию и версионированная публикация, переквалификация воркеров и четыре тактовых контура (four clocks). Выборочно адаптировано из lopopolo/harness-engineering — антологии, а не рантайма; локальный прирост не измерен.
 
-## Machine-readable entry points
+## Машиночитаемые точки входа
 
-- machine-readable/reference.yaml: full index with file paths, anchors and line numbers into the guide
-- machine-readable/claude-code-releases.yaml: condensed Claude Code release history, breaking changes, milestones
-- machine-readable/cowork-reference.yaml: index for Claude Cowork (dedicated repo, non-dev audience)
-- machine-readable/agentsec-security-feed.v1.json: AgentSec versions, detector coverage, security counters, and reviewed incident fiches consumed by the landing
-- machine-readable/agent-harnesses.json: normalized Agent Harness Map with evidence states, official project URLs, and dated repository metadata
-- machine-readable/mcp-product.json, mcp-stats.json, and mcp-dashboard.json: generated runtime contract plus dated package and aggregate page metrics with explicit availability and methodology boundaries
-- machine-readable/translations.json: canonical, maintained, and community translation status with source checksums, versions, dates, and coverage
-- machine-readable/distribution-channels.yaml: attributed publication channels, asset states, dates, and 30-day outcome fields
+- machine-readable/reference.yaml: полный индекс с путями к файлам, якорями и номерами строк в руководстве
+- machine-readable/claude-code-releases.yaml: сжатая история релизов Claude Code, критические изменения (breaking changes), ключевые вехи
+- machine-readable/cowork-reference.yaml: индекс для Claude Cowork (отдельный репозиторий, аудитория не-разработчиков)
+- machine-readable/agentsec-security-feed.v1.json: версии AgentSec, покрытие детекторов, счётчики безопасности и проверенные карточки инцидентов, используемые лендингом
+- machine-readable/agent-harnesses.json: нормализованная карта обвязок агентов (Agent Harness Map) со статусами доказательности, официальными URL проектов и датированными метаданными репозиториев
+- machine-readable/mcp-product.json, mcp-stats.json и mcp-dashboard.json: сгенерированный рантайм-контракт плюс датированные метрики пакетов и агрегированные метрики страниц с явными границами доступности и методологии
+- machine-readable/translations.json: статус канонических, поддерживаемых и сообщественных переводов с контрольными суммами исходников, версиями, датами и охватом
+- machine-readable/distribution-channels.yaml: каналы публикации с атрибуцией, статусы материалов, даты и поля 30-дневных результатов
 
-## Key URLs
+## Ключевые URL
 
-- Guide site: https://cc.bruniaux.com
-- Guide reader: https://cc.bruniaux.com/guide/
-- Agent Harness Engineering: https://cc.bruniaux.com/guide/agent-harness/
-- Loop & Graph Engineering: https://cc.bruniaux.com/guide/loop-graph-engineering/
-- AI Design Patterns: https://cc.bruniaux.com/ai-design-patterns/
-- Agent Harness Map: https://cc.bruniaux.com/guide/agent-harness-landscape/
-- Agent Tools: https://cc.bruniaux.com/guide/agentic-tools/
-- AI Ecosystem: https://cc.bruniaux.com/guide/ai-ecosystem/
-- Glossary: https://cc.bruniaux.com/guide/glossary/
-- Translations and language status: https://cc.bruniaux.com/guide/translations/
-- Learning path skill: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/tree/main/examples/skills/learning-path
-- Learning companion project: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/tree/main/examples/learning-project
-- Best-of-N workflow: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/workflows/best-of-n.md
-- Releases tracking: https://cc.bruniaux.com/releases/
-- Whitepapers (PDF + EPUB, FR and EN): https://cc.bruniaux.com/whitepapers/
+- Сайт руководства: https://cc.bruniaux.com
+- Веб-версия руководства: https://cc.bruniaux.com/guide/
+- Инженерия обвязок агентов (Agent Harness Engineering): https://cc.bruniaux.com/guide/agent-harness/
+- Инженерия циклов и графов (Loop & Graph Engineering): https://cc.bruniaux.com/guide/loop-graph-engineering/
+- Паттерны проектирования для ИИ (AI Design Patterns): https://cc.bruniaux.com/ai-design-patterns/
+- Карта обвязок агентов (Agent Harness Map): https://cc.bruniaux.com/guide/agent-harness-landscape/
+- Инструменты для агентов (Agent Tools): https://cc.bruniaux.com/guide/agentic-tools/
+- Экосистема ИИ (AI Ecosystem): https://cc.bruniaux.com/guide/ai-ecosystem/
+- Глоссарий: https://cc.bruniaux.com/guide/glossary/
+- Переводы и статус языков: https://cc.bruniaux.com/guide/translations/
+- Скилл учебного маршрута: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/tree/main/examples/skills/learning-path
+- Учебный сопутствующий проект: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/tree/main/examples/learning-project
+- Рабочий процесс Best-of-N: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/guide/workflows/best-of-n.md
+- Отслеживание релизов: https://cc.bruniaux.com/releases/
+- Аналитические обзоры / вайтпейперы (PDF + EPUB, FR и EN): https://cc.bruniaux.com/whitepapers/
 - GitHub: https://github.com/FlorianBruniaux/claude-code-ultimate-guide
-- Plugins marketplace: https://github.com/FlorianBruniaux/claude-code-plugins
-- Cowork guide (non-devs, Claude Desktop): https://github.com/FlorianBruniaux/claude-cowork-guide
+- Маркетплейс плагинов: https://github.com/FlorianBruniaux/claude-code-plugins
+- Руководство по Cowork (не для разработчиков, Claude Desktop): https://github.com/FlorianBruniaux/claude-cowork-guide
 
-## Author
+## Автор
 
-Florian Bruniaux, AI engineer with 12+ months of production Claude Code usage. Former VP Engineering. Expert in context engineering and AI-assisted development workflows.
+Florian Bruniaux, ИИ-инженер с более чем 12 месяцами продакшн-опыта работы с Claude Code. Бывший VP Engineering. Эксперт по инженерии контекста и рабочим процессам разработки с помощью ИИ.
 
-- Portfolio and blog: https://florian.bruniaux.com
+- Портфолио и блог: https://florian.bruniaux.com
 - LinkedIn: https://www.linkedin.com/in/florian-bruniaux-43408b83/

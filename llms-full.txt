@@ -1,493 +1,492 @@
-# Claude Code Ultimate Guide: Full Content for AI Indexing
+# Полное руководство по Claude Code: контент для ИИ-индексации
 
-> This file is optimized for AI/LLM consumption. It contains the condensed guide overview,
-> full cheatsheet, complete template list, and FAQ for Claude Code.
+> Этот файл оптимизирован для обработки ИИ/LLM. Он содержит сжатый обзор руководства,
+> полную шпаргалку, полный список шаблонов и FAQ по Claude Code.
 >
-> Standard llms.txt: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/llms.txt
-> Machine-readable index: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/machine-readable/reference.yaml
+> Стандартный llms.txt: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/llms.txt
+> Машиночитаемый индекс: https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/machine-readable/reference.yaml
 
-## Metadata
+## Метаданные
 
-- Title: Claude Code Ultimate Guide
-- Author: Florian Bruniaux (Fractional Chief AI Officer)
-- Version: 3.46.0
-- Last Updated: November 22, 2026
-- License: CC BY-SA 4.0
-- Repository: https://github.com/FlorianBruniaux/claude-code-ultimate-guide
-- Landing: https://cc.bruniaux.com
-- Lines of Documentation: 26,193
-- Production Templates: 278
-- Quiz Questions: 473
-- Whitepapers: 13 titles (FR + EN)
-
----
-
-## What Is Claude Code
-
-Claude Code is Anthropic's official CLI for AI-assisted development. It lets developers interact with Claude directly from the terminal to write, edit, debug, and review code. Unlike IDE plugins, it has full filesystem access, can run shell commands, and works autonomously on multi-step tasks.
-
-This guide is the most comprehensive community resource for Claude Code. It covers everything from installation to production security, with 278 ready-to-use templates for agents, hooks, commands, and skills.
-
-## Who This Guide Is For
-
-- **Beginners**: Install Claude Code, complete first task in 15 minutes
-- **Intermediate**: Configure CLAUDE.md memory files, custom agents, hooks
-- **Power users**: MCP servers, Trinity pattern, CI/CD integration, multi-agent workflows
-- **Tech leads**: Team adoption, security hardening, governance patterns
-- **CTOs/CIOs**: ROI, risk, security posture
-
-## Guide Structure (11 Sections + Architecture)
-
-**AI Concept Boundaries** (`guide/core/ai-concept-boundaries.md`): seven practical distinctions covering context/memory, model/harness responsibilities, workflow versus agent decisions, tools/MCP, instructions versus access controls, evaluation versus production evidence, and architecture/size/modality/task labels. Includes seven original comprehension scenarios with corrections. Selectively adapted from Anthony Capirchio / The Operating Shift's Lexigraph under CC BY 4.0; source review and export limitations are in `docs/resource-evaluations/lexigraph-ai-lexicon.md`. No source quiz bank is imported, and the exercises are not a validated proficiency assessment.
-
-**Architecture Deep Dive** (`guide/core/architecture.md`):
-- Master Loop: `while(tool_call)`, no DAGs, no classifiers, no RAG
-- 8 Core Tools: Bash, Read, Edit, Write, Grep, Glob, Task, TodoWrite
-- Context: ~200K tokens, auto-compact at 75-92%
-- Sub-agents: isolated context, max depth=1
-- Philosophy: "less scaffolding, more model"
-
-**Main Guide Sections** (`guide/ultimate-guide.md`, 26,193 lines):
-1. Quick Start: Installation, first workflow, essential commands
-2. Core Concepts: Context management, Plan Mode, Rewind, Mental Model
-3. Memory & Settings: CLAUDE.md files, .claude/ folder, precedence rules
-4. Agents: Custom AI personas, Tool SEO, orchestration patterns
-5. Skills: Reusable knowledge modules (Skills 2.0: Capability Uplift + Encoded Preference, Evals)
-6. Commands: Custom slash commands, variable interpolation
-7. Hooks: Event-driven automation (PreToolUse, PostToolUse, UserPromptSubmit)
-8. MCP Servers: Serena, Context7, Sequential, Playwright, Postgres, grepai
-9. Advanced Patterns: Trinity, CI/CD, Tasks API, multi-agent teams, feedback loops
-10. Reference: Commands, shortcuts, troubleshooting, checklists
-11. AI Ecosystem: Complementary tools matrix, practical multi-tool workflows, integration patterns
-
-**Security & Sandboxing** (`guide/security/sandbox-native.md`, `guide/core/settings-reference.md`):
-- Two independent layers: filesystem (write CWD + session temp, read the whole machine) and network (no domain pre-allowed, proxy does not terminate TLS)
-- The default read policy covers `~/.ssh` and `~/.aws` and there is no built-in denylist; `sandbox.credentials.files` and `credentials.envVars` are what actually protect them
-- `excludedCommands` bare-name form never matches, use the glob form; since v2.1.277 every command in a call must match, so a chained, piped, redirected or `cd`-prefixed call stays sandboxed (anthropics/claude-code#10524, #81157)
-- Git over SSH needs an exception on macOS only (its SSH tunnel cannot authenticate to the sandbox proxy); on Linux/WSL2 it works once the host is allowed, and an HTTPS remote avoids it everywhere
-- No curl/wget blocklist exists; a missing domain prompts in manual mode and is refused, naming the host, in auto mode, where commands can declare hosts per command (`allowed_domains`, v2.1.271+)
-- `failIfUnavailable: true` stops a sandbox that cannot start from silently running commands unsandboxed; native Windows has no sandbox
-- Writes to Claude Code's own settings.json are denied at every scope, so a sandboxed script cannot widen its own policy
-
-**Agent Harnesses and Orchestration** (`guide/core/agent-harness.md`, `guide/ecosystem/agent-harness-landscape.md`, `guide/ecosystem/agentic-tools.md`):
-- The catalog separates 42 strict runtimes from 16 adjacent control planes.
-- Multica is classified as an adjacent control plane: its server coordinates issue, chat, and scheduled runs while a daemon on a connected computer executes external coding-agent CLIs.
-- Its profile documents the server/local execution split, server-stored run data, daemon-user permission boundary, Git enforcement boundary, restricted licence, and untested runtime status.
-- WikiSkill separates execution traces, accumulated knowledge and active skills. Rejected proposal diffs and validation outcomes persist while active skills roll back; pattern pages remain revisable. See `guide/core/memory-systems.md` section 6.8 and `docs/resource-evaluations/wikiskill-persistent-skill-evolution.md` for reported benchmarks, negative transfer and the limits of full skill injection. No native skill-routing or production benefit was measured here.
+- Название: Claude Code Ultimate Guide
+- Автор: Florian Bruniaux (Fractional Chief AI Officer)
+- Версия: 3.46.0
+- Последнее обновление: 22 ноября 2026 г.
+- Лицензия: CC BY-SA 4.0
+- Репозиторий: https://github.com/FlorianBruniaux/claude-code-ultimate-guide
+- Лендинг: https://cc.bruniaux.com
+- Строк документации: 26 193
+- Продакшен-шаблонов: 278
+- Вопросов в тестах: 473
+- Аналитических обзоров (вайтпейперов): 13 наименований (FR + EN)
 
 ---
 
-For the October 6, 2026 Mistral Large 4 preview, read `docs/resource-evaluations/mistral-large-4.md` and its integration map. The ecosystem, market snapshot, subscription strategy, and local-inference pages distinguish sale pricing, independent evaluations, regional endpoint constraints, unresolved specifications, and future weights. No native Claude Code or self-hosted Large 4 integration was tested.
+## Что такое Claude Code
 
-## Full Cheatsheet
+Claude Code — официальный CLI от Anthropic для разработки с помощью ИИ. Он позволяет разработчикам взаимодействовать с Claude напрямую из терминала, чтобы писать, редактировать, отлаживать и проверять код. В отличие от плагинов для IDE, он имеет полный доступ к файловой системе, может выполнять команды оболочки и автономно работать над многошаговыми задачами.
+
+Это руководство — самый полный ресурс сообщества по Claude Code. Оно охватывает всё — от установки до продакшен-безопасности — и включает 278 готовых к использованию шаблонов для агентов, хуков, команд и скиллов (skills).
+
+## Для кого это руководство
+
+- **Новички**: установка Claude Code, выполнение первой задачи за 15 минут
+- **Средний уровень**: настройка файлов памяти CLAUDE.md, пользовательских агентов, хуков
+- **Продвинутые пользователи**: MCP-серверы, паттерн Trinity, интеграция с CI/CD, мультиагентные рабочие процессы
+- **Тимлиды**: внедрение в команде, усиление безопасности, практики управления (governance)
+- **CTO/CIO**: окупаемость (ROI), риски, уровень безопасности
+
+## Структура руководства (11 разделов + Архитектура)
+
+**Границы концепций ИИ** (`guide/core/ai-concept-boundaries.md`): семь практических разграничений, охватывающих контекст и память, разделение ответственности между моделью и обвязкой агента (agent harness), выбор между рабочим процессом и агентом, инструменты и MCP, инструкции и механизмы контроля доступа, оценки (evals) и продакшен-доказательства, а также метки архитектуры, размера, модальности и типа задачи. Включает семь оригинальных сценариев на понимание с разбором и исправлениями. Выборочно адаптировано из Lexigraph (Anthony Capirchio / The Operating Shift) по лицензии CC BY 4.0; разбор источника и ограничения экспорта приведены в `docs/resource-evaluations/lexigraph-ai-lexicon.md`. Исходный банк вопросов не импортировался, а упражнения не являются валидированной оценкой уровня владения.
+
+**Глубокий разбор архитектуры** (`guide/core/architecture.md`):
+- Главный цикл (Master Loop): `while(tool_call)`, без DAG, без классификаторов, без RAG
+- 8 базовых инструментов: Bash, Read, Edit, Write, Grep, Glob, Task, TodoWrite
+- Контекст: ~200K токенов, автокомпакция на 75–92%
+- Субагенты: изолированный контекст, максимальная глубина depth=1
+- Философия: «меньше обвязки, больше модели» ("less scaffolding, more model")
+
+**Основные разделы руководства** (`guide/ultimate-guide.md`, 26 193 строки):
+1. Быстрый старт: установка, первый рабочий процесс, основные команды
+2. Базовые концепции: управление контекстом, Plan Mode, откат (Rewind), ментальная модель
+3. Память и настройки: файлы CLAUDE.md, папка .claude/, правила приоритета
+4. Агенты: пользовательские ИИ-персоны, Tool SEO, паттерны оркестрации
+5. Скиллы: переиспользуемые модули знаний (Skills 2.0: Capability Uplift + Encoded Preference, Evals)
+6. Команды: пользовательские слэш-команды, интерполяция переменных
+7. Хуки: событийная автоматизация (PreToolUse, PostToolUse, UserPromptSubmit)
+8. MCP-серверы: Serena, Context7, Sequential, Playwright, Postgres, grepai
+9. Продвинутые паттерны: Trinity, CI/CD, Tasks API, мультиагентные команды, циклы обратной связи
+10. Справочник: команды, горячие клавиши, устранение неполадок, чек-листы
+11. Экосистема ИИ: матрица дополняющих инструментов, практические сценарии с несколькими инструментами, паттерны интеграции
+
+**Безопасность и песочница (sandbox)** (`guide/security/sandbox-native.md`, `guide/core/settings-reference.md`):
+- Два независимых уровня: файловая система (запись в CWD + временный каталог сессии, чтение всей машины) и сеть (ни один домен не разрешён заранее, прокси не терминирует TLS)
+- Политика чтения по умолчанию охватывает `~/.ssh` и `~/.aws`, а встроенного запрещающего списка (denylist) нет; реальную защиту для них обеспечивают `sandbox.credentials.files` и `credentials.envVars`
+- Форма с голым именем команды в `excludedCommands` никогда не срабатывает — используйте форму с glob-шаблоном; начиная с v2.1.277 каждая команда в вызове должна соответствовать правилу, поэтому вызовы с цепочками команд, конвейерами, перенаправлением вывода или префиксом `cd` остаются внутри песочницы (anthropics/claude-code#10524, #81157)
+- Git поверх SSH требует исключения только на macOS (его SSH-туннель не может пройти аутентификацию на прокси песочницы); на Linux/WSL2 он работает сразу после разрешения хоста, а использование HTTPS-remote снимает эту проблему везде
+- Списка блокировки для curl/wget не существует; при обращении к отсутствующему в списке домену в ручном режиме выводится запрос подтверждения, а в режиме `auto` выполняется отказ с указанием имени хоста — при этом команды могут объявлять нужные хосты индивидуально для каждой команды (`allowed_domains`, v2.1.271+)
+- `failIfUnavailable: true` не позволяет песочнице, которую не удалось запустить, молча выполнять команды без изоляции; в нативной Windows песочницы нет
+- Запись в собственный файл settings.json Claude Code запрещена на всех уровнях области действия, поэтому скрипт в песочнице не может расширить собственную политику доступа
+
+**Обвязки агентов (Agent Harnesses) и оркестрация** (`guide/core/agent-harness.md`, `guide/ecosystem/agent-harness-landscape.md`, `guide/ecosystem/agentic-tools.md`):
+- Каталог разделяет 42 строгих среды выполнения (strict runtimes) и 16 смежных плоскостей управления (adjacent control planes).
+- Multica классифицируется как смежная плоскость управления: её сервер координирует задачи (issues), чаты и запланированные запуски, в то время как демон на подключённом компьютере выполняет внешние CLI-инструменты агентов для написания кода.
+- В её профиле задокументированы разделение серверного и локального выполнения, хранение данных запусков на сервере, граница прав пользователя-демона, граница принудительного применения правил Git, ограниченная лицензия и статус непроверенной среды выполнения.
+- WikiSkill разделяет трассировки выполнения, накопленные знания и активные скиллы. Диффы отклонённых предложений и результаты валидации сохраняются, пока активные скиллы откатываются; страницы паттернов остаются доступными для пересмотра. См. раздел 6.8 в `guide/core/memory-systems.md` и `docs/resource-evaluations/wikiskill-persistent-skill-evolution.md` для ознакомления с заявленными бенчмарками, отрицательным переносом (negative transfer) и ограничениями полной инъекции скиллов. Ни нативная маршрутизация скиллов, ни продакшен-эффект здесь не измерялись.
 
 ---
-title: "Claude Code Cheatsheet"
-description: "One-page printable daily essentials for maximum Claude Code productivity"
+
+О предварительном релизе Mistral Large 4 от 6 октября 2026 года читайте в `docs/resource-evaluations/mistral-large-4.md` и его карте интеграции. На страницах экосистемы, обзора рынка, стратегии подписок и локального инференса разграничены акционные цены, независимые оценки (evals), региональные ограничения эндпоинтов, неуточнённые спецификации и будущие веса модели. Ни нативная интеграция с Claude Code, ни самостоятельный хостинг Large 4 не тестировались.
+
+## Полная шпаргалка
+
+---
+title: "Шпаргалка по Claude Code"
+description: "Одностраничная печатная памятка с основными приёмами для максимальной продуктивности в Claude Code"
 tags: [cheatsheet, reference]
 ---
 
-# Claude Code cheatsheet
+# Шпаргалка по Claude Code
 
-**Daily reference**. For compact printable editions, use the [English and French cheatsheets](../whitepapers/README.md).
+**Ежедневный справочник**. Компактные печатные издания доступны в разделе [шпаргалок на английском и французском языках](../whitepapers/README.md).
 
-**Author**: Florian BRUNIAUX | Fractional Chief AI Officer
+**Автор**: Florian BRUNIAUX | Fractional Chief AI Officer
 
-**Written with**: Claude (Anthropic)
+**Написано с помощью**: Claude (Anthropic)
 
-**Version**: 3.46.0 | **Last Updated**: Nov 22, 2026
-
----
-
-## Essential commands
-
-These are selected daily commands. Availability depends on your version, provider, and plan: the complete list is in [§10.1 of the guide](./ultimate-guide.md#101-commands-table), and the always-current official reference is [code.claude.com/docs/en/commands](https://code.claude.com/docs/en/commands).
-
-| Command | Action |
-|---------|--------|
-| `/help` | Contextual help |
-| `/powerup` | Interactive animated lessons teaching Claude Code features |
-| `/clear` | Reset conversation |
-| `/compact` | Free up context |
-| `/status` | Session state + context usage |
-| `/context` | Detailed token breakdown |
-| `/plan` | Enter Plan Mode (no changes). Exit by approving the plan or `Shift+Tab` |
-| `/model` | Select model and save the default; press `s` in the picker for this session only |
-| `/autocompact [auto\|500k]` | Choose the auto-compaction window or restore the model default |
-| `/output-style [style]` | Select Default, Proactive, Concise, Explanatory, Learning, or a custom style |
-| `/insights` | Usage analytics + optimization report |
-| `/code-review [level]` | Review the diff for correctness bugs, `--fix` applies them, `ultra` runs it in the cloud |
-| `/simplify` | Cleanup-only review of changed code: reuse, simplification, efficiency (applies cleanup fixes; use `/code-review` for correctness bugs) |
-| `/security-review` | Scan the branch diff for injection, auth, and data-exposure risks |
-| `/batch` | Large-scale refactors via 5–30 parallel worktree agents |
-| `/subtask <task>` | Hand a side task to a forked subagent that reports back here (v2.1.212+) |
-| `/teleport` | Teleport session from web |
-| `/tasks` | Monitor background tasks |
-| `/remote-env` | Configure cloud environment |
-| `/remote-control` (`/rc`) | Connect this local session to web/mobile; Team/Enterprise require owner enablement |
-| `/mobile` | Get Claude mobile app download links |
-| `/fast` | Toggle faster Opus output; Opus 5.5 costs $8/$40 per MTok in fast mode |
-| `/voice` | Toggle voice input (hold Space to speak, release to send) |
-| `/recap` | Session context summary on return to a break (v2.1.108) |
-| `/effort [level]` | Thinking depth: low/medium/high/xhigh/max/ultracode; no arg = interactive slider (v2.1.111) |
-| `/tui [fullscreen]` | Full-screen flicker-free TUI rendering (v2.1.110) |
-| `/focus` | Toggle minimal focus view, separate from Ctrl+O (v2.1.110) |
-| `/fewer-permission-prompts` | Scan transcripts and propose a read-only tool allowlist (shipped as `/less-permission-prompts` in v2.1.111) |
-| `/btw [question]` | Side question overlay: read-only ephemeral agent, no history pollution, no tools |
-| `/loop [interval] [prompt]` | Repeat on a fixed interval, or let Claude choose the interval when omitted; recurring tasks expire after 7 days (see scheduling reference) |
-| `/usage` (`/cost`, `/stats`) | Token + cost usage per model, plan limits, activity graph (merged in v2.1.118) |
-| `/ultrareview` | Multi-agent cloud code review, now an alias of `/code-review ultra` (v2.1.114) |
-| `/goal [condition]` | Autonomous multi-turn mode: Claude works until condition is met, live overlay shows elapsed/turns/tokens (v2.1.139) |
-| `/scroll-speed` | Tune mouse wheel scroll speed with interactive live-preview slider (v2.1.139) |
-| `/rename [name]` | Name or rename the current session |
-| `/copy` | Interactive picker to copy a code block or full response |
-| `/doctor` | Full setup checkup: install, settings, hooks, `CLAUDE.md` bloat, unused skills (v2.1.205+) |
-| `/debug` | Systematic troubleshooting |
-| `/exit` | Quit (or Ctrl+D) |
+**Версия**: 3.46.0 | **Последнее обновление**: 22 нояб. 2026
 
 ---
 
-## Keyboard shortcuts
+## Основные команды
 
-| Shortcut | Action |
-|----------|--------|
-| `Shift+Tab` | Cycle permission modes |
-| `Esc` × 2 | Rewind (undo) |
-| `Ctrl+C` | Interrupt |
-| `Ctrl+R` | Search command history |
-| `Ctrl+L` | Clear screen (keeps context) |
-| `Tab` | Autocomplete |
-| `Shift+Enter` | New line |
-| `Ctrl+B` | Background tasks |
-| `Ctrl+X Ctrl+K` | Stop running background subagents |
-| `Ctrl+Enter` / `Ctrl+X Ctrl+S` | Send queued messages now, interrupting the current turn |
-| `Option+T` / `Alt+T` | Toggle thinking where supported; no effect on Opus 5.5 or Fable |
-| `Space` (hold) | Voice input (requires `/voice` enabled) |
-| `Ctrl+D` | Exit |
+Ниже приведены избранные повседневные команды. Их доступность зависит от версии, провайдера и тарифа: полный список находится в [§10.1 руководства](./ultimate-guide.md#101-commands-table), а всегда актуальный официальный справочник — на [code.claude.com/docs/en/commands](https://code.claude.com/docs/en/commands).
+
+| Команда | Действие |
+|---------|----------|
+| `/help` | Контекстная справка |
+| `/powerup` | Интерактивные анимированные уроки по возможностям Claude Code |
+| `/clear` | Сброс диалога |
+| `/compact` | Освобождение контекста |
+| `/status` | Состояние сессии + использование контекста |
+| `/context` | Детальная разбивка токенов |
+| `/plan` | Переход в Plan Mode (без изменений). Выход — подтверждением плана или `Shift+Tab` |
+| `/model` | Выбор модели с сохранением по умолчанию; нажмите `s` в списке, чтобы выбрать только для текущей сессии |
+| `/autocompact [auto\|500k]` | Выбор окна автокомпакции или восстановление значения модели по умолчанию |
+| `/output-style [style]` | Выбор стиля: Default, Proactive, Concise, Explanatory, Learning или пользовательского |
+| `/insights` | Аналитика использования + отчёт по оптимизации |
+| `/code-review [level]` | Ревью diff на логические ошибки; `--fix` применяет исправления, `ultra` запускает в облаке |
+| `/simplify` | Ревью изменённого кода исключительно для очистки: переиспользование, упрощение, эффективность (применяет правки по очистке; для поиска багов корректности используйте `/code-review`) |
+| `/security-review` | Проверка diff ветки на риски инъекций, аутентификации и утечки данных |
+| `/batch` | Масштабный рефакторинг силами 5–30 параллельных агентов в отдельных worktree |
+| `/subtask <task>` | Передача побочной задачи форкнутому субагенту, который отчитается обратно сюда (v2.1.212+) |
+| `/teleport` | Перенос сессии из веба |
+| `/tasks` | Мониторинг фоновых задач |
+| `/remote-env` | Настройка облачного окружения |
+| `/remote-control` (`/rc`) | Подключение текущей локальной сессии к вебу/мобильному приложению; на Team/Enterprise требуется включение владельцем |
+| `/mobile` | Ссылки на загрузку мобильного приложения Claude |
+| `/fast` | Переключение ускоренного вывода Opus; Opus 5.5 стоит $8/$40 за MTok в быстром режиме |
+| `/voice` | Переключение голосового ввода (удерживайте Пробел для речи, отпустите для отправки) |
+| `/recap` | Краткая сводка контекста сессии при возвращении после перерыва (v2.1.108) |
+| `/effort [level]` | Глубина рассуждений: low/medium/high/xhigh/max/ultracode; без аргумента = интерактивный ползунок (v2.1.111) |
+| `/tui [fullscreen]` | Полноэкранный рендеринг TUI без мерцания (v2.1.110) |
+| `/focus` | Переключение минималистичного режима фокусировки, отдельно от Ctrl+O (v2.1.110) |
+| `/fewer-permission-prompts` | Сканирование транскриптов и предложение разрешающего списка инструментов только для чтения (выпущено как `/less-permission-prompts` в v2.1.111) |
+| `/btw [question]` | Наложение для побочного вопроса: эфемерный агент только для чтения, без засорения истории и без инструментов |
+| `/loop [interval] [prompt]` | Повтор через заданный интервал, либо Claude выбирает интервал сам, если не указан; повторяющиеся задачи истекают через 7 дней (см. справочник планирования) |
+| `/usage` (`/cost`, `/stats`) | Расход токенов и стоимость по моделям, лимиты тарифа, график активности (объединены в v2.1.118) |
+| `/ultrareview` | Мультиагентное облачное ревью кода, теперь псевдоним `/code-review ultra` (v2.1.114) |
+| `/goal [condition]` | Автономный многошаговый режим: Claude работает до выполнения условия, живой оверлей показывает время/ходы/токены (v2.1.139) |
+| `/scroll-speed` | Настройка скорости прокрутки колёсиком мыши с интерактивным ползунком предпросмотра (v2.1.139) |
+| `/rename [name]` | Назначение или изменение имени текущей сессии |
+| `/copy` | Интерактивный выбор для копирования блока кода или всего ответа |
+| `/doctor` | Полная диагностика установки: инсталляция, настройки, хуки, раздутие `CLAUDE.md`, неиспользуемые скиллы (v2.1.205+) |
+| `/debug` | Систематическое устранение неполадок |
+| `/exit` | Выход (или Ctrl+D) |
 
 ---
 
-## File references
+## Горячие клавиши
+
+| Сочетание | Действие |
+|-----------|----------|
+| `Shift+Tab` | Циклическое переключение режимов прав доступа |
+| `Esc` × 2 | Откат (отмена действий) |
+| `Ctrl+C` | Прерывание |
+| `Ctrl+R` | Поиск по истории команд |
+| `Ctrl+L` | Очистка экрана (сохраняет контекст) |
+| `Tab` | Автодополнение |
+| `Shift+Enter` | Перенос строки |
+| `Ctrl+B` | Фоновые задачи |
+| `Ctrl+X Ctrl+K` | Остановка работающих фоновых субагентов |
+| `Ctrl+Enter` / `Ctrl+X Ctrl+S` | Отправить сообщения из очереди прямо сейчас, прервав текущий ход |
+| `Option+T` / `Alt+T` | Переключение режима рассуждений там, где поддерживается; не действует на Opus 5.5 и Fable |
+| `Space` (удержание) | Голосовой ввод (требует включённого `/voice`) |
+| `Ctrl+D` | Выход |
+
+---
+
+## Ссылки на файлы
 
 ```
-@path/to/file.ts    → Reference a file
-@agent-name         → Call an agent
-@session-name       → Message another live Claude session (v2.1.232+)
-!shell-command      → Run shell command
+@path/to/file.ts    → Ссылка на файл
+@agent-name         → Вызов агента
+@session-name       → Сообщение другой активной сессии Claude (v2.1.232+)
+!shell-command      → Выполнение команды оболочки
 ```
 
-| IDE | Shortcut |
-|-----|----------|
+| IDE | Сочетание |
+|-----|-----------|
 | VS Code | `Alt+K` |
 | JetBrains | `Cmd+Option+K` |
 
 ---
 
-## Features Méconnues (But Official!)
+## Малоизвестные возможности (но официальные!)
 
-| Feature | Since | What It Does |
-|---------|-------|--------------|
-| **Tasks API** | v2.1.16 | Persistent task lists with dependencies; opt in on newer models with `CLAUDE_CODE_ENABLE_TODO_TOOLS=1` |
-| **Background Agents** | v2.0.60 | Sub-agents work while you code. Since v2.1.232 forking is the default: a `subagent_type: "fork"` agent inherits the full conversation and prompt cache, and non-teammate spawns go background on their own |
-| **Agent Teams** | v2.1.32 | Multi-agent coordination (TeamCreate/SendMessage) |
-| **Cross-Session Messaging** | v2.1.224 | Sessions message each other across all your machines. `ListAgents` to discover, `SendMessage` to talk, `@name` to mention (v2.1.232). macOS, Linux, Windows (v2.1.234+). [Full guide →](./workflows/cross-session-messaging.md) |
-| **Self-Hosted Environments** | v2.1.224 | `claude self-hosted-runner` makes your own machine or container the place web, mobile, and desktop sessions execute. Team and Enterprise |
-| **Auto-Memories** | v2.1.32 | Automatic cross-session context capture |
-| **Session Forking** | v2.1.19 | Rewind + create parallel timeline |
-| **LSP Tool** | v2.0.74 | IDE-like navigation: symbols, types, refs. ~50ms vs 45s with grep. 11 languages |
-| **Voice Mode** | v2.1.x | Native voice input, free transcription, no rate limit impact |
-| **Remote Control** | v2.1.51 | Control a local session from phone/browser; subscription required, with owner enablement on Team/Enterprise |
-| **`/loop`** | v2.1.71 | Session-scoped recurring scheduler: `/loop 5m check the deploy` (stops when session ends). Min 1 min, max 50 tasks/session |
-| **`/goal`** | v2.1.139 | Autonomous completion loop: set a condition, Claude works across turns until a separate evaluator (Haiku by default on the Claude API) judges the surfaced evidence. Live overlay shows elapsed time, turns, and tokens. Three-element formula: measurable end state + verification mechanism + constraints. |
-| **Cloud Scheduled Tasks** | 2026 | Machine-off scheduling via `/schedule` or `claude.ai/code/scheduled`. Runs on Anthropic infra, clones repo fresh each run, min 1h interval. Pro/Max/Team/Enterprise |
-| **Desktop Scheduled Tasks** | 2026 | Local machine scheduling via Desktop app. Min 1 min, full local file access, no session required |
-| **Skill Evals** | Mar 2026 | Two skill types: Capability Uplift (fills model gap, fades) / Encoded Preference (encodes workflow, stays). Benchmark Mode, A/B testing, Trigger Tuning. |
-| **Output Styles** | v2.1.269 command | `/output-style` selects Default, Proactive, Concise, Explanatory, Learning, or a custom style. Coding-oriented custom styles need `keep-coding-instructions: true`. |
+| Возможность | С версии | Что делает |
+|-------------|----------|------------|
+| **Tasks API** | v2.1.16 | Постоянные списки задач с зависимостями; включается на новых моделях через `CLAUDE_CODE_ENABLE_TODO_TOOLS=1` |
+| **Фоновые агенты (Background Agents)** | v2.0.60 | Субагенты работают, пока вы пишете код. Начиная с v2.1.232 форкинг включён по умолчанию: агент с `subagent_type: "fork"` наследует весь диалог и кэш промптов, а запуски без участника команды автоматически уходят в фон |
+| **Команды агентов (Agent Teams)** | v2.1.32 | Мультиагентная координация (TeamCreate/SendMessage) |
+| **Межсессионный обмен сообщениями (Cross-Session Messaging)** | v2.1.224 | Сессии обмениваются сообщениями между всеми вашими машинами. `ListAgents` для обнаружения, `SendMessage` для общения, `@name` для упоминания (v2.1.232). macOS, Linux, Windows (v2.1.234+). [Полное руководство →](./workflows/cross-session-messaging.md) |
+| **Самостоятельно размещённые окружения (Self-Hosted Environments)** | v2.1.224 | `claude self-hosted-runner` превращает вашу машину или контейнер в среду выполнения веб-, мобильных и десктопных сессий. Team и Enterprise |
+| **Автопамять (Auto-Memories)** | v2.1.32 | Автоматическое сохранение контекста между сессиями |
+| **Форкинг сессий (Session Forking)** | v2.1.19 | Откат + создание параллельной ветки истории |
+| **Инструмент LSP (LSP Tool)** | v2.0.74 | Навигация уровня IDE: символы, типы, ссылки. ~50 мс против 45 с с grep. 11 языков |
+| **Голосовой режим (Voice Mode)** | v2.1.x | Нативный голосовой ввод, бесплатная транскрибация, не влияет на лимит запросов (rate limit) |
+| **Удалённое управление (Remote Control)** | v2.1.51 | Управление локальной сессией с телефона/браузера; требуется подписка, а на Team/Enterprise — включение владельцем |
+| **`/loop`** | v2.1.71 | Повторяющийся планировщик в рамках сессии: `/loop 5m check the deploy` (останавливается при завершении сессии). Минимум 1 мин, максимум 50 задач на сессию |
+| **`/goal`** | v2.1.139 | Автономный цикл завершения задачи: задайте условие, и Claude будет работать ход за ходом, пока отдельный оценщик (по умолчанию Haiku в Claude API) не оценит представленные доказательства. Живой оверлей показывает прошедшее время, число ходов и токены. Формула из трёх элементов: измеримое конечное состояние + механизм проверки + ограничения. |
+| **Облачные задачи по расписанию (Cloud Scheduled Tasks)** | 2026 | Планирование при выключенном компьютере через `/schedule` или `claude.ai/code/scheduled`. Выполняются в инфраструктуре Anthropic, каждый раз клонируют свежий репозиторий, минимальный интервал 1 ч. Pro/Max/Team/Enterprise |
+| **Десктопные задачи по расписанию (Desktop Scheduled Tasks)** | 2026 | Планирование на локальной машине через приложение Desktop. Минимум 1 мин, полный доступ к локальным файлам, активная сессия не требуется |
+| **Оценка скиллов (Skill Evals)** | мар. 2026 | Два типа скиллов: Capability Uplift (закрывает пробел модели, со временем устаревает) / Encoded Preference (кодирует рабочий процесс, остаётся). Режим бенчмарка, A/B-тестирование, настройка триггеров. |
+| **Стили вывода (Output Styles)** | команда с v2.1.269 | `/output-style` выбирает Default, Proactive, Concise, Explanatory, Learning или пользовательский стиль. Пользовательским стилям для написания кода требуется `keep-coding-instructions: true`. |
 
-**Activate LSP**: Add to `~/.claude/settings.json` → `{ "env": { "ENABLE_LSP_TOOL": "1" } }` (requires LSP server installed for your language: `tsserver`, `pylsp`, `gopls`, `rust-analyzer`, `sourcekit-lsp`...)
+**Активация LSP**: добавьте в `~/.claude/settings.json` → `{ "env": { "ENABLE_LSP_TOOL": "1" } }` (требуется установленный LSP-сервер для вашего языка: `tsserver`, `pylsp`, `gopls`, `rust-analyzer`, `sourcekit-lsp`...)
 
-**Pro tip**: These are public, documented in the [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md). Read it!
-
----
-
-## Permission modes
-
-| Mode | Editing | Execution |
-|------|---------|-----------|
-| Manual (`default`) | Permission rules apply | Permission rules apply |
-| acceptEdits | Auto | Asks |
-| Plan Mode | No file changes | Read-only exploration tools allowed |
-| auto | Classifier decides | Classifier decides |
-| dontAsk | Only if in allow rules | Only if in allow rules |
-| bypassPermissions | Auto | Auto (CI/CD only) |
-
-**Shift+Tab** to switch modes
+**Совет профи**: все эти возможности публичны и задокументированы в [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md). Читайте его!
 
 ---
 
-## Memory & Settings (2 levels)
+## Режимы прав доступа
 
-| Level | macOS/Linux | Windows | Scope | Git |
-|-------|-------------|---------|-------|-----|
-| **Project** | `.claude/` | `.claude\` | Team | ✅ |
-| **Personal** | `~/.claude/` | `%USERPROFILE%\.claude\` | You (all projects) | ❌ |
+| Режим | Редактирование | Выполнение |
+|-------|----------------|------------|
+| Ручной (`default`) | Применяются правила прав доступа | Применяются правила прав доступа |
+| acceptEdits | Автоматически | Спрашивает |
+| Plan Mode | Без изменения файлов | Разрешены инструменты исследования только для чтения |
+| auto | Решает классификатор | Решает классификатор |
+| dontAsk | Только если указано в правилах allow | Только если указано в правилах allow |
+| bypassPermissions | Автоматически | Автоматически (только для CI/CD) |
 
-**Priority**: Project overrides Personal
-
-| File | Where | Usage |
-|------|-------|-------|
-| `CLAUDE.md` | Project root | Team memory (instructions) |
-| `settings.json` | `.claude/` | Team settings (hooks) |
-| `settings.local.json` | `.claude/` | Your setting overrides |
-| `CLAUDE.md` | `~/.claude/` (Win: `%USERPROFILE%\.claude\`) | Personal memory |
+**Shift+Tab** — переключение режимов
 
 ---
 
-## .claude/ folder structure
+## Память и настройки (2 уровня)
+
+| Уровень | macOS/Linux | Windows | Область действия | Git |
+|---------|-------------|---------|------------------|-----|
+| **Проектный** | `.claude/` | `.claude\` | Команда | ✅ |
+| **Личный** | `~/.claude/` | `%USERPROFILE%\.claude\` | Вы (все проекты) | ❌ |
+
+**Приоритет**: проектные настройки переопределяют личные
+
+| Файл | Где | Назначение |
+|------|-----|------------|
+| `CLAUDE.md` | Корень проекта | Командная память (инструкции) |
+| `settings.json` | `.claude/` | Командные настройки (хуки) |
+| `settings.local.json` | `.claude/` | Ваши переопределения настроек |
+| `CLAUDE.md` | `~/.claude/` (Win: `%USERPROFILE%\.claude\`) | Личная память |
+
+---
+
+## Структура папки .claude/
 
 ```
 .claude/
-├── CLAUDE.md           # Local memory (gitignored)
-├── settings.json       # Hooks (committed)
-├── settings.local.json # Permissions (not committed)
-├── agents/             # Custom agents
-├── hooks/              # Event scripts
-├── rules/              # Auto-loaded rules
-└── skills/             # Slash commands + knowledge modules (unified)
+├── CLAUDE.md           # Локальная память (в .gitignore)
+├── settings.json       # Хуки (в коммите)
+├── settings.local.json # Права доступа (не в коммите)
+├── agents/             # Пользовательские агенты
+├── hooks/              # Скрипты событий
+├── rules/              # Автоматически загружаемые правила
+└── skills/             # Слэш-команды + модули знаний (объединены)
 ```
 
 ---
 
-## Typical workflow
+## Типовой рабочий процесс
 
 ```
-1. Start session      → claude
-2. Check context      → /status
-3. Plan Mode          → Shift+Tab × 2 (for complex tasks)
-4. Describe task      → Clear, specific prompt
-5. Review changes     → Always read the diff!
-6. Accept/Reject      → y/n
-7. Verify             → Run tests
-8. Commit             → When task complete
-9. /compact           → When context >70%
+1. Запуск сессии        → claude
+2. Проверка контекста   → /status
+3. Plan Mode            → Shift+Tab × 2 (для сложных задач)
+4. Описание задачи      → Чёткий, конкретный промпт
+5. Ревью изменений      → Всегда читайте diff!
+6. Принять/Отклонить    → y/n
+7. Проверка             → Запуск тестов
+8. Коммит               → Когда задача завершена
+9. /compact             → Когда контекст >70%
 ```
 
 ---
 
-## Context management (CRITICAL)
+## Управление контекстом (КРИТИЧНО)
 
-### Statusline
+### Строка состояния (Statusline)
 
 ```
 Model: Sonnet | Ctx: 89.5k | Cost: $2.11 | Ctx(u): 56.0%
 ```
-**Watch `Ctx(u):`** → >70% = `/compact`, >85% = `/clear`
+**Следите за `Ctx(u):`** → >70% = `/compact`, >85% = `/clear`
 
-**Enhanced statusline ([ccstatusline](https://github.com/sirmalloc/ccstatusline)):** Add to `~/.claude/settings.json`:
+**Расширенная строка состояния ([ccstatusline](https://github.com/sirmalloc/ccstatusline)):** добавьте в `~/.claude/settings.json`:
 ```json
 { "statusLine": { "type": "command", "command": "npx -y ccstatusline@latest", "padding": 0 } }
 ```
 
-### Context thresholds
+### Пороги контекста
 
-| Context % | Status | Action |
-|-----------|--------|--------|
-| 0-50% | Green | Work freely |
-| 50-70% | Yellow | Be selective |
-| 70-90% | Orange | `/compact` now |
-| 90%+ | Red | `/clear` required |
+| Контекст % | Статус | Действие |
+|------------|--------|----------|
+| 0–50% | Зелёный | Работайте свободно |
+| 50–70% | Жёлтый | Будьте избирательны |
+| 70–90% | Оранжевый | Выполните `/compact` сейчас |
+| 90%+ | Красный | Необходим `/clear` |
 
-### Actions by symptom
+### Действия по симптомам
 
-| Sign | Action |
-|------|--------|
-| Short responses | `/compact` |
-| Frequent forgetting | `/clear` |
-| >70% context | `/compact` |
-| Task complete | `/clear` |
+| Признак | Действие |
+|---------|----------|
+| Короткие ответы | `/compact` |
+| Частая забывчивость | `/clear` |
+| Контекст >70% | `/compact` |
+| Задача завершена | `/clear` |
 
-### Context recovery commands
+### Команды восстановления контекста
 
-| Command | Usage |
-|---------|-------|
-| `/compact` | Summarize and free context |
-| `/clear` | Fresh start |
-| `/rewind` | Undo recent changes |
-| `claude -c` | Resume last session (CLI flag) |
-| `claude -r <id>` | Resume specific session (CLI flag) |
-
----
-
-## Under the hood (quick facts)
-
-| Concept | Key Point |
-|---------|-----------|
-| **Master Loop** | Model/tool loop; permissions and auto-mode review are separate controls |
-| **Tools** | Bash, Read, Edit, Write, Grep, Glob, Agent and more ([tool reference](./core/tools-reference.md)) |
-| **Context** | Model-dependent: native 1M on current Opus, Sonnet and Fable; 200K on Haiku 4.5. Inspect `/context` |
-| **Sub-agents** | Isolated context, max depth=1 |
-| **Philosophy** | "Less scaffolding, more model" (trust Claude's reasoning) |
-
-**Deep dive**: [Architecture & Internals](./core/architecture.md)
+| Команда | Применение |
+|---------|------------|
+| `/compact` | Сжать (суммаризировать) и освободить контекст |
+| `/clear` | Начать с чистого листа |
+| `/rewind` | Откатить последние изменения |
+| `claude -c` | Продолжить последнюю сессию (флаг CLI) |
+| `claude -r <id>` | Продолжить конкретную сессию (флаг CLI) |
 
 ---
 
-## Harness choice in four layers
+## Под капотом (краткие факты)
 
-| Layer | Owns | Start here |
-|-------|------|------------|
-| Model | Reasoning and tool-call proposals | [Glossary](https://cc.bruniaux.com/guide/glossary/) |
-| Runtime harness | Tool loop, permissions, and recovery | [Agent Harness Engineering](https://cc.bruniaux.com/guide/agent-harness/) |
-| Repository harness | Instructions, task state, and verification | [Repository Harness Engineering](https://cc.bruniaux.com/guide/ultimate-guide/09-advanced-patterns/#925-harness-engineering) |
-| Orchestrator | Coordination between runtimes or sessions | [Agent Tools](https://cc.bruniaux.com/guide/agentic-tools/) |
+| Концепция | Ключевой момент |
+|-----------|-----------------|
+| **Главный цикл (Master Loop)** | Цикл «модель / инструменты»; права доступа и проверка режима `auto` — отдельные контуры контроля |
+| **Инструменты** | Bash, Read, Edit, Write, Grep, Glob, Agent и другие ([справочник инструментов](./core/tools-reference.md)) |
+| **Контекст** | Зависит от модели: нативный 1M на актуальных Opus, Sonnet и Fable; 200K на Haiku 4.5. Проверяйте через `/context` |
+| **Субагенты** | Изолированный контекст, максимальная глубина depth=1 |
+| **Философия** | «Меньше обвязки, больше модели» (доверяйте рассуждениям Claude) |
 
-Choose the smallest control structure that safely solves the need: a bounded loop for one repeated task; an explicit graph for routing, joins, parallelism, interruption, or durable recovery; a repository harness for repeatable project behavior; and an orchestrator for several runs or queues. Specify success, failure, timeout, budget, and escalation before execution. See [Loop & Graph Engineering](https://cc.bruniaux.com/guide/loop-graph-engineering/) and compare products in the [Agent Harness Map](https://cc.bruniaux.com/guide/agent-harness-landscape/).
-
-Architect-engineer handoffs use a self-contained versioned contract, applicable ADRs, an assigned next owner, and revision-bound review evidence. Task status, run status, and decision status are distinct. Reconcile historical completion claims with live state on resume. See `guide/workflows/dual-instance-planning.md` and `docs/resource-evaluations/honkonen-architect-engineer.md`; separation does not guarantee lower cost, better quality, or reviewer independence.
-
-Repository context routes to authorized owners of stable contracts, organizational knowledge, and live operational state. MLD (Mistakes, Learnings, Desires) supplies observations for corroboration before promotion. Curated candidates stay outside served context until reviewed publication with provenance, audience, revision, and expiry. See `docs/resource-evaluations/lopopolo-harness-engineering.md` for the anthology's evidence limits and integrated locations.
-
-Requalify after material model, host, harness, or action-interface changes. Measure feedback latency, run duration, human attention, and time to accepted outcome separately. See `guide/roles/agent-evaluation.md#evaluation-epochs-and-four-clocks`.
-
-Price uncached input, cache writes, cache reads and generated output separately; a file loaded once can remain billable on later calls. Keep changing working state after the stable prefix, and retain plans or handoffs when they support decisions, review or recovery. Boucard's $0.01 cached-prefix versus $0.10 generated-note example is illustrative, not a measured task saving. See `guide/core/agent-harness.md#price-generated-artifacts-against-cached-context` and `docs/resource-evaluations/boucard-frugal-agent-harnesses.md`.
-
-Evaluate the exact model-harness pair for a bounded coding task. Introduce orchestration only when coordination is the constraint. A harness optimizer sits outside the four operating layers and changes candidate harnesses under a separate evaluation protocol.
+**Глубокий разбор**: [Архитектура и внутреннее устройство](./core/architecture.md)
 
 ---
 
-## Plan mode & thinking
+## Выбор обвязки (харнесса) в четырёх слоях
 
-| Feature | Activation | Usage |
-|---------|------------|-------|
-| **Plan Mode** | `Shift+Tab × 2` or `/plan` | Explore without modifying |
-| **OpusPlan** | `/model opusplan` | Opus for planning, Sonnet for execution |
+| Слой | Зона ответственности | С чего начать |
+|------|----------------------|---------------|
+| Модель | Рассуждения и предложения вызовов инструментов | [Глоссарий](https://cc.bruniaux.com/guide/glossary/) |
+| Обвязка среды выполнения (Runtime harness) | Цикл инструментов, права доступа и восстановление | [Инженерия обвязки агента](https://cc.bruniaux.com/guide/agent-harness/) |
+| Обвязка репозитория (Repository harness) | Инструкции, состояние задач и верификация | [Инженерия обвязки репозитория](https://cc.bruniaux.com/guide/ultimate-guide/09-advanced-patterns/#925-harness-engineering) |
+| Оркестратор | Координация между средами выполнения или сессиями | [Агентные инструменты](https://cc.bruniaux.com/guide/agentic-tools/) |
 
-> **Verified September 24, 2026**: Opus 5.5 defaults to `medium`; Sonnet 5 and Fable 5.1 default to `high`. Haiku 4.5 has no effort parameter. `ultrathink` adds a reasoning instruction for the turn without changing API effort.
+Выбирайте минимальную управляющую структуру, которая безопасно решает задачу: ограниченный цикл — для одной повторяющейся задачи; явный граф — для маршрутизации, объединения веток (joins), параллелизма, прерываний или надёжного восстановления; обвязку репозитория — для воспроизводимого поведения проекта; оркестратор — для нескольких запусков или очередей. Задавайте критерии успеха, отказа, таймаут, бюджет и правила эскалации до начала выполнения. См. [Инженерия циклов и графов](https://cc.bruniaux.com/guide/loop-graph-engineering/) и сравнение продуктов на [Карте обвязок агентов](https://cc.bruniaux.com/guide/agent-harness-landscape/).
 
-| Control | Action | Persistence |
-|---------|--------|-------------|
-| **Option+T / Alt+T** | Toggle thinking on supported models; Opus 5.5 and Fable always think | Session |
-| **`/effort` or `/model` slider** | Choose a supported level; `Enter` saves per model, `s` applies once | Per model or session |
-| **`/effort max`** | Highest supported effort | Session |
-| **`CLAUDE_CODE_EFFORT_LEVEL`** | Override effort in the launching environment | Process environment |
-| **`modelSettings` / `effortLevel`** | Persist `low`, `medium`, `high`, or `xhigh`; not `max` | Settings |
-| **`effort` in skill frontmatter** | Override effort while the skill runs | Invocation |
+Передача задач между архитектором и инженером (architect-engineer handoffs) опирается на самодостаточный версионированный контракт, применимые ADR, назначенного следующего владельца и привязанные к ревизии доказательства ревью. Статус задачи, статус запуска и статус решения — это разные сущности. При возобновлении сверяйте прошлые заявления о завершении с актуальным состоянием. См. `guide/workflows/dual-instance-planning.md` и `docs/resource-evaluations/honkonen-architect-engineer.md`; само по себе разделение ролей не гарантирует более низкую стоимость, более высокое качество или независимость ревьюера.
 
-**Cost tip**: try a lower supported effort for bounded tasks, then verify the result. On Opus 5.5, changing effort is the control; disabling thinking has no effect.
+Контекст репозитория направляется авторизованным владельцам стабильных контрактов, организационных знаний и живого эксплуатационного состояния. MLD (Mistakes, Learnings, Desires — ошибки, выводы, пожелания) поставляет наблюдения для перепроверки перед продвижением в базу знаний. Отобранные кандидаты остаются вне подаваемого в модель контекста до рецензируемой публикации с указанием источника происхождения (provenance), аудитории, ревизии и срока действия. Ограничения доказательной базы антологии и интегрированные разделы см. в `docs/resource-evaluations/lopopolo-harness-engineering.md`.
 
-**Per-skill effort**: add `effort: low` to mechanical skills (commit, sync, scaffold) and `effort: high` to analytical ones (security-audit, architecture-review). Overrides session setting automatically.
+Проводите повторную квалификацию после существенных изменений модели, хоста, обвязки (харнесса) или интерфейса действий. Измеряйте задержку обратной связи, длительность запуска, затраты человеческого внимания и время до принятого результата по отдельности. См. `guide/roles/agent-evaluation.md#evaluation-epochs-and-four-clocks`.
 
-**OpusPlan workflow**: `/model opusplan` → `Shift+Tab × 2` (plan with Opus) → `Shift+Tab` (execute with Sonnet)
+Оценивайте стоимость некэшированного ввода, записи в кэш, чтения из кэша и сгенерированного вывода по отдельности: единожды загруженный файл может продолжать тарифицироваться при последующих вызовах. Размещайте изменяемое рабочее состояние после стабильного префикса и сохраняйте планы или материалы передачи задач (handoffs), когда они помогают принимать решения, проводить ревью или восстанавливаться после сбоев. Пример Boucard с $0.01 за кэшированный префикс против $0.10 за сгенерированную заметку носит иллюстративный характер и не является измеренной экономией на реальной задаче. См. `guide/core/agent-harness.md#price-generated-artifacts-against-cached-context` и `docs/resource-evaluations/boucard-frugal-agent-harnesses.md`.
 
-**Required for**: features >3 files, architecture, complex debugging
+Оценивайте конкретную пару «модель + обвязка (харнесс)» на ограниченной задаче программирования. Вводите оркестрацию только тогда, когда узким местом становится координация. Оптимизатор обвязки находится за пределами четырёх операционных слоёв и изменяет кандидаты обвязок по отдельному протоколу оценки (eval).
 
-### Quick model selection
+---
+## Режим планирования и размышление
 
-| Task | Model | Effort |
-|------|-------|--------|
-| Rename, boilerplate, test gen | Haiku 4.5 | Not supported |
-| Feature dev, debug, refactor | Sonnet 5 or Opus 5.5 | Start at the model default |
-| Architecture, security audit | Opus 5.5; evaluate Fable 5.1 if needed | Increase with evidence |
+| Функция | Активация | Использование |
+|---------|-----------|---------------|
+| **Plan Mode** | `Shift+Tab × 2` или `/plan` | Исследование без внесения изменений |
+| **OpusPlan** | `/model opusplan` | Opus для планирования, Sonnet для выполнения |
 
-> Full decision table and pricing boundaries: [Section 2.5 Model Selection & Thinking Guide](ultimate-guide.md#25-model-selection--thinking-guide)
+> **Проверено 24 сентября 2026**: для Opus 5.5 по умолчанию используется `medium`; для Sonnet 5 и Fable 5.1 — `high`. У Haiku 4.5 нет параметра уровня усилий (effort). `ultrathink` добавляет инструкцию для рассуждения на текущий ход без изменения параметра effort в API.
 
-### Dynamic model switching (mid-session)
+| Элемент управления | Действие | Область действия |
+|--------------------|----------|------------------|
+| **Option+T / Alt+T** | Включает или отключает режим размышления (thinking) на поддерживаемых моделях; Opus 5.5 и Fable размышляют всегда | Сессия |
+| **Ползунок `/effort` или `/model`** | Выбор поддерживаемого уровня; `Enter` сохраняет для модели, `s` применяет однократно | Для модели или на сессию |
+| **`/effort max`** | Максимальный поддерживаемый уровень усилий | Сессия |
+| **`CLAUDE_CODE_EFFORT_LEVEL`** | Переопределение уровня усилий в окружении запуска | Окружение процесса |
+| **`modelSettings` / `effortLevel`** | Постоянное сохранение `low`, `medium`, `high` или `xhigh` (но не `max`) | Настройки |
+| **`effort` во frontmatter скилла** | Переопределение уровня усилий на время выполнения скилла | Вызов |
 
-**Pattern**: Start Sonnet (speed) → swap Opus (complexity) → back Sonnet
+**Совет по экономии**: попробуйте более низкий поддерживаемый уровень усилий для ограниченных по объёму задач, а затем проверьте результат. В Opus 5.5 управление происходит именно через уровень усилий; отключение размышления (thinking) не даёт эффекта.
 
-**Workflow**:
+**Уровень усилий для отдельных скиллов**: добавляйте `effort: low` в механические скиллы (commit, sync, scaffold) и `effort: high` в аналитические (security-audit, architecture-review). Это автоматически переопределяет настройку сессии.
+
+**Рабочий процесс OpusPlan**: `/model opusplan` → `Shift+Tab × 2` (планирование с Opus) → `Shift+Tab` (выполнение с Sonnet)
+
+**Обязательно для**: фич, затрагивающих >3 файлов, архитектуры, сложной отладки
+
+### Быстрый выбор модели
+
+| Задача | Модель | Уровень усилий |
+|--------|--------|----------------|
+| Переименование, шаблонный код, генерация тестов | Haiku 4.5 | Не поддерживается |
+| Разработка фич, отладка, рефакторинг | Sonnet 5 или Opus 5.5 | Начинайте со значения модели по умолчанию |
+| Архитектура, аудит безопасности | Opus 5.5; при необходимости оцените Fable 5.1 | Повышайте при наличии оснований |
+
+> Полная таблица выбора и границы тарификации: [Раздел 2.5 «Руководство по выбору модели и режиму размышления»](ultimate-guide.md#25-model-selection--thinking-guide)
+
+### Динамическое переключение модели (в середине сессии)
+
+**Паттерн**: старт на Sonnet (скорость) → переключение на Opus (сложность) → возврат на Sonnet
+
+**Рабочий процесс**:
 ```bash
-# Select Sonnet explicitly for this session
+# Явный выбор Sonnet для этой сессии
 claude --model sonnet
 
-# Complex feature encountered
-> "Implement OAuth2 flow with PKCE"
-/model opus                    # Switch to deep reasoning
+# Встретилась сложная фича
+> "Реализуй поток OAuth2 с PKCE"
+/model opus                    # Переключение на глубокие рассуждения
 
-# Feature complete, back to routine
-/model sonnet                  # Speed + cost optimization
+# Фича готова, возвращаемся к рутине
+/model sonnet                  # Оптимизация скорости и стоимости
 ```
 
-**Best Practices**:
-- ✅ Swap **on task boundaries**, not mid-task
-- ✅ Use Opus for: architecture decisions, complex debugging, security-critical code
-- ✅ Use Sonnet for: routine edits, refactoring, test writing
-- ✅ Use Haiku for: simple fixes, typos, validation checks
-- Model switches keep conversation history but can invalidate prompt caches; switch at a useful task boundary.
+**Проверенные практики**:
+- ✅ Переключайтесь **на границах задач**, а не в середине задачи
+- ✅ Используйте Opus для: архитектурных решений, сложной отладки, критичного к безопасности кода
+- ✅ Используйте Sonnet для: рутинных правок, рефакторинга, написания тестов
+- ✅ Используйте Haiku для: простых исправлений, опечаток, проверок валидации
+- Переключение модели сохраняет историю диалога, но может сбросить кэш промптов; переключайтесь на логичной границе задачи.
 
-**Standard Anthropic API rates**, USD per million tokens, checked September 24, 2026:
+**Стандартные тарифы Anthropic API**, USD за миллион токенов, проверено 24 сентября 2026:
 
-| Model | Input | Output | Context |
-|-------|-------|--------|---------|
+| Модель | Вход (Input) | Выход (Output) | Контекст |
+|--------|--------------|----------------|----------|
 | Opus 5.5 | $4 | $20 | 1M |
 | Sonnet 5 | $2 | $10 | 1M |
 | Haiku 4.5 | $1 | $5 | 200K |
 | Fable 5.1 | $10 | $50 | 1M |
 
-Opus 5.5 fast mode costs $8/$40. Subscription allowances, usage credits, cache tokens, and cloud-provider pricing are separate. [Official pricing](https://platform.claude.com/docs/en/about-claude/pricing).
+Быстрый режим Opus 5.5 стоит $8/$40. Лимиты подписок, кредиты использования, токены кэша и тарифы облачных провайдеров рассчитываются отдельно. [Официальные тарифы](https://platform.claude.com/docs/en/about-claude/pricing).
 
-On the direct Anthropic service, the account default and `opus` select Opus 5.5; `sonnet` selects Sonnet 5. Provider aliases differ: check the [provider table](ultimate-guide.md#model-aliases). `fable` normally selects Fable 5.1, while Claude apps gateway sessions resolve it to Fable 5.
+При прямом подключении к сервису Anthropic значение по умолчанию в аккаунте и алиас `opus` выбирают Opus 5.5; `sonnet` выбирает Sonnet 5. Алиасы у провайдеров отличаются: сверьтесь с [таблицей провайдеров](ultimate-guide.md#model-aliases). `fable` обычно выбирает Fable 5.1, тогда как сессии через шлюз приложений Claude разрешают его в Fable 5.
 
-**Source**: [Gur Sannikov embedded engineering workflow](https://www.linkedin.com/posts/gursannikov_claudecode-embeddedengineering-aiagents-activity-7423851983331328001-DrFb)
+**Источник**: [Рабочий процесс embedded-разработки от Gur Sannikov](https://www.linkedin.com/posts/gursannikov_claudecode-embeddedengineering-aiagents-activity-7423851983331328001-DrFb)
 
 ---
 
-## MCP servers
+## MCP-серверы
 
-| Server | Purpose |
-|--------|---------|
-| **Serena** | Indexation + session memory + symbol search |
-| **grepai** | Semantic search + call graph analysis |
-| **Context7** | Library documentation |
-| **Sequential** | Structured reasoning |
-| **Playwright** | Browser automation |
-| **Postgres** | Database queries |
-| **doobidoo** | Semantic memory + multi-client + Knowledge Graph |
+| Сервер | Назначение |
+|--------|------------|
+| **Serena** | Индексация + память сессий + поиск по символам |
+| **grepai** | Семантический поиск + анализ графа вызовов |
+| **Context7** | Документация библиотек |
+| **Sequential** | Структурированные рассуждения |
+| **Playwright** | Автоматизация браузера |
+| **Postgres** | Запросы к базе данных |
+| **doobidoo** | Семантическая память + мультиклиентский доступ + граф знаний |
 
-**Serena memory**: `write_memory()` / `read_memory()` / `list_memories()`
+**Память Serena**: `write_memory()` / `read_memory()` / `list_memories()`
 
-**Serena indexation**:
+**Индексация Serena**:
 ```bash
-# Initial index
+# Первичная индексация
 uvx --from git+https://github.com/oraios/serena serena project index
 
-# Force rebuild
+# Принудительная полная пересборка
 serena project index --force-full
 
-# Incremental update (faster)
+# Инкрементальное обновление (быстрее)
 serena project index --incremental --parallel 4
 ```
 
-Check status: `/mcp`
+Проверка статуса: `/mcp`
 
 ---
 
-## Creating custom components
+## Создание пользовательских компонентов
 
-### Agent (`.claude/agents/my-agent.md`)
+### Агент (`.claude/agents/my-agent.md`)
 ```yaml
 ---
 name: my-agent
-description: Use when [trigger]
+description: Использовать при [триггере]
 model: sonnet
 tools: Read, Write, Edit, Bash
 ---
-# Instructions here
+# Инструкции здесь
 ```
 
-### Skill: user-invocable (`.claude/skills/my-command/SKILL.md`)
+### Скилл: вызываемый пользователем (`.claude/skills/my-command/SKILL.md`)
 ```markdown
 ---
-description: Brief description
+description: Краткое описание
 argument-hint: "<required_arg> [--flag]"
 disable-model-invocation: true
 ---
-# Command Name
-Instructions for what to do...
-$ARGUMENTS[0] $ARGUMENTS[1] (or $0 $1) - user args
+# Название команды
+Инструкции, что нужно сделать...
+$ARGUMENTS[0] $ARGUMENTS[1] (или $0 $1) — аргументы пользователя
 ```
 
-### Dynamic workflow (`.claude/workflows/name.js`)
+### Динамический рабочий процесс (`.claude/workflows/name.js`)
 
 ```js
 export const meta = {
@@ -495,7 +494,7 @@ export const meta = {
   description: 'What this orchestrates',
   phases: [{ title: 'Analyze' }, { title: 'Verify' }],
 };
-// meta must be the first statement, a pure literal (no variables/spreads)
+// meta должен быть первым выражением и представлять собой чистый литерал (без переменных и spread)
 
 export default async function ({ agent, parallel, pipeline, phase, log, args, budget }) {
   phase('Analyze');
@@ -506,245 +505,244 @@ export default async function ({ agent, parallel, pipeline, phase, log, args, bu
 }
 ```
 
-Trigger: type `ultracode` in the prompt (or ask in your own words). Monitor: `/workflows`.
+Запуск: введите `ultracode` в промпте (или сформулируйте запрос своими словами). Мониторинг: `/workflows`.
 
-| Primitive | Behavior |
-|-----------|----------|
-| `agent(prompt, { schema })` | Spawn one subagent; returns text or validated JSON |
-| `parallel([() => agent(...)])` | Barrier: all run concurrently, return when slowest finishes |
-| `pipeline(items, stage1, stage2)` | No barrier: items flow through stages independently |
-| `phase(title)` | Update progress label in `/workflows` UI |
-| `log(msg)` | Emit progress message |
-| `budget.remaining()` | Guard open-ended loops (budget hits 1000-agent cap otherwise) |
+| Примитив | Поведение |
+|----------|-----------|
+| `agent(prompt, { schema })` | Запускает одного субагента; возвращает текст или провалидированный JSON |
+| `parallel([() => agent(...)])` | Барьер: все задачи выполняются параллельно, возврат происходит после завершения самой медленной |
+| `pipeline(items, stage1, stage2)` | Без барьера: элементы проходят этапы независимо друг от друга |
+| `phase(title)` | Обновляет метку прогресса в интерфейсе `/workflows` |
+| `log(msg)` | Выводит сообщение о прогрессе |
+| `budget.remaining()` | Ограничивает открытые циклы (иначе бюджет упрётся в лимит 1000 агентов) |
 
-Key rules: orchestrator consumes 0 tokens; `Date.now()`/`Math.random()` unavailable (breaks resume); filter `parallel()` results with `.filter(Boolean)`.
+Ключевые правила: оркестратор потребляет 0 токенов; `Date.now()`/`Math.random()` недоступны (ломают возобновление); результаты `parallel()` нужно фильтровать через `.filter(Boolean)`.
 
-Full reference: [Dynamic Workflows](./workflows/dynamic-workflows.md)
+Полный справочник: [Динамические рабочие процессы](./workflows/dynamic-workflows.md)
 
-### Hook (macOS/Linux: `.sh` | Windows: `.ps1`)
+### Хук (macOS/Linux: `.sh` | Windows: `.ps1`)
 
 **Bash** (macOS/Linux):
 ```bash
 #!/bin/bash
 INPUT=$(cat)
-# Process JSON input
-exit 0  # 0=continue, 2=block
+# Обработка входного JSON
+exit 0  # 0=продолжить, 2=заблокировать
 ```
 
 **PowerShell** (Windows):
 ```powershell
 $input = [Console]::In.ReadToEnd() | ConvertFrom-Json
-# Process JSON input
-exit 0  # 0=continue, 2=block
+# Обработка входного JSON
+exit 0  # 0=продолжить, 2=заблокировать
 ```
 
 ---
 
-## Anti-patterns
+## Антипаттерны
 
-| ❌ Don't | ✅ Do |
-|----------|-------|
-| Vague prompts | Specify file + line with @references |
-| Accept without reading | Read every diff |
-| Ignore warnings | Use `/compact` at 70% |
-| Skip permissions | Never in production |
-| Negative constraints only | Provide alternatives |
-
----
-
-## Quick prompting formula
-
-```
-WHAT: [Concrete deliverable]
-WHERE: [File paths]
-HOW: [Constraints, approach]
-VERIFY: [Success criteria]
-```
-
-**Example:**
-```
-Add input validation to the login form.
-WHERE: src/components/LoginForm.tsx
-HOW: Use Zod schema, show inline errors
-VERIFY: Empty email shows error, invalid format shows error
-```
+| ❌ Не делайте так | ✅ Делайте так |
+|------------------|----------------|
+| Размытые промпты | Указывайте файл и строку через @-ссылки |
+| Принимать правки не читая | Читайте каждый diff |
+| Игнорировать предупреждения | Используйте `/compact` при заполнении на 70% |
+| Пропускать проверки прав доступа | Никогда не делайте этого в продакшене |
+| Только запрещающие ограничения | Предлагайте альтернативы |
 
 ---
 
-## CLI flags quick reference
+## Формула быстрого промпта
 
-| Flag | Usage |
-|------|-------|
-| `-p "query"` | Non-interactive mode (CI/CD) |
-| `-c` / `--continue` | Continue last session |
-| `-r` / `--resume <id>` | Resume specific session |
-| `--teleport` | Teleport session from web |
-| `remote-control` | Subcommand: start remote control session |
-| `--model sonnet` | Change model |
-| `--add-dir ../lib` | Allow access outside CWD |
-| `--permission-mode plan` | Plan mode |
-| `--tools "Tool1,Tool2"` | Enable specific tools for session |
-| `--max-budget-usd 5.00` | Max API spend limit (print mode) |
-| `--system-prompt "..."` | Replace the entire default system prompt |
-| `--append-system-prompt "..."` | Append text to the default system prompt |
-| `--worktree` / `-w` | Run in isolated git worktree |
-| `--dangerously-skip-permissions` | Auto-accept (use carefully) |
-| `--debug` | Debug output |
-| `--allowedTools "Edit,Read"` | Allow these tools without prompting; use `--tools` to restrict availability |
-| `--effort medium` | Choose session effort on a supported model |
-| `--system-prompt-file ./prompt.txt` | Replace the prompt from a file |
-| `--append-system-prompt-file ./rules.txt` | Append prompt text from a file |
+```
+ЧТО: [Конкретный результат]
+ГДЕ: [Пути к файлам]
+КАК: [Ограничения, подход]
+ПРОВЕРКА: [Критерии успеха]
+```
 
-> Use the [official CLI reference](https://code.claude.com/docs/en/cli-reference) for the full flag list. Self-hosted runners and command hooks must use the file-based system-prompt flags.
-
-## Key CLI subcommands
-
-| Command | Description |
-|---------|-------------|
-| `claude project purge [path]` | Delete all Claude Code state for a project (transcripts, tasks, config). `--dry-run` for preview. (v2.1.126) |
-| `claude ultrareview [target]` | Non-interactive cloud code review for CI. `--json` output. Exits 0/1. (v2.1.120) |
-| `claude plugin prune` | Remove orphaned auto-installed plugin deps. (v2.1.121) |
-| `claude plugin details <name>` | Show plugin inventory and token cost estimate. (v2.1.139) |
-| `claude --plugin-url <url>` | Load plugin `.zip` from URL for this session. (v2.1.129) |
-| `claude self-hosted-runner` | Run web/mobile/desktop sessions on your own machine or container. Windows needs an explicit `--base-dir`. Team and Enterprise. (v2.1.224) |
+**Пример:**
+```
+Добавь валидацию ввода в форму входа.
+ГДЕ: src/components/LoginForm.tsx
+КАК: Используй схему Zod, показывай ошибки прямо под полями
+ПРОВЕРКА: Пустой email показывает ошибку, неверный формат показывает ошибку
+```
 
 ---
 
-## Debug commands
+## Краткий справочник флагов CLI
+
+| Флаг | Использование |
+|------|---------------|
+| `-p "query"` | Неинтерактивный режим (CI/CD) |
+| `-c` / `--continue` | Продолжить последнюю сессию |
+| `-r` / `--resume <id>` | Возобновить конкретную сессию |
+| `--teleport` | Перенести (телепортировать) сессию из веба |
+| `remote-control` | Подкоманда: запустить сессию удалённого управления |
+| `--model sonnet` | Сменить модель |
+| `--add-dir ../lib` | Разрешить доступ за пределами текущей директории (CWD) |
+| `--permission-mode plan` | Режим планирования |
+| `--tools "Tool1,Tool2"` | Включить конкретные инструменты для сессии |
+| `--max-budget-usd 5.00` | Максимальный лимит расходов API (в режиме print) |
+| `--system-prompt "..."` | Полностью заменить системный промпт по умолчанию |
+| `--append-system-prompt "..."` | Добавить текст к системному промпту по умолчанию |
+| `--worktree` / `-w` | Запуск в изолированном git worktree |
+| `--dangerously-skip-permissions` | Автоподтверждение (используйте осторожно) |
+| `--debug` | Отладочный вывод |
+| `--allowedTools "Edit,Read"` | Разрешить эти инструменты без запроса подтверждения; для ограничения доступности используйте `--tools` |
+| `--effort medium` | Выбрать уровень усилий на сессию для поддерживаемой модели |
+| `--system-prompt-file ./prompt.txt` | Заменить системный промпт содержимым файла |
+| `--append-system-prompt-file ./rules.txt` | Добавить текст системного промпта из файла |
+
+> Полный список флагов см. в [официальном справочнике CLI](https://code.claude.com/docs/en/cli-reference). Self-hosted-раннеры и командные хуки должны использовать файловые флаги системного промпта.
+
+## Ключевые подкоманды CLI
+
+| Команда | Описание |
+|---------|----------|
+| `claude project purge [path]` | Удалить всё состояние Claude Code для проекта (транскрипты, задачи, конфигурацию). `--dry-run` для предпросмотра. (v2.1.126) |
+| `claude ultrareview [target]` | Неинтерактивное облачное код-ревью для CI. Вывод в `--json`. Код возврата 0/1. (v2.1.120) |
+| `claude plugin prune` | Удалить осиротевшие автоматически установленные зависимости плагинов. (v2.1.121) |
+| `claude plugin details <name>` | Показать состав плагина и оценку расхода токенов. (v2.1.139) |
+| `claude --plugin-url <url>` | Загрузить `.zip` плагина по URL для текущей сессии. (v2.1.129) |
+| `claude self-hosted-runner` | Запускать веб-/мобильные/десктопные сессии на собственной машине или в контейнере. В Windows требуется явный флаг `--base-dir`. Тарифы Team и Enterprise. (v2.1.224) |
+
+---
+
+## Команды отладки
 
 ```bash
-claude --version     # Version
-claude update        # Check/install updates
-claude doctor        # Diagnostic
-claude --debug       # Verbose mode
-claude --debug='mcp' # Debug MCP connections
-/mcp                 # MCP status (inside Claude)
+claude --version     # Версия
+claude update        # Проверить/установить обновления
+claude doctor        # Диагностика
+claude --debug       # Подробный режим
+claude --debug='mcp' # Отладка подключений MCP
+/mcp                 # Статус MCP (внутри Claude)
 ```
 
 ---
 
-## CI/CD mode (headless)
+## Режим CI/CD (headless)
 
 ```bash
-# Non-interactive execution
+# Неинтерактивное выполнение
 claude -p "analyze this file" src/api.ts
 
-# JSON output
+# Вывод в формате JSON
 claude -p "review" --output-format json
 
-# Economic model
+# Экономичная модель
 claude -p "lint" --model haiku
 
-# With auto-accept
+# С автоматическим подтверждением
 claude -p "fix typos" --dangerously-skip-permissions
 ```
 
 ---
 
-## Remote Control: Mobile access
+## Remote Control: мобильный доступ
 
-Available with Pro, Max, Team, and Enterprise subscriptions. Team and Enterprise owners must enable it first. API keys and third-party provider connections are not supported.
+Доступно на подписках Pro, Max, Team и Enterprise. Владельцы аккаунтов Team и Enterprise должны сначала включить эту функцию. API-ключи и подключения через сторонних провайдеров не поддерживаются.
 
 ```bash
-# Start a server in the project directory
+# Запустить сервер в директории проекта
 claude remote-control
 
-# Or connect an existing session
+# Или подключить существующую сессию
 /remote-control
 ```
 
-Open the displayed URL or scan the QR code from a browser or the Claude mobile app. The local process must keep running; the files and tools stay on your machine. Server mode can run multiple sessions with `--spawn worktree` and `--capacity`; `/remote-control` connects the current session. Available commands vary by client, so check the [current limitations](https://code.claude.com/docs/en/remote-control#limitations).
+Откройте отображённый URL или отсканируйте QR-код из браузера либо мобильного приложения Claude. Локальный процесс должен продолжать работать; файлы и инструменты остаются на вашей машине. Серверный режим поддерживает несколько сессий с `--spawn worktree` и `--capacity`; `/remote-control` подключает текущую сессию. Доступные команды различаются в зависимости от клиента, поэтому сверьтесь с [текущими ограничениями](https://code.claude.com/docs/en/remote-control#limitations).
 
-**Full doc**: [Remote Control](ultimate-guide.md#922-remote-control-mobile-access) | [Security notes](security/security-hardening.md#remote-control-security)
+**Полная документация**: [Remote Control](ultimate-guide.md#922-remote-control-mobile-access) | [Заметки по безопасности](security/security-hardening.md#remote-control-security)
 
 ---
 
-## Task management (v2.1.16+)
+## Управление задачами (v2.1.16+)
 
-**Availability**: newer models, including Opus 5.5, Sonnet 5, and Fable, do not receive task-tracking tools by default. Start with `CLAUDE_CODE_ENABLE_TODO_TOOLS=1 claude` to opt in. `CLAUDE_CODE_ENABLE_TASKS=0` selects legacy TodoWrite only where task tools are enabled. [Official tool availability](https://code.claude.com/docs/en/tools-reference#task-tool-availability).
+**Доступность**: более новые модели, включая Opus 5.5, Sonnet 5 и Fable, по умолчанию не получают инструменты отслеживания задач. Для явного включения запускайте с `CLAUDE_CODE_ENABLE_TODO_TOOLS=1 claude`. `CLAUDE_CODE_ENABLE_TASKS=0` выбирает устаревший TodoWrite только там, где инструменты задач включены. [Официальная документация по доступности инструментов](https://code.claude.com/docs/en/tools-reference#task-tool-availability).
 
-**Two systems available:**
+**Доступны две системы:**
 
-| System | When to Use | Persistence |
-|--------|-------------|-------------|
-| **Tasks API** (v2.1.16+) | Multi-session projects, dependencies | ✅ Disk (`~/.claude/tasks/`) |
-| **TodoWrite** (Legacy) | Simple single-session | ❌ Session only |
+| Система | Когда использовать | Сохранение состояния |
+|---------|--------------------|----------------------|
+| **Tasks API** (v2.1.16+) | Многосессионные проекты, зависимости | ✅ Диск (`~/.claude/tasks/`) |
+| **TodoWrite** (устаревшая) | Простые односессионные задачи | ❌ Только в рамках сессии |
 
-### Tasks API commands
+### Команды Tasks API
 
 ```bash
-# Enable persistence across sessions
+# Включить сохранение состояния между сессиями
 export CLAUDE_CODE_TASK_LIST_ID="project-name"
 CLAUDE_CODE_ENABLE_TODO_TOOLS=1 claude
 
-# Inside Claude: Create task hierarchy
-> "Create tasks for auth system with dependencies"
+# Внутри Claude: создать иерархию задач
+> "Создай задачи для системы аутентификации с зависимостями"
 
-# Resume later (new session)
+# Возобновить позже (новая сессия)
 export CLAUDE_CODE_TASK_LIST_ID="project-name"
 CLAUDE_CODE_ENABLE_TODO_TOOLS=1 claude
-> "TaskList to see current state"
+> "TaskList, чтобы увидеть текущее состояние"
 ```
 
-**Key capabilities:**
-- 📁 **Persistent**: Survives session end, context compaction
-- 🔗 **Dependencies**: Task A blocks Task B
-- 🔄 **Multi-session**: Broadcast state to multiple terminals
-- 📊 **Status**: pending → in_progress → completed
+**Ключевые возможности:**
+- 📁 **Постоянное хранение**: переживает завершение сессии и сжатие контекста (компакцию)
+- 🔗 **Зависимости**: Задача A блокирует Задачу B
+- 🔄 **Многосессионность**: трансляция состояния в несколько терминалов
+- 📊 **Статусы**: pending → in_progress → completed
 
-**⚠️ Limitation**: TaskList shows `id`, `subject`, `status`, `blockedBy` only.
-For `description`/`metadata` → use `TaskGet(taskId)` per task.
+**⚠️ Ограничение**: TaskList показывает только `id`, `subject`, `status`, `blockedBy`.
+Для `description`/`metadata` → используйте `TaskGet(taskId)` для каждой задачи.
 
-**Tip**: Store key info in `subject` for quick scanning.
+**Совет**: храните ключевую информацию в `subject` для быстрого просмотра.
 
-**Migration flag** (v2.1.19+):
+**Флаг миграции** (v2.1.19+):
 ```bash
-# Revert to old TodoWrite system
+# Вернуться к старой системе TodoWrite
 CLAUDE_CODE_ENABLE_TODO_TOOLS=1 CLAUDE_CODE_ENABLE_TASKS=0 claude
 ```
 
-**→ Full workflow**: [guide/workflows/task-management.md](workflows/task-management.md)
+**→ Полный рабочий процесс**: [guide/workflows/task-management.md](workflows/task-management.md)
+
+---
+## Золотые правила
+
+1. **Всегда просматривайте diff** перед принятием изменений
+2. **Используйте `/compact`** до того, как заполнение контекста станет критическим (>70%)
+3. **Будьте конкретны** в запросах (ЧТО, ГДЕ, КАК, КАК ПРОВЕРИТЬ)
+4. **Сначала Plan Mode** для сложных или рискованных задач
+5. **Создавайте CLAUDE.md** для каждого проекта
+6. **Делайте коммиты часто** после каждой завершённой задачи
+7. **Знайте, что отправляется**: промпты, файлы, результаты MCP → Anthropic ([отказаться от обучения](https://claude.ai/settings/data-privacy-controls))
 
 ---
 
-## The golden rules
-
-1. **Always review diffs** before accepting
-2. **Use `/compact`** before context gets critical (>70%)
-3. **Be specific** in requests (WHAT, WHERE, HOW, VERIFY)
-4. **Plan Mode first** for complex/risky tasks
-5. **Create CLAUDE.md** for every project
-6. **Commit frequently** after each completed task
-7. **Know what's sent**: prompts, files, MCP results → Anthropic ([opt-out training](https://claude.ai/settings/data-privacy-controls))
-
----
-
-## Quick decision tree
+## Быстрое дерево решений
 
 ```
-Simple task       → Just ask Claude
-Complex task      → Tasks API to plan first
-Risky change      → Plan Mode first
-Repeating task    → Create agent or command
-Context full      → /compact or /clear
-Need docs         → Use Context7 MCP
-Deep analysis     → Use Opus (thinking on by default)
+Простая задача        → Просто спросите Claude
+Сложная задача        → Сначала спланируйте через Tasks API
+Рискованное изменение → Сначала Plan Mode
+Повторяющаяся задача  → Создайте агента или команду
+Контекст заполнен     → /compact или /clear
+Нужна документация    → Используйте Context7 MCP
+Глубокий анализ       → Используйте Opus (режим размышления включён по умолчанию)
 ```
 
 ---
 
-## Common issues quick fix
+## Быстрое решение частых проблем
 
-| Problem | Solution |
-|---------|----------|
-| "Command not found" | Check PATH, reinstall: `curl -fsSL https://claude.ai/install.sh \| sh` |
-| Context too high (>70%) | `/compact` immediately |
-| Slow responses | `/compact` or `/clear` |
-| MCP not working | `claude mcp list`, check config |
-| Permission denied | Check `settings.local.json` |
-| Hook blocking | Check hook exit code, review logic |
+| Проблема | Решение |
+|----------|---------|
+| «Command not found» | Проверьте PATH, переустановите: `curl -fsSL https://claude.ai/install.sh \| sh` |
+| Контекст слишком велик (>70%) | Немедленно выполните `/compact` |
+| Медленные ответы | `/compact` или `/clear` |
+| MCP не работает | `claude mcp list`, проверьте конфигурацию |
+| Отказ в доступе (Permission denied) | Проверьте `settings.local.json` |
+| Блокировка хуком | Проверьте код возврата хука и его логику |
 
-**Health Check Script** (save & run):
+**Скрипт проверки состояния** (сохраните и запустите):
 ```bash
 # macOS/Linux
 which claude && claude doctor && claude mcp list
@@ -755,270 +753,270 @@ where.exe claude; claude doctor; claude mcp list
 
 ---
 
-## Cost optimization
+## Оптимизация затрат
 
-| Model | Use For | Cost |
-|-------|---------|------|
-| Haiku | Simple fixes, reviews | $ |
-| Sonnet | Most development | $$ |
-| Opus | Architecture, complex bugs | $$$ |
-| OpusPlan | Plan (Opus) + Execute (Sonnet) | $$ |
+| Модель | Для чего использовать | Стоимость |
+|--------|-----------------------|-----------|
+| Haiku | Простые исправления, ревью | $ |
+| Sonnet | Основная разработка | $$ |
+| Opus | Архитектура, сложные баги | $$$ |
+| OpusPlan | Планирование (Opus) + выполнение (Sonnet) | $$ |
 
-**Tip**: Use `--add-dir` to allow tool access to directories outside your current working directory
-
----
-
-## Community tools
-
-| Tool | Purpose | Install |
-|------|---------|---------|
-| **ccusage** | Cost tracking & reports | `bunx ccusage daily` |
-| **RTK** | Shell-output reduction (up to 90%) | `brew install rtk` (or `cargo install --git https://github.com/rtk-ai/rtk`) · [Site](https://www.rtk-ai.app/) (author is a core contributor) |
-| **claude-code-viewer** | Session history UI | `npx @kimuson/claude-code-viewer` |
-| **Entire CLI** | Session checkpoints + Git forge | [entire.com](https://entire.com) (CLI Feb 2026, forge Oct 2026) |
-
-> **Entire CLI**: By ex-GitHub CEO. Links each agent session to its commit as a checkpoint stored in Git, resumable across agents; its hosted forge adds agent-scored review and merge gates. For audit evidence or multi-agent workflows.
+**Совет**: используйте `--add-dir`, чтобы разрешить инструментам доступ к каталогам вне текущей рабочей директории
 
 ---
 
-## Search tools quick reference
+## Инструменты сообщества
 
-Quick decision (5 seconds): exact text → `rg` | exact name → `rg`/Serena | concept → grepai | structure → ast-grep
+| Инструмент | Назначение | Установка |
+|------------|------------|-----------|
+| **ccusage** | Учёт расходов и отчёты | `bunx ccusage daily` |
+| **RTK** | Сокращение вывода оболочки (до 90%) | `brew install rtk` (или `cargo install --git https://github.com/rtk-ai/rtk`) · [Сайт](https://www.rtk-ai.app/) (автор — один из основных контрибьюторов) |
+| **claude-code-viewer** | Интерфейс истории сессий | `npx @kimuson/claude-code-viewer` |
+| **Entire CLI** | Контрольные точки сессий + Git-платформа (forge) | [entire.com](https://entire.com) (CLI — февр. 2026, платформа — окт. 2026) |
 
-| Task | Tool | Command |
-|------|------|---------|
-| "Find TODO comments" | `rg` | `rg "TODO"` |
-| "Find auth code" | `grepai` | `grepai search "authentication"` |
-| "Who calls login?" | `grepai` | `grepai trace callers "login"` |
-| "Get file structure" | `Serena` | `serena get_symbols_overview` |
-| "Async without try/catch" | `ast-grep` | `ast-grep "async function $F"` |
-
-Speed: `rg` (~20ms) → Serena (~100ms) → ast-grep (~200ms) → grepai (~500ms)
-
-> Full workflows: [workflows/search-tools-mastery.md](./workflows/search-tools-mastery.md)
+> **Entire CLI**: от бывшего CEO GitHub. Связывает каждую сессию агента с её коммитом в виде контрольной точки, хранящейся в Git, с возможностью возобновления между агентами; облачная платформа (forge) добавляет ревью с оценкой от агентов и гейты слияния. Подходит для аудиторских доказательств или мультиагентных рабочих процессов.
 
 ---
 
-## Resources
+## Краткий справочник по инструментам поиска
 
-- **Official docs**: [docs.anthropic.com/claude-code](https://docs.anthropic.com/en/docs/claude-code)
-- **Advanced guide**: [Claudelog.com](https://claudelog.com/) - Tips & patterns
-- **Full guide**: `ultimate-guide.md` (this repo)
-- **Whitepapers (FR + EN)**: [cc.bruniaux.com/whitepapers](https://cc.bruniaux.com/whitepapers/), 13 focused PDFs
-- **Project memory**: Create `CLAUDE.md` at project root
-- **DeepSeek (cost-effective)**: Configure via `ANTHROPIC_BASE_URL`
+Быстрый выбор (5 секунд): точный текст → `rg` | точное имя → `rg`/Serena | концепция → grepai | структура → ast-grep
+
+| Задача | Инструмент | Команда |
+|--------|------------|---------|
+| «Найти комментарии TODO» | `rg` | `rg "TODO"` |
+| «Найти код аутентификации» | `grepai` | `grepai search "authentication"` |
+| «Кто вызывает login?» | `grepai` | `grepai trace callers "login"` |
+| «Получить структуру файла» | `Serena` | `serena get_symbols_overview` |
+| «Async без try/catch» | `ast-grep` | `ast-grep "async function $F"` |
+
+Скорость: `rg` (~20 мс) → Serena (~100 мс) → ast-grep (~200 мс) → grepai (~500 мс)
+
+> Подробные рабочие процессы: [workflows/search-tools-mastery.md](./workflows/search-tools-mastery.md)
 
 ---
 
-**Author**: Florian BRUNIAUX | Fractional Chief AI Officer | Written with Claude
+## Ресурсы
 
-*Last updated: Nov 22, 2026 | Version 3.46.0*
+- **Официальная документация**: [docs.anthropic.com/claude-code](https://docs.anthropic.com/en/docs/claude-code)
+- **Продвинутое руководство**: [Claudelog.com](https://claudelog.com/) — советы и паттерны
+- **Полное руководство**: `ultimate-guide.md` (в этом репозитории)
+- **Аналитические обзоры / вайтпейперы (FR + EN)**: [cc.bruniaux.com/whitepapers](https://cc.bruniaux.com/whitepapers/), 13 тематических PDF
+- **Память проекта**: создайте `CLAUDE.md` в корне проекта
+- **DeepSeek (экономичный вариант)**: настраивается через `ANTHROPIC_BASE_URL`
+
+---
+
+**Автор**: Florian BRUNIAUX | Внештатный директор по ИИ (Fractional Chief AI Officer) | Написано с помощью Claude
+
+*Последнее обновление: 22 ноября 2026 г. | Версия 3.46.0*
 
 
 ---
 
-## Template Library (278 templates)
+## Библиотека шаблонов (278 шаблонов)
 
-### Agents (21 files)
-- `adr-writer.md`: Architecture Decision Records
-- `architecture-reviewer.md`: System architecture review
-- `code-reviewer.md`: Code quality review
-- `devops-sre.md`: DevOps/SRE operations
-- `implementer.md`: Feature implementation
-- `integration-reviewer.md`: API integration review
-- `loop-monitor.md`: Autonomous loop progress monitoring
-- `output-evaluator.md`: AI output evaluation
-- `plan-challenger.md`: Challenge implementation plans
-- `planner.md`: Task planning
-- `planning-coordinator.md`: Multi-agent coordination
-- `refactoring-specialist.md`: Code refactoring
-- `security-auditor.md`: Security auditing
-- `security-patcher.md`: Security patch application
-- `test-writer.md`: Test generation
-- `analytics-with-eval/`: Full analytics agent with eval framework (analytics-agent.md + eval/report-template.md)
-- `cyber-defense/`: Multi-agent cyber defense team (anomaly-detector.md, log-ingestor.md, risk-classifier.md, threat-reporter.md)
+### Агенты (21 файл)
+- `adr-writer.md`: записи архитектурных решений (Architecture Decision Records)
+- `architecture-reviewer.md`: ревью системной архитектуры
+- `code-reviewer.md`: ревью качества кода
+- `devops-sre.md`: операции DevOps/SRE
+- `implementer.md`: реализация функциональности
+- `integration-reviewer.md`: ревью интеграции API
+- `loop-monitor.md`: мониторинг прогресса автономного цикла
+- `output-evaluator.md`: оценка результатов работы ИИ
+- `plan-challenger.md`: критическая проверка планов реализации
+- `planner.md`: планирование задач
+- `planning-coordinator.md`: мультиагентная координация
+- `refactoring-specialist.md`: рефакторинг кода
+- `security-auditor.md`: аудит безопасности
+- `security-patcher.md`: применение патчей безопасности
+- `test-writer.md`: генерация тестов
+- `analytics-with-eval/`: полноценный агент аналитики с фреймворком оценки (eval) (analytics-agent.md + eval/report-template.md)
+- `cyber-defense/`: мультиагентная команда киберзащиты (anomaly-detector.md, log-ingestor.md, risk-classifier.md, threat-reporter.md)
 
-### Commands (legacy, pre-CC 2.1.3)
-Since Claude Code 2.1.3, `.claude/commands/` merged into `.claude/skills/`; every file below is now a redirect stub pointing to its `examples/skills/<name>/SKILL.md` equivalent, kept for backward compatibility.
-- `audit-agents-skills.md`: Quality audit for .claude/ configs
-- `audit-codebase.md`: Full codebase audit
-- `catchup.md`: Daily catchup briefing
-- `commit.md`: Smart git commit
-- `diagnose.md`: Problem diagnosis
-- `explain.md`: Code explanation
-- `generate-tests.md`: Test suite generation
-- `git-worktree.md`: Isolated git worktree workflow
-- `git-worktree-status.md`: Worktree status
-- `git-worktree-clean.md`: Worktree cleanup
-- `git-worktree-remove.md`: Worktree removal
-- `optimize.md`: Performance optimization
-- `plan-execute.md`: Plan then execute workflow
-- `plan-start.md`: Plan mode startup
-- `plan-validate.md`: Plan validation
-- `pr.md`: Pull request creation
-- `refactor.md`: Code refactoring
-- `release-notes.md`: Release notes generation
-- `learn/`: Interactive learning command
+### Команды (устаревшие, до CC 2.1.3)
+Начиная с Claude Code 2.1.3, каталог `.claude/commands/` объединён с `.claude/skills/`; каждый файл ниже теперь представляет собой заглушку-перенаправление на эквивалент `examples/skills/<name>/SKILL.md` и сохранён для обратной совместимости.
+- `audit-agents-skills.md`: аудит качества конфигураций .claude/
+- `audit-codebase.md`: полный аудит кодовой базы
+- `catchup.md`: ежедневная сводка для быстрого ввода в курс дела
+- `commit.md`: умный git-коммит
+- `diagnose.md`: диагностика проблем
+- `explain.md`: объяснение кода
+- `generate-tests.md`: генерация набора тестов
+- `git-worktree.md`: рабочий процесс с изолированным git worktree
+- `git-worktree-status.md`: статус worktree
+- `git-worktree-clean.md`: очистка worktree
+- `git-worktree-remove.md`: удаление worktree
+- `optimize.md`: оптимизация производительности
+- `plan-execute.md`: рабочий процесс «планирование → выполнение»
+- `plan-start.md`: запуск режима планирования
+- `plan-validate.md`: валидация плана
+- `pr.md`: создание pull request
+- `refactor.md`: рефакторинг кода
+- `release-notes.md`: генерация примечаний к релизу (release notes)
+- `learn/`: интерактивная команда обучения
 
-### Hooks (bash + PowerShell)
-**Bash hooks** (36 files in `examples/hooks/bash/`, a representative sample):
-- `dangerous-actions-blocker.sh`: Block destructive commands (PreToolUse)
-- `prompt-injection-detector.sh`: Detect prompt injection attempts (PreToolUse)
-- `security-check.sh`: Block commands containing secrets (PreToolUse)
-- `pre-commit-secrets.sh`: Detect secrets in staged files before commit
-- `auto-format.sh`: Auto-format edited files (PostToolUse)
-- `test-on-change.sh`: Run tests after code changes
-- `typecheck-on-save.sh`: Type-check edited files
-- `notification.sh`: macOS desktop alerts with contextual sounds
-- `session-logger.sh`: Log all Claude Code operations for monitoring (PostToolUse)
-- `auto-checkpoint.sh`: Automatic git checkpoints during a session
-- `learning-capture.sh`: Capture one learning insight at session end (Stop)
-- `output-validator.sh`: Validate Claude's outputs for quality issues (PostToolUse)
+### Хуки (bash + PowerShell)
+**Bash-хуки** (36 файлов в `examples/hooks/bash/`, репрезентативная выборка):
+- `dangerous-actions-blocker.sh`: блокировка разрушительных команд (PreToolUse)
+- `prompt-injection-detector.sh`: обнаружение попыток промпт-инъекции (PreToolUse)
+- `security-check.sh`: блокировка команд, содержащих секреты (PreToolUse)
+- `pre-commit-secrets.sh`: обнаружение секретов в индексированных (staged) файлах перед коммитом
+- `auto-format.sh`: автоформатирование отредактированных файлов (PostToolUse)
+- `test-on-change.sh`: запуск тестов после изменений в коде
+- `typecheck-on-save.sh`: проверка типов отредактированных файлов
+- `notification.sh`: системные уведомления macOS с контекстными звуками
+- `session-logger.sh`: логирование всех операций Claude Code для мониторинга (PostToolUse)
+- `auto-checkpoint.sh`: автоматические git-контрольные точки во время сессии
+- `learning-capture.sh`: фиксация одного полезного вывода по завершении сессии (Stop)
+- `output-validator.sh`: проверка ответов Claude на проблемы качества (PostToolUse)
 
-**PowerShell hooks** (2 files in `examples/hooks/powershell/`, Windows equivalents for a subset, not a 1:1 mirror of the bash list):
+**PowerShell-хуки** (2 файла в `examples/hooks/powershell/`, Windows-эквиваленты для части списка, а не зеркало 1:1 списка bash):
 - `auto-format.ps1`, `security-check.ps1`
 
-### Skills (64 modules)
-- `ast-grep-patterns.md`: AST-based code search patterns
-- `audit-agents-skills/`: Agents/skills quality audit system
-- `ccboard/`: Claude Code monitoring dashboard
-- `cyber-defense-team/`: Security team coordination
-- `design-patterns/`: Software design pattern guidance
-- `guide-recap/`: CHANGELOG → social content generator
-- `issue-triage/`: GitHub issue prioritization
-- `landing-page-generator/`: Landing page from repo
-- `pdf-generator.md`: Professional PDF generation (Quarto/Typst)
-- `pr-triage/`: PR review prioritization
-- `release-notes-generator/`: Multi-format release notes
-- `rtk-optimizer/`: Token reduction optimization
-- `security-checklist.md`: Security audit checklist
-- `skill-creator/`: Create new skills with proper structure
-- `talk-pipeline/`: Conference talk preparation pipeline
-- `tdd-workflow.md`: Test-Driven Development workflow
-- `voice-refine/`: Voice input refinement
+### Скиллы (64 модуля)
+- `ast-grep-patterns.md`: паттерны поиска по коду на основе AST
+- `audit-agents-skills/`: система аудита качества агентов и скиллов
+- `ccboard/`: дашборд мониторинга Claude Code
+- `cyber-defense-team/`: координация команды безопасности
+- `design-patterns/`: рекомендации по паттернам проектирования ПО
+- `guide-recap/`: генератор контента для соцсетей из CHANGELOG
+- `issue-triage/`: приоритизация GitHub issues
+- `landing-page-generator/`: генерация лендинга на основе репозитория
+- `pdf-generator.md`: профессиональная генерация PDF (Quarto/Typst)
+- `pr-triage/`: приоритизация ревью PR
+- `release-notes-generator/`: генерация примечаний к релизу в нескольких форматах
+- `rtk-optimizer/`: оптимизация сокращения токенов
+- `security-checklist.md`: чек-лист аудита безопасности
+- `skill-creator/`: создание новых скиллов с правильной структурой
+- `talk-pipeline/`: пайплайн подготовки докладов для конференций
+- `tdd-workflow.md`: рабочий процесс разработки через тестирование (TDD)
+- `voice-refine/`: улучшение и доработка голосового ввода
 
-### Scripts (15 utility scripts)
-- `audit-scan.sh`: Config security audit
-- `bridge.py`: Tool bridging utility
-- `check-claude.sh` / `.ps1`: Installation health check
-- `clean-reinstall-claude.sh` / `.ps1`: Clean reinstall
-- `fresh-context-loop.sh`: Automated fresh-context iteration
-- `migrate-arguments-syntax.sh` / `.ps1`: Update argument syntax
-- `rtk-benchmark.sh`: RTK token savings benchmark
-- `session-search.sh`: Search across sessions
-- `session-stats.sh`: Session statistics
-- `sonnetplan.sh`: OpusPlan workflow automation
-- `sync-claude-config.sh`: Sync .claude/ across machines
+### Скрипты (15 служебных скриптов)
+- `audit-scan.sh`: аудит безопасности конфигурации
+- `bridge.py`: утилита-мост между инструментами
+- `check-claude.sh` / `.ps1`: проверка состояния установки
+- `clean-reinstall-claude.sh` / `.ps1`: чистая переустановка
+- `fresh-context-loop.sh`: автоматизированные итерации со свежим контекстом
+- `migrate-arguments-syntax.sh` / `.ps1`: обновление синтаксиса аргументов
+- `rtk-benchmark.sh`: бенчмарк экономии токенов RTK
+- `session-search.sh`: поиск по сессиям
+- `session-stats.sh`: статистика сессий
+- `sonnetplan.sh`: автоматизация рабочего процесса OpusPlan
+- `sync-claude-config.sh`: синхронизация .claude/ между машинами
 
-### Additional Categories
-- `claude-md/`: CLAUDE.md templates (7 variants)
-- `config/`: Configuration templates (settings.json, etc.)
-- `github-actions/`: CI/CD workflow templates
-- `integrations/`: Third-party integrations
-- `mcp-configs/`: MCP server configuration templates
-- `memory/`: Memory file templates
-- `modes/`: Custom mode configurations
-- `multi-provider/`: Multi-LLM provider setups
-- `plugins/`: Plugin templates
-- `rules/`: Auto-loaded rules templates
-- `semantic-anchors/`: Semantic navigation patterns
-- `team-config/`: Team configuration examples
-- `templates/`: Generic project templates
-- `workflows/`: Step-by-step workflow guides
-
----
-
-## Contribution and verification workflows
-
-- `guide/workflows/ai-assisted-open-source-contributions.md`: prepare a contribution with project policy, reproduction, author understanding and verification evidence.
-- `examples/templates/ai-assisted-contribution.md`: reusable contribution packet.
-- `examples/workflows/review-admission.md`: proposed pause/resume policy for a shared verification queue, with illustrative tabletop cases.
-- `examples/learning-project/review-comprehension-exercise.md`: proposed comprehension assessment, distinct from delivery metrics.
-
-The 2025-2026 IFTTD additions extend Practitioner Insights to 75 attributed observations, including six public transcripts checked through episode 373. Field accounts and proposed procedures do not establish measured throughput or learning improvements.
-
-## FAQ
-
-**Q: What is the Claude Code Ultimate Guide?**
-A: The most comprehensive community guide for Claude Code (Anthropic's CLI). 26,193 lines in the canonical full guide, 278 production-ready templates, 473-question quiz, and security threat database. Free and open-source (CC BY-SA 4.0).
-
-**Q: Is this guide free?**
-A: Yes, completely free. The guide is CC BY-SA 4.0 (share and adapt with attribution). Templates are CC0 (copy-paste freely, no attribution needed). No paywall, no login required.
-
-**Q: What's the difference between this and Anthropic's official docs?**
-A: This guide goes 10x deeper on practical workflows, templates, security hardening, and real-world patterns. The official docs explain what Claude Code does; this guide teaches you how to use it effectively for production work.
-
-**Q: Do I need a paid Claude plan to use Claude Code?**
-A: A Claude subscription is not the only access path. Individuals can use Pro or Max, organizations can use Team or Enterprise for workforce access, and usage-based deployments can authenticate with supported API or cloud-provider credentials. These paths have different billing and administrative controls; see `guide/ops/subscription-strategy.md`.
-
-**Q: What are Hooks in Claude Code?**
-A: Hooks are shell scripts (bash or PowerShell) that run automatically before/after Claude tool calls. They enable event-driven automation: block dangerous commands, scan for secrets, auto-format code, run tests after edits, log activity for compliance. They use `exit 0` (continue) or `exit 2` (block) to control Claude's actions.
-
-**Q: What are MCP servers?**
-A: Model Context Protocol servers extend Claude's capabilities beyond its built-in tools. Examples: Serena (codebase indexation + session memory), Context7 (library documentation), Sequential (structured multi-step reasoning), Playwright (browser automation), Postgres (database queries). The community has built 1,000+ MCP servers; this guide teaches you to vet them for security.
-
-**Q: What is Plan Mode?**
-A: Plan Mode (`Shift+Tab × 2` or `/plan`) is a read-only exploration mode where Claude can analyze your codebase without making any changes. Use it before complex or risky tasks to let Claude research the problem, then switch to execution mode.
-
-**Q: What are Agents in Claude Code?**
-A: Agents are custom Claude instances with specific instructions, tools, and personas stored in `.claude/agents/` as markdown files. Examples: a security-auditor that only uses Read/Grep tools, a code-reviewer with specific standards, a devops-sre with infrastructure expertise. They're invoked via `@agent-name` in your prompt.
-
-**Q: What is CLAUDE.md?**
-A: CLAUDE.md is a memory file at your project root (or `~/.claude/`) that Claude reads at the start of every session. Use it to define project conventions, tech stack, coding standards, and commands. It's the primary way to give Claude persistent project context without repeating yourself.
-
-**Q: What are Skills?**
-A: Skills are reusable knowledge modules stored in `.claude/skills/`. Two types: Capability Uplift (fills model gaps, becomes less necessary as models improve) and Encoded Preference (encodes your team's specific workflow preferences, stays durable). Skills 2.0 (March 2026) adds Benchmark Mode, A/B testing, and Trigger Tuning.
-
-**Q: How do I handle context limits?**
-A: Monitor context usage via `/status`. At 70%: run `/compact` to summarize and free context. At 90%: use `/clear` for a fresh start. Use Plan Mode early to explore without consuming context. For long projects, use Tasks API (`CLAUDE_CODE_TASK_LIST_ID`) for cross-session persistence.
-
-**Q: Is Claude Code safe for production use?**
-A: With proper hardening, yes. Key steps: never use `bypassPermissions` in production, vet all MCP servers against the threat database (28+ CVEs tracked), use hooks to block dangerous commands, enable audit logging, run `claude doctor` regularly. See `guide/security/security-hardening.md` for the complete checklist.
+### Дополнительные категории
+- `claude-md/`: шаблоны CLAUDE.md (7 вариантов)
+- `config/`: шаблоны конфигураций (settings.json и т.д.)
+- `github-actions/`: шаблоны CI/CD-воркфлоу
+- `integrations/`: интеграции со сторонними сервисами
+- `mcp-configs/`: шаблоны конфигурации MCP-серверов
+- `memory/`: шаблоны файлов памяти
+- `modes/`: конфигурации пользовательских режимов
+- `multi-provider/`: настройки для нескольких LLM-провайдеров
+- `plugins/`: шаблоны плагинов
+- `rules/`: шаблоны автоматически загружаемых правил
+- `semantic-anchors/`: паттерны семантической навигации
+- `team-config/`: примеры командных конфигураций
+- `templates/`: универсальные шаблоны проектов
+- `workflows/`: пошаговые руководства по рабочим процессам
 
 ---
 
-## Privacy & Data
+## Рабочие процессы контрибуции и верификации
 
-Agentic pentesting: `guide/security/agentic-pentesting.md` compares DarkMoon and Strix, separates configuration scans, source review, and active testing, and explains exploit evidence, model data exposure, and reproducible evaluation. `guide/security/data-privacy.md` covers reversible tokenization and error-path limits. The comparison records source inspection and bounded local checks; it does not establish a performance winner or production readiness.
+- `guide/workflows/ai-assisted-open-source-contributions.md`: подготовка контрибуции с учётом политики проекта, воспроизведения проблемы, понимания автором и доказательств верификации.
+- `examples/templates/ai-assisted-contribution.md`: переиспользуемый пакет контрибуции.
+- `examples/workflows/review-admission.md`: предлагаемая политика паузы/возобновления для общей очереди верификации с иллюстративными учебными разборами (tabletop cases).
+- `examples/learning-project/review-comprehension-exercise.md`: предлагаемая оценка понимания материала, отделённая от метрик поставки.
 
-Claude Code sends to Anthropic servers: your prompts, file contents you reference, MCP tool results.
-- Default retention: 5 years (training enabled)
-- Opt-out: 30 days retention, https://claude.ai/settings/data-privacy-controls
-- Enterprise: 0 retention, no training
-- The guide covers this in detail: `guide/security/data-privacy.md`
+Дополнения IFTTD 2025–2026 годов расширяют раздел Practitioner Insights до 75 атрибутированных наблюдений, включая шесть публичных расшифровок, проверенных вплоть до выпуска 373. Полевые отчёты и предлагаемые процедуры не доказывают измеримого прироста пропускной способности или улучшения обучения.
+
+## Частые вопросы (FAQ)
+
+**В: Что такое Claude Code Ultimate Guide?**
+О: Самое полное руководство от сообщества по Claude Code (CLI от Anthropic). 26 193 строки в каноническом полном руководстве, 278 готовых к продакшену шаблонов, тест из 473 вопросов и база угроз безопасности. Бесплатно и с открытым исходным кодом (CC BY-SA 4.0).
+
+**В: Это руководство бесплатное?**
+О: Да, полностью бесплатное. Руководство распространяется по лицензии CC BY-SA 4.0 (можно делиться и адаптировать с указанием авторства). Шаблоны — под CC0 (копируйте свободно, указание авторства не требуется). Никакого пейволла и обязательной регистрации.
+
+**В: В чём разница между этим руководством и официальной документацией Anthropic?**
+О: Это руководство в 10 раз глубже раскрывает практические рабочие процессы, шаблоны, усиление безопасности (security hardening) и реальные паттерны. Официальная документация объясняет, что делает Claude Code; это руководство учит, как эффективно использовать его в продакшен-разработке.
+
+**В: Нужен ли платный тариф Claude для использования Claude Code?**
+О: Подписка Claude — не единственный способ доступа. Частные лица могут использовать Pro или Max, организации — Team или Enterprise для доступа сотрудников, а развёртывания с оплатой по факту использования могут проходить аутентификацию через поддерживаемые учётные данные API или облачного провайдера. Эти варианты различаются условиями биллинга и административного контроля; см. `guide/ops/subscription-strategy.md`.
+
+**В: Что такое хуки (Hooks) в Claude Code?**
+О: Хуки — это скрипты оболочки (bash или PowerShell), которые запускаются автоматически до или после вызовов инструментов Claude. Они обеспечивают событийную автоматизацию: блокировку опасных команд, поиск секретов, автоформатирование кода, запуск тестов после правок, логирование активности для соответствия требованиям (compliance). Для управления действиями Claude они используют `exit 0` (продолжить) или `exit 2` (заблокировать).
+
+**В: Что такое MCP-серверы?**
+О: Серверы Model Context Protocol расширяют возможности Claude за пределы встроенных инструментов. Примеры: Serena (индексация кодовой базы + память сессии), Context7 (документация библиотек), Sequential (структурированное многошаговое рассуждение), Playwright (автоматизация браузера), Postgres (запросы к базам данных). Сообщество создало более 1 000 MCP-серверов; это руководство учит проверять их на безопасность.
+
+**В: Что такое Plan Mode?**
+О: Plan Mode (`Shift+Tab × 2` или `/plan`) — это режим исследования только для чтения, в котором Claude может анализировать вашу кодовую базу без внесения изменений. Используйте его перед сложными или рискованными задачами, чтобы Claude сначала изучил проблему, а затем переключайтесь в режим выполнения.
+
+**В: Что такое агенты (Agents) в Claude Code?**
+О: Агенты — это пользовательские экземпляры Claude с конкретными инструкциями, инструментами и ролями, хранящиеся в `.claude/agents/` в виде markdown-файлов. Примеры: `security-auditor`, использующий только инструменты Read/Grep, `code-reviewer` с определёнными стандартами, `devops-sre` с экспертизой в инфраструктуре. Они вызываются в промпте через `@agent-name`.
+
+**В: Что такое CLAUDE.md?**
+О: CLAUDE.md — это файл памяти в корне вашего проекта (или в `~/.claude/`), который Claude читает в начале каждой сессии. Используйте его для описания соглашений проекта, технологического стека, стандартов кодирования и команд. Это основной способ дать Claude постоянный контекст проекта без необходимости повторяться.
+
+**В: Что такое скиллы (Skills)?**
+О: Скиллы — это переиспользуемые модули знаний, хранящиеся в `.claude/skills/`. Есть два типа: Capability Uplift (закрывает пробелы модели и становится менее актуальным по мере развития моделей) и Encoded Preference (кодирует специфические предпочтения рабочего процесса вашей команды и остаётся долговечным). Skills 2.0 (март 2026) добавляет режим бенчмаркинга (Benchmark Mode), A/B-тестирование и настройку триггеров (Trigger Tuning).
+
+**В: Как справляться с ограничениями контекста?**
+О: Отслеживайте расход контекста через `/status`. При 70% запустите `/compact`, чтобы сжать историю и освободить контекст. При 90% используйте `/clear` для чистого старта. Используйте Plan Mode на раннем этапе для исследования без лишнего расхода контекста. Для длительных проектов применяйте Tasks API (`CLAUDE_CODE_TASK_LIST_ID`) для сохранения состояния между сессиями.
+
+**В: Безопасен ли Claude Code для использования в продакшене?**
+О: При должном усилении безопасности — да. Ключевые шаги: никогда не используйте `bypassPermissions` в продакшене, проверяйте все MCP-серверы по базе угроз (отслеживается более 28 CVE), используйте хуки для блокировки опасных команд, включите аудит-логирование, регулярно запускайте `claude doctor`. Полный чек-лист см. в `guide/security/security-hardening.md`.
 
 ---
 
-## Repository
+## Конфиденциальность и данные
+
+Агентный пентестинг: `guide/security/agentic-pentesting.md` сравнивает DarkMoon и Strix, разделяет сканирование конфигураций, ревью исходного кода и активное тестирование, а также объясняет доказательства эксплуатации, раскрытие данных моделям и воспроизводимую оценку. В `guide/security/data-privacy.md` рассматриваются обратимая токенизация и ограничения путей обработки ошибок. В сравнении зафиксированы проверка исходного кода и ограниченные локальные проверки; оно не определяет победителя по производительности и не подтверждает готовность к продакшену.
+
+Claude Code отправляет на серверы Anthropic: ваши промпты, содержимое файлов, на которые вы ссылаетесь, и результаты инструментов MCP.
+- Срок хранения по умолчанию: 5 лет (обучение включено)
+- Отказ от обучения (opt-out): срок хранения 30 дней, https://claude.ai/settings/data-privacy-controls
+- Enterprise: нулевой срок хранения (0 retention), без обучения
+- Подробнее в руководстве: `guide/security/data-privacy.md`
+
+---
+
+## Репозиторий
 
 ```
 claude-code-ultimate-guide/
-├── llms.txt                        # This file (short version, for AI indexing)
-├── llms-full.txt                   # Full content (you are here)
-├── guide/                          # Core documentation
-│   ├── ultimate-guide.md           # Complete guide (26,193 lines)
-│   ├── cheatsheet.md               # 1-page reference
-│   ├── core/architecture.md        # How Claude Code works internally
-│   ├── security/security-hardening.md  # Security best practices
-│   ├── security/data-privacy.md    # What data is sent to Anthropic
-│   └── core/claude-code-releases.md    # Official release tracking
-├── examples/                       # 278 production-ready templates
-│   ├── agents/                     # Custom AI personas
-│   ├── commands/                   # Legacy slash commands (pre-CC 2.1.3)
-│   ├── hooks/                      # Event automation (bash + PowerShell)
-│   ├── skills/                     # User-invocable skills (unified since CC 2.1.3)
-│   └── scripts/                    # Utility scripts
-├── machine-readable/               # LLM/AI consumption
-│   ├── reference.yaml              # Machine-optimized index (~2K tokens)
-│   └── llms.txt                    # Short version
-├── whitepapers/                    # 13 focused PDFs (FR + EN)
-└── quiz/                           # 473-question interactive quiz
+├── llms.txt                        # Этот файл (краткая версия для индексации ИИ)
+├── llms-full.txt                   # Полное содержимое (вы здесь)
+├── guide/                          # Основная документация
+│   ├── ultimate-guide.md           # Полное руководство (26 193 строки)
+│   ├── cheatsheet.md               # Шпаргалка на 1 страницу
+│   ├── core/architecture.md        # Как Claude Code устроен внутри
+│   ├── security/security-hardening.md  # Проверенные практики безопасности
+│   ├── security/data-privacy.md    # Какие данные отправляются в Anthropic
+│   └── core/claude-code-releases.md    # Отслеживание официальных релизов
+├── examples/                       # 278 готовых к продакшену шаблонов
+│   ├── agents/                     # Пользовательские роли ИИ
+│   ├── commands/                   # Устаревшие слэш-команды (до CC 2.1.3)
+│   ├── hooks/                      # Событийная автоматизация (bash + PowerShell)
+│   ├── skills/                     # Вызываемые пользователем скиллы (объединены с CC 2.1.3)
+│   └── scripts/                    # Служебные скрипты
+├── machine-readable/               # Машиночитаемые файлы для LLM/ИИ
+│   ├── reference.yaml              # Индекс, оптимизированный для машин (~2K токенов)
+│   └── llms.txt                    # Краткая версия
+├── whitepapers/                    # 13 тематических PDF (FR + EN)
+└── quiz/                           # Интерактивный тест на 473 вопроса
 ```
 
 ---
 
-## Author & License
+## Автор и лицензия
 
-**Author**: Florian Bruniaux, Fractional Chief AI Officer
+**Автор**: Florian Bruniaux, внештатный директор по ИИ (Fractional Chief AI Officer)
 **GitHub**: https://github.com/FlorianBruniaux
-**License**: Guide = CC BY-SA 4.0 | Templates = CC0 1.0
+**Лицензия**: Руководство = CC BY-SA 4.0 | Шаблоны = CC0 1.0
