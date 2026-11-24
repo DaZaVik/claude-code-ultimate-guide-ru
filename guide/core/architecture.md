@@ -1,68 +1,69 @@
 ---
-title: "How Claude Code Works: Architecture & Internals"
-description: "Technical deep-dive into Claude Code internal mechanisms and architecture"
+title: "Как работает Claude Code: архитектура и внутреннее устройство"
+description: "Глубокий технический разбор внутренних механизмов и архитектуры Claude Code"
 tags: [architecture, guide, performance]
 ---
 
-# How Claude Code works: Architecture & internals
+# Как работает Claude Code: архитектура и внутреннее устройство
 
-> A technical guide to documented Claude Code behavior, with separately attributed community observations. Cited historical analyses do not establish current internals.
+> Техническое руководство по документированному поведению Claude Code с отдельно атрибутированными наблюдениями сообщества. Цитируемые исторические исследования не подтверждают текущее внутреннее устройство.
 
-**Author**: Florian BRUNIAUX | Contributions from Claude (Anthropic)
+**Автор**: Florian BRUNIAUX | При участии Claude (Anthropic)
 
-**Reading time**: ~25 minutes (full) | ~5 minutes (TL;DR only)
+**Время чтения**: ~25 минут (полностью) | ~5 минут (только краткое содержание)
 
-**Last verified**: October 2026 for the tool inventory, context-window and sub-agent claims corrected below. Other sections retain their cited source dates.
+**Последняя проверка**: октябрь 2026 года — для перечня инструментов, а также исправленных ниже утверждений о контекстном окне и субагентах. Для остальных разделов сохраняются даты цитируемых источников.
 
 ---
 
-## Source transparency
+## Прозрачность источников
 
-This document combines three tiers of sources:
+Этот документ объединяет источники трёх уровней:
 
-| Tier | Description | Evidence limit | Example |
+| Уровень | Описание | Ограничение доказательности | Пример |
 |------|-------------|------------|---------|
-| **Tier 1** | Official Anthropic documentation | Contract or behavior for the cited version/date and scope | code.claude.com documentation |
-| **Tier 2** | Cited inspection or reverse-engineering | Observation limited to the inspected version and method | PromptLayer analysis |
-| **Tier 3** | Community inference | Unverified explanation, not a product contract | Observed but not officially confirmed |
+| **Уровень 1** | Официальная документация Anthropic | Контракт или поведение для указанных версии, даты и области применения | документация code.claude.com |
+| **Уровень 2** | Цитируемое исследование или обратная разработка | Наблюдение ограничено исследованной версией и использованным методом | анализ PromptLayer |
+| **Уровень 3** | Вывод сообщества | Непроверенное объяснение, не являющееся контрактом продукта | Наблюдалось, но официально не подтверждено |
 
-Source labels describe provenance, not measured confidence. Prefer current official documentation; historical observations remain bounded by their source dates and methods.
-
----
-
-## Where Claude Code sits in the harness stack
-
-Claude Code is a **runtime harness**: it owns the iterative model-and-tool loop for a coding task. The model generates tokens; the repository supplies instructions, setup, state, and verification; an orchestrator coordinates multiple runtime sessions. Those layers answer different questions and should not be evaluated as interchangeable products.
-
-Read [Agent Harness Engineering](./agent-harness.md) for the four-layer model and the mechanics inside a runtime. Use the [Agent Harness Map](../ecosystem/agent-harness-landscape.md) when comparing products that own a coding loop. Use [Agent Tools: Beyond Claude Code](../ecosystem/agentic-tools.md) for the broader set of frameworks, control planes, and runtime-adjacent tools. The [glossary](./glossary.md) defines the terms used across those pages.
-
-### Claude Code and the Agent SDK
-
-Claude Code is the product you run in a terminal, an IDE or the desktop app. The Claude Agent SDK is a library that embeds Claude Code's agent in your own Python or TypeScript application. According to the [official Agent SDK overview](https://code.claude.com/docs/en/agent-sdk/overview), it runs the Claude Code binary and provides the same tools, agent loop and context management, including permissions, sessions, hooks, subagents and MCP. The loop and context mechanics on this page therefore also describe agents built with the SDK. The SDK-only loop limit is covered in [Controlling loop depth with max_turns](#controlling-loop-depth-with-max_turns). For how the SDK compares with other agent frameworks, see [Agent Tools §3.4](../ecosystem/agentic-tools.md#34-anthropic-agent-sdk).
+Метки источников указывают на происхождение данных, а не на измеренную степень уверенности. Отдавайте предпочтение актуальной официальной документации; исторические наблюдения ограничены датами и методами своих источников.
 
 ---
 
-## TL;DR - 5 bullet summary
+## Место Claude Code в стеке обвязки агента
 
-1. **Agentic loop**: The model proposes tools or a response; the harness applies permission checks before executing tools. Auto mode can use a classifier. This loop is a teaching model, not a complete description of every runtime component. [Permission system](https://code.claude.com/docs/en/permissions#permission-system).
+Claude Code — это **рантайм-харнесс**: он управляет итеративным циклом взаимодействия модели и инструментов при выполнении задачи программирования. Модель генерирует токены; репозиторий предоставляет инструкции, настройку, состояние и средства проверки; оркестратор координирует несколько рантайм-сессий. Эти слои отвечают на разные вопросы, поэтому их не следует оценивать как взаимозаменяемые продукты.
 
-2. **Built-in and extensible tools**: Claude Code provides file editing, shell access, search, sub-agents and other built-in capabilities. The available set varies by version, model and configuration; the [tools reference](https://code.claude.com/docs/en/tools-reference) is the current inventory.
+Ознакомьтесь с [Инженерией обвязки агента](./agent-harness.md), чтобы изучить четырёхслойную модель и внутренние механизмы рантайма. Используйте [Карту обвязок агентов](../ecosystem/agent-harness-landscape.md), сравнивая продукты, управляющие циклом программирования. В разделе [Инструменты агентов: за пределами Claude Code](../ecosystem/agentic-tools.md) рассматривается более широкий набор фреймворков, плоскостей управления и смежных с рантаймом инструментов. Термины, используемые на этих страницах, определены в [глоссарии](./glossary.md).
 
-   **Search Strategy Evolution**: Early Claude Code versions experimented with RAG using Voyage embeddings for semantic code search. Anthropic switched to grep-based (ripgrep) agentic search after internal benchmarks showed superior performance with lower operational complexity: no index sync required, no security liabilities from external embedding providers. This "Search, Don't Index" philosophy trades latency/tokens for simplicity/security. Community plugins (ast-grep for AST patterns) and MCP servers (Serena for symbols, grepai for RAG) available for specialized needs.
+### Claude Code и Agent SDK
 
-   *Source*: [Latent Space podcast](https://www.latent.space/p/claude-code) (May 2025), ast-grep documentation
-
-3. **Model-dependent context budget**: The context window is shared between instructions, history, tool results and responses. Supported models and account configurations can provide 200K or 1M tokens; [model configuration](https://code.claude.com/docs/en/model-config#extended-context) documents availability and auto-compaction controls.
-
-4. **Sub-agent context**: Ordinary sub-agents start fresh; forks inherit the parent's conversation at spawn. Context separation does not isolate filesystem or external effects. Ordinary delegation has a configurable depth limit, three layers below the main conversation by default; forks cannot spawn further forks. [Sub-agent modes and limits](https://code.claude.com/docs/en/sub-agents).
-
-5. **Philosophy**: "Less scaffolding, more model." Trust Claude's reasoning instead of building complex orchestration systems around it.
+Claude Code — это продукт, который запускается в терминале, IDE или настольном приложении. Claude Agent SDK — библиотека, встраивающая агента Claude Code в ваше приложение на Python или TypeScript. Согласно [официальному обзору Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview), она запускает бинарный файл Claude Code и предоставляет те же инструменты, цикл агента и управление контекстом, включая права доступа, сессии, хуки, субагентов и MCP. Поэтому описанные на этой странице механизмы цикла и контекста также относятся к агентам, созданным с помощью SDK. Ограничение цикла, относящееся только к SDK, рассматривается в разделе [Управление глубиной цикла с помощью max_turns](#controlling-loop-depth-with-max_turns). Сравнение SDK с другими фреймворками агентов приведено в разделе [Инструменты агентов §3.4](../ecosystem/agentic-tools.md#34-anthropic-agent-sdk).
 
 ---
 
-## Visual overview
+## Краткое содержание — 5 пунктов
 
-Claude Code is not a new AI model. It's an orchestration layer that wraps Claude (Opus/Sonnet/Haiku) with the ability to read files, run shell commands, navigate repositories, and spawn sub-agents, all in a continuous loop until the task is done.
+1. **Агентный цикл**: модель предлагает инструменты или ответ; перед выполнением инструментов харнесс проверяет права доступа. В автоматическом режиме может использоваться классификатор. Этот цикл — учебная модель, а не полное описание всех компонентов рантайма. [Система прав доступа](https://code.claude.com/docs/en/permissions#permission-system).
+
+2. **Встроенные и расширяемые инструменты**: Claude Code предоставляет редактирование файлов, доступ к оболочке, поиск, субагентов и другие встроенные возможности. Доступный набор зависит от версии, модели и конфигурации; актуальный перечень приведён в [справочнике по инструментам](https://code.claude.com/docs/en/tools-reference).
+
+   **Эволюция стратегии поиска**: ранние версии Claude Code экспериментировали с RAG, используя эмбеддинги Voyage для семантического поиска по коду. Anthropic перешла на агентный поиск на основе grep (ripgrep), после того как внутренние тесты показали более высокую производительность при меньшей операционной сложности: не требуется синхронизация индекса и отсутствуют риски безопасности, связанные с внешними поставщиками эмбеддингов. Эта философия «Ищи, а не индексируй» обменивает задержку и токены на простоту и безопасность. Для специализированных задач доступны плагины сообщества (ast-grep для AST-шаблонов) и MCP-серверы (Serena для символов, grepai для RAG).
+
+   *Источник*: [подкаст Latent Space](https://www.latent.space/p/claude-code) (май 2025 года), документация ast-grep
+
+3. **Зависящий от модели бюджет контекста**: контекстное окно совместно используется инструкциями, историей, результатами инструментов и ответами. Поддерживаемые модели и конфигурации учётных записей могут предоставлять 200 тыс. или 1 млн токенов; доступность и параметры автоматического сжатия контекста описаны в разделе [конфигурации модели](https://code.claude.com/docs/en/model-config#extended-context).
+
+4. **Контекст субагентов**: обычные субагенты начинают с чистого контекста; форки наследуют родительскую беседу на момент создания. Разделение контекста не изолирует файловую систему или внешние эффекты. Обычное делегирование имеет настраиваемое ограничение глубины — по умолчанию три уровня ниже основной беседы; форки не могут создавать дополнительные форки. [Режимы и ограничения субагентов](https://code.claude.com/docs/en/sub-agents).
+
+5. **Философия**: «Меньше обвязки, больше модели». Доверяйте рассуждениям Claude вместо построения вокруг него сложных систем оркестрации.
+
+---
+
+<a id="visual-overview"></a>
+## Визуальный обзор
+
+Claude Code — не новая ИИ-модель. Это слой оркестрации, который дополняет Claude (Opus/Sonnet/Haiku) возможностью читать файлы, выполнять команды оболочки, перемещаться по репозиториям и создавать субагентов — всё это в непрерывном цикле до завершения задачи.
 
 ```mermaid
 flowchart TB
@@ -93,88 +94,90 @@ flowchart TB
     style MCP fill:#B8B8B8,color:#333
 ```
 
-*Inspired by [Mohamed Ali Ben Salem's architecture diagram](https://www.linkedin.com/posts/mohamed-ali-ben-salem-2b777b9a_en-ce-moment-je-vois-passer-des-posts-du-activity-7420592149110362112-eY5a). See [Architecture Internals diagrams](../diagrams/04-architecture-internals.md) for a deeper breakdown.*
+*Вдохновлено [схемой архитектуры Mohamed Ali Ben Salem](https://www.linkedin.com/posts/mohamed-ali-ben-salem-2b777b9a_en-ce-moment-je-vois-passer-des-posts-du-activity-7420592149110362112-eY5a). Более подробное представление см. в разделе [Схемы внутреннего устройства архитектуры](../diagrams/04-architecture-internals.md).*
 
 ---
 
-## Table of contents
+## Оглавление
 
-- [Visual Overview](#visual-overview)
+- [Визуальный обзор](#visual-overview)
 
-1. [The Master Loop](#1-the-master-loop)
-2. [The Tool Arsenal](#2-the-tool-arsenal)
-3. [Context Management Internals](#3-context-management-internals)
-4. [Sub-Agent Architecture](#4-sub-agent-architecture)
-5. [Permission & Security Model](#5-permission--security-model)
-6. [MCP Integration](#6-mcp-integration)
-7. [Advanced Tool Use Patterns (API)](#7-advanced-tool-use-patterns-api)
-8. [The Edit Tool: How It Actually Works](#8-the-edit-tool-how-it-actually-works)
-9. [Session Persistence](#9-session-persistence)
-10. [Philosophy: Less Scaffolding, More Model](#10-philosophy-less-scaffolding-more-model)
-11. [Claude Code vs Alternatives](#11-claude-code-vs-alternatives)
-12. [Sources & References](#12-sources--references)
-13. [Appendix: What We Don't Know](#13-appendix-what-we-dont-know)
+1. [Главный цикл](#1-the-master-loop)
+2. [Арсенал инструментов](#2-the-tool-arsenal)
+3. [Внутреннее устройство управления контекстом](#3-context-management-internals)
+4. [Архитектура субагентов](#4-sub-agent-architecture)
+5. [Модель прав доступа и безопасности](#5-permission--security-model)
+6. [Интеграция MCP](#6-mcp-integration)
+7. [Расширенные схемы использования инструментов (API)](#7-advanced-tool-use-patterns-api)
+8. [Инструмент Edit: как он работает на самом деле](#8-the-edit-tool-how-it-actually-works)
+9. [Сохранение сессий](#9-session-persistence)
+10. [Философия: меньше обвязки, больше модели](#10-philosophy-less-scaffolding-more-model)
+11. [Claude Code в сравнении с альтернативами](#11-claude-code-vs-alternatives)
+12. [Источники и ссылки](#12-sources--references)
+13. [Приложение: чего мы не знаем](#13-appendix-what-we-dont-know)
 
 
 ---
 
-## 1. The master loop
+<a id="1-the-master-loop"></a>
+## 1. Главный цикл
 
-**Source category**: Tier 1, Official; bounded by the cited version/date and scope.
-**Source**: [Anthropic Engineering Blog](https://www.anthropic.com/engineering/claude-code-best-practices)
+**Категория источника**: уровень 1, официальный; ограничен указанными версией, датой и областью применения.
+**Источник**: [блог Anthropic Engineering](https://www.anthropic.com/engineering/claude-code-best-practices)
 
-The diagram shows the central loop, with permission evaluation condensed into the tool step. It omits hook lifecycle, compaction, retries and delegation details.
+На схеме показан центральный цикл, где оценка прав доступа сведена к этапу работы с инструментом. Жизненный цикл хуков, сжатие контекста, повторные попытки и подробности делегирования опущены.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    CLAUDE CODE MASTER LOOP                  │
+│                   ГЛАВНЫЙ ЦИКЛ CLAUDE CODE                 │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │   ┌──────────────┐                                          │
-│   │  Your Prompt │                                          │
+│   │  Ваш промпт  │                                          │
 │   └──────┬───────┘                                          │
 │          │                                                  │
 │          ▼                                                  │
 │   ┌──────────────────────────────────────────────────────┐  │
 │   │                                                      │  │
-│   │                  CLAUDE REASONS                      │  │
-│   │             (Select the next action)                │  │
+│   │                 CLAUDE РАССУЖДАЕТ                   │  │
+│   │            (Выбирает следующее действие)            │  │
 │   │                                                      │  │
 │   └────────────────────────┬─────────────────────────────┘  │
 │                            │                                │
 │                            ▼                                │
 │                   ┌────────────────┐                        │
-│                   │  Tool Call?    │                        │
+│                   │Вызов инструмента?│                      │
 │                   └───────┬────────┘                        │
 │                           │                                 │
-│              YES          │           NO                    │
+│              ДА           │           НЕТ                   │
 │         ┌─────────────────┴─────────────────┐               │
 │         │                                   │               │
 │         ▼                                   ▼               │
 │  ┌────────────┐                      ┌────────────┐         │
-│  │  Evaluate  │                      │   Text     │         │
-│  │ permission │                      │  Response  │         │
-│  │ run/refuse │                      │   (DONE)   │         │
+│  │  Оценить   │                      │ Текстовый  │         │
+│  │   права    │                      │   ответ    │         │
+│  │выполнить/  │                      │ (ГОТОВО)   │         │
+│  │ отказать   │                      │            │         │
 │  └─────┬──────┘                      └────────────┘         │
 │        │                                                    │
 │        ▼                                                    │
 │  ┌─────────────┐                                            │
-│  │ Feed Result │                                            │
-│  │  to Claude  │──────────────────┐                         │
+│  │  Передать   │                                            │
+│  │результат Claude│────────────────┐                        │
 │  └─────────────┘                  │                         │
 │                                   │                         │
 │                                   ▼                         │
 │                          ┌────────────────┐                 │
-│                          │   LOOP BACK    │                 │
-│                          │  (Next turn)   │                 │
+│                          │ ВЕРНУТЬСЯ В ЦИКЛ│                │
+│                          │(Следующая итерация)│              │
 │                          └────────────────┘                 │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### What this means
+### Что это означает
 
-Simplified teaching pseudocode, not an implementation of the permission or hook system:
+Упрощённый учебный псевдокод, не являющийся реализацией системы прав доступа или хуков:
 
 ```
 while (claude_response.has_tool_call):
@@ -183,26 +186,26 @@ while (claude_response.has_tool_call):
 return claude_response.text
 ```
 
-The model selects the next action, subject to harness controls. [Permission rules](https://code.claude.com/docs/en/permissions#permission-system) are enforced by Claude Code, and auto mode can use a classifier. Optional workflows and extensions add other control paths; this sketch does not prove their absence. See [how Claude Code works](https://code.claude.com/docs/en/how-claude-code-works) and the current [tool inventory](https://code.claude.com/docs/en/tools-reference).
+Модель выбирает следующее действие с учётом ограничений харнесса. [Правила доступа](https://code.claude.com/docs/en/permissions#permission-system) применяются Claude Code, а в автоматическом режиме может использоваться классификатор. Необязательные рабочие процессы и расширения добавляют другие пути управления; эта схема не доказывает их отсутствия. См. [как работает Claude Code](https://code.claude.com/docs/en/how-claude-code-works) и актуальный [перечень инструментов](https://code.claude.com/docs/en/tools-reference).
 
-### Why this design?
+### Почему выбрана такая архитектура?
 
-1. **Simplicity**: Fewer components = fewer failure modes
-2. **Model-driven**: Claude's reasoning is better than hand-coded heuristics
-3. **Flexibility**: No rigid pipeline constraining what Claude can do
-4. **Debuggability**: Easy to understand what happened and why
+1. **Простота**: меньше компонентов — меньше вариантов отказа
+2. **Управление моделью**: рассуждения Claude эффективнее эвристик, написанных вручную
+3. **Гибкость**: отсутствует жёсткий конвейер, ограничивающий возможности Claude
+4. **Удобство отладки**: легко понять, что произошло и почему
 
-### Agentic loop API vocabulary
+### Терминология API агентного цикла
 
-The master loop diagram above shows the flow conceptually, but the Messages API exposes it through concrete `stop_reason` values. These three common values illustrate the loop; see the [official stop-reason reference](https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons) for the full list.
+Приведённая выше схема главного цикла показывает процесс концептуально, однако Messages API выражает его через конкретные значения `stop_reason`. Следующие три распространённых значения иллюстрируют цикл; полный список приведён в [официальном справочнике по причинам остановки](https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons).
 
-| `stop_reason` | Meaning | Loop action |
+| `stop_reason` | Значение | Действие цикла |
 |---------------|---------|-------------|
-| `tool_use` | Claude wants to call one or more tools | Execute tools, feed results back, continue loop |
-| `end_turn` | Claude decided it has finished | Exit loop, return the text response |
-| `max_tokens` | Requested output-token limit reached | Raise the output limit or continue the response |
+| `tool_use` | Claude хочет вызвать один или несколько инструментов | Выполнить инструменты, передать результаты обратно и продолжить цикл |
+| `end_turn` | Claude решил, что закончил работу | Выйти из цикла и вернуть текстовый ответ |
+| `max_tokens` | Достигнут запрошенный лимит токенов вывода | Увеличить лимит вывода или продолжить ответ |
 
-The pseudocode becomes precise with these names:
+С этими именами псевдокод становится точным:
 
 ```python
 messages = [{"role": "user", "content": user_prompt}]
@@ -211,10 +214,10 @@ while True:
     response = client.messages.create(model=model, messages=messages, tools=tools)
 
     if response.stop_reason == "end_turn":
-        return response.content[0].text  # done
+        return response.content[0].text  # готово
 
     if response.stop_reason == "tool_use":
-        # Process every tool_use block in the response
+        # Обработать каждый блок tool_use в ответе
         tool_results = []
         for block in response.content:
             if block.type == "tool_use":
@@ -226,374 +229,380 @@ while True:
                 })
         messages.append({"role": "assistant", "content": response.content})
         messages.append({"role": "user", "content": tool_results})
-        # loop continues
+        # цикл продолжается
 ```
 
-The `tool_use` block inside `response.content` has three fields you act on: `id` (to match results back), `name` (which function to call), and `input` (a dict of arguments). The result you send back must reference `tool_use_id` so the model can correlate call and response.
+Блок `tool_use` внутри `response.content` содержит три поля, с которыми нужно работать: `id` (для сопоставления с результатами), `name` (имя вызываемой функции) и `input` (словарь аргументов). Отправляемый обратно результат должен ссылаться на `tool_use_id`, чтобы модель могла сопоставить вызов и ответ.
 
-**`fork_session`** is a higher-level concept built on this loop: it creates an independent branch of the current conversation, sharing the same message history up to the fork point. Both branches can explore different approaches or configurations simultaneously, like `git branch` but for agent sessions. Each fork runs its own agentic loop independently, useful for comparing responses under different tool configurations or prompt variants without re-running the full conversation from scratch.
+**`fork_session`** — высокоуровневая концепция, построенная на этом цикле: она создаёт независимую ветвь текущей беседы, совместно использующую ту же историю сообщений до точки ветвления. Обе ветви могут одновременно исследовать разные подходы или конфигурации — подобно `git branch`, но для сессий агентов. Каждый форк независимо выполняет собственный агентный цикл, что удобно для сравнения ответов при разных конфигурациях инструментов или вариантах промпта без повторного выполнения всей беседы с нуля.
 
-#### Controlling loop depth with max_turns
+#### Управление глубиной цикла с помощью max_turns
 
-`max_turns` caps the number of assistant/tool iterations before the orchestrator exits. Without an explicit limit, a runaway loop can exhaust budget or context window in ways that are hard to diagnose after the fact.
+`max_turns` ограничивает число итераций ассистента и инструментов до завершения работы оркестратора. Без явного ограничения вышедший из-под контроля цикл может исчерпать бюджет или контекстное окно так, что впоследствии причину будет трудно диагностировать.
 
-Practical ranges by task type:
+Практические диапазоны по типам задач:
 
-| Task type | Recommended `max_turns` |
+| Тип задачи | Рекомендуемое значение `max_turns` |
 |---|---|
-| Simple retrieval (single lookup) | 5 |
-| Research or multi-step coding | 20-30 |
-| Extended autonomous workflows | 50 |
+| Простой поиск данных (один запрос) | 5 |
+| Исследование или многоэтапное программирование | 20–30 |
+| Продолжительные автономные рабочие процессы | 50 |
 
-`max_turns` is an Agent SDK loop limit, not a Messages API `stop_reason`. If this cap is reached, the task may be incomplete. Inspect the SDK's final result message for `subtype == "error_max_turns"`, as documented in the [Python Agent SDK reference](https://code.claude.com/docs/en/agent-sdk/python):
+`max_turns` — это ограничение цикла Agent SDK, а не значение `stop_reason` Messages API. При достижении этого ограничения задача может остаться незавершённой. Проверьте итоговое сообщение результата SDK на наличие `subtype == "error_max_turns"`, как описано в [справочнике по Python Agent SDK](https://code.claude.com/docs/en/agent-sdk/python):
 
 ```python
 from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
 
-# Inside an async function; handle_incomplete is your application callback.
+# Внутри асинхронной функции; handle_incomplete — функция обратного вызова вашего приложения.
 async for message in query(prompt=task, options=ClaudeAgentOptions(max_turns=20)):
     if isinstance(message, ResultMessage) and message.subtype == "error_max_turns":
         handle_incomplete(message)
 ```
 
-Setting `max_turns` per task type rather than globally prevents a single slow task from starving others in a multi-agent pipeline. A nightly batch job that legitimately needs 50 turns should not inherit the same cap as a quick lookup that should resolve in 5.
+Настройка `max_turns` по типам задач, а не глобально, не позволяет одной медленной задаче лишить ресурсов остальные задачи в многоагентном конвейере. Ночная пакетная задача, которой обоснованно требуется 50 итераций, не должна наследовать то же ограничение, что и быстрый поиск, который должен завершаться за 5.
 
-### Native capabilities audit
+### Аудит встроенных возможностей
 
-Use this checklist to verify you understand Claude Code's full surface area. Each capability is documented in detail elsewhere in this guide.
+Используйте этот список, чтобы проверить своё понимание полного набора возможностей Claude Code. Каждая возможность подробно описана в других разделах этого руководства.
 
-**The 11 Native Capabilities**:
+**11 встроенных возможностей**:
 
-- [ ] **Event Hooks**: Bash/PowerShell scripts triggered on tool execution
+- [ ] **Хуки событий**: скрипты Bash/PowerShell, запускаемые при выполнении инструментов
   - PreToolUse, PostToolUse, UserPromptSubmit, Notification
-  - See: [Section 5 Hooks](#5-permission--security-model)
+  - См.: [раздел 5 «Хуки»](#5-permission--security-model)
 
-- [ ] **Skill-Scoped Hooks**: Event hooks specific to skill execution context
-  - Lifecycle management per skill
-  - See: [Ultimate Guide Section 5.11](#51-understanding-skills)
+- [ ] **Хуки уровня скилла**: хуки событий, относящиеся к контексту выполнения конкретного скилла
+  - Управление жизненным циклом для каждого скилла
+  - См.: [раздел 5.11 полного руководства](#51-understanding-skills)
 
-- [ ] **Background Agents**: Async task execution (test suites, long operations)
-  - Non-blocking agent spawning
-  - See: [Section 4.2 Sub-Agent Architecture](#4-sub-agent-architecture)
+- [ ] **Фоновые агенты**: асинхронное выполнение задач (наборы тестов, длительные операции)
+  - Неблокирующее создание агентов
+  - См.: [раздел 4.2 «Архитектура субагентов»](#4-sub-agent-architecture)
 
-- [ ] **Explore Subagent**: `/explore` for codebase analysis
-  - Read-only codebase exploration
-  - See: [Section 4.2 Sub-Agents](#4-sub-agent-architecture)
+- [ ] **Субагент Explore**: `/explore` для анализа кодовой базы
+  - Исследование кодовой базы только для чтения
+  - См.: [раздел 4.2 «Субагенты»](#4-sub-agent-architecture)
 
-- [ ] **Plan Subagent**: `/plan` for read-only planning mode
-  - Safe architectural exploration
-  - See: [Ultimate Guide Section 2.3](#23-plan-mode)
+- [ ] **Субагент Plan**: `/plan` для режима планирования только для чтения
+  - Безопасное исследование архитектуры
+  - См.: [раздел 2.3 полного руководства](#23-plan-mode)
 
-- [ ] **Agent Tool**: Hierarchical task delegation to specialized agents
-  - Parallel task execution; nesting is configurable (three layers by default)
-  - See: [Section 4.2 Sub-Agent Architecture](#4-sub-agent-architecture)
+- [ ] **Инструмент Agent**: иерархическое делегирование задач специализированным агентам
+  - Параллельное выполнение задач; вложенность настраивается (по умолчанию три уровня)
+  - См.: [раздел 4.2 «Архитектура субагентов»](#4-sub-agent-architecture)
 
-- [ ] **Agent Teams**: Multi-agent parallel coordination (experimental v2.1.32+)
-  - Git-based coordination, autonomous task claiming
-  - See: [Ultimate Guide Section 9.20](#920-agent-teams-multi-agent-coordination)
+- [ ] **Команды агентов (Agent Teams)**: параллельная координация нескольких агентов (экспериментальная возможность, v2.1.32+)
+  - Координация на основе Git, автономное назначение задач
+  - См.: [раздел 9.20 полного руководства](#920-agent-teams-multi-agent-coordination)
 
-- [ ] **Per-Task Model Selection**: Dynamic model switching mid-session
-  - `/model opus|sonnet|haiku` on task boundaries
-  - See: [Section 10 Cost Optimization](#10-claude-code-vs-alternatives)
+- [ ] **Выбор модели для каждой задачи**: динамическое переключение модели в ходе сессии
+  - `/model opus|sonnet|haiku` на границах задач
+  - См.: [раздел 10 «Оптимизация затрат»](#10-claude-code-vs-alternatives)
 
-- [ ] **MCP Protocol Integration**: Model Context Protocol for tool extensions
-  - Context7, Sequential, Serena, Playwright, etc.
-  - See: [Section 6 MCP Integration](#6-mcp-integration)
+- [ ] **Интеграция протокола MCP**: Model Context Protocol для расширения набора инструментов
+  - Context7, Sequential, Serena, Playwright и т. д.
+  - См.: [раздел 6 «Интеграция MCP»](#6-mcp-integration)
 
-- [ ] **Permission Modes**: Fine-grained control over tool execution
-  - Default, auto-accept, plan mode, custom rules
-  - See: [Section 5 Permission & Security Model](#5-permission--security-model)
+- [ ] **Режимы прав доступа**: детальное управление выполнением инструментов
+  - Режим по умолчанию, автоматическое подтверждение, режим планирования, пользовательские правила
+  - См.: [раздел 5 «Модель прав доступа и безопасности»](#5-permission--security-model)
 
-- [ ] **Session Memory**: Persistent context across sessions
-  - CLAUDE.md, memory files, project state
-  - See: [Section 8 Session Persistence](#8-session-persistence)
+- [ ] **Память сессии**: сохранение контекста между сессиями
+  - CLAUDE.md, файлы памяти, состояние проекта
+  - См.: [раздел 8 «Сохранение сессий»](#8-session-persistence)
 
-**Onboarding Tip**: If you haven't explored all 11 capabilities, you're likely missing productivity opportunities. Focus on the unchecked items above.
+**Совет по началу работы**: если вы ещё не изучили все 11 возможностей, вероятно, вы упускаете способы повысить продуктивность. Сосредоточьтесь на неотмеченных пунктах выше.
 
-**Source**: Synthesized from [Gur Sannikov analysis](https://www.linkedin.com/posts/gursannikov_claudecode-embeddedengineering-aiagents-activity-7423851983331328001-DrFb)
+**Источник**: обобщено на основе [анализа Gur Sannikov](https://www.linkedin.com/posts/gursannikov_claudecode-embeddedengineering-aiagents-activity-7423851983331328001-DrFb)
 
 ---
 
-## 2. The tool arsenal
+<a id="2-the-tool-arsenal"></a>
+## 2. Арсенал инструментов
 
-**Source category**: Tier 1, Official; bounded by the cited version/date and scope.
-**Source**: [code.claude.com/docs](https://code.claude.com/docs/en/setup)
+**Категория источника**: уровень 1, официальный; ограничен указанными версией, датой и областью применения.
+**Источник**: [code.claude.com/docs](https://code.claude.com/docs/en/setup)
 
-The tools below are examples, not an exhaustive inventory. See the [current tools reference](https://code.claude.com/docs/en/tools-reference) for availability by model and configuration.
+Приведённые ниже инструменты являются примерами, а не исчерпывающим перечнем. Доступность по моделям и конфигурациям указана в [актуальном справочнике по инструментам](https://code.claude.com/docs/en/tools-reference).
 
-| Tool | Purpose | Key Behavior | Token Cost |
+| Инструмент | Назначение | Ключевое поведение | Расход токенов |
 |------|---------|--------------|------------|
-| `Bash` | Execute shell commands | Universal adapter, most powerful | Low (command) + Variable (output) |
-| `Read` | Read file contents | Max 2000 lines, handles truncation | High for large files |
-| `Edit` | Modify existing files | Diff-based, requires exact match | Medium |
-| `Write` | Create/overwrite files | Must read first if file exists | Medium |
-| `Grep` | Search file contents | Ripgrep-based (regex), replaced RAG/embedding approach. For structural code search (AST-based), see ast-grep plugin. Trade-off: Grep (fast, simple) vs ast-grep (precise, setup required) vs Serena MCP (semantic, symbol-aware) | Low |
-| `Glob` | Find files by pattern | Path matching, sorted by mtime | Low |
-| `Agent` | Spawn sub-agents (formerly `Task`) | Fresh or forked context; ordinary nesting configurable (three layers by default); filesystem effects may be shared | Depends on delegation mode |
-| `TodoWrite` / Task tools | Track progress | Available tools and defaults vary by model and configuration; consult the [current tool reference](https://code.claude.com/docs/en/tools-reference) | Depends on task list |
+| `Bash` | Выполнение команд оболочки | Универсальный адаптер, самый мощный инструмент | Низкий (команда) + переменный (вывод) |
+| `Read` | Чтение содержимого файлов | Не более 2000 строк, поддерживает усечение | Высокий для больших файлов |
+| `Edit` | Изменение существующих файлов | Основан на различиях, требует точного совпадения | Средний |
+| `Write` | Создание или перезапись файлов | Если файл существует, сначала его необходимо прочитать | Средний |
+| `Grep` | Поиск по содержимому файлов | Основан на ripgrep (регулярные выражения), заменил подход с RAG/эмбеддингами. Для структурного поиска по коду (на основе AST) см. плагин ast-grep. Компромисс: Grep (быстро и просто), ast-grep (точно, но требует настройки), Serena MCP (семантический поиск с учётом символов) | Низкий |
+| `Glob` | Поиск файлов по шаблону | Сопоставление путей, сортировка по времени изменения | Низкий |
+| `Agent` | Создание субагентов (ранее `Task`) | Чистый или ответвлённый контекст; обычная вложенность настраивается (по умолчанию три уровня); воздействия на файловую систему могут быть общими | Зависит от режима делегирования |
+| `TodoWrite` / инструменты задач | Отслеживание прогресса | Доступные инструменты и значения по умолчанию зависят от модели и конфигурации; см. [актуальный справочник по инструментам](https://code.claude.com/docs/en/tools-reference) | Зависит от списка задач |
 
-### The bash universal adapter
+### Универсальный адаптер Bash
 
-**Key insight**: Bash is Claude's swiss-army knife. It can:
+**Ключевая идея**: Bash — универсальный инструмент Claude. Он позволяет:
 
-- Run any CLI tool (git, npm, docker, curl...)
-- Execute scripts
-- Chain commands with pipes
-- Access system state
+- Запускать любой CLI-инструмент (git, npm, docker, curl...)
+- Выполнять скрипты
+- Объединять команды конвейерами
+- Получать доступ к состоянию системы
 
-The model has been trained on massive amounts of shell data, making it highly effective at using Bash as a universal adapter when specialized tools aren't enough.
+Модель обучена на огромном объёме данных об оболочках, поэтому она очень эффективно использует Bash как универсальный адаптер, когда специализированных инструментов недостаточно.
 
-### Tool selection logic
+### Логика выбора инструментов
 
-Claude decides which tool to use based on the task. There's no hardcoded routing:
+Claude решает, какой инструмент использовать, исходя из задачи. Жёстко заданной маршрутизации нет:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│              TOOL SELECTION (Model-Driven)          │
+│          ВЫБОР ИНСТРУМЕНТА (УПРАВЛЯЕТСЯ МОДЕЛЬЮ)   │
 ├─────────────────────────────────────────────────────┤
 │                                                     │
-│  "Read auth.ts"           → Read tool               │
-│  "Find all test files"    → Glob tool               │
-│  "Search for TODO"        → Grep tool               │
-│  "Run npm test"           → Bash tool               │
-│  "Explore the codebase"   → Agent (sub-agent)       │
-│  "Track my progress"      → Available task tools    │
+│  «Прочитай auth.ts»       → инструмент Read         │
+│  «Найди все файлы тестов» → инструмент Glob         │
+│  «Найди TODO»             → инструмент Grep         │
+│  «Запусти npm test»       → инструмент Bash         │
+│  «Исследуй кодовую базу»  → Agent (субагент)        │
+│  «Отслеживай мой прогресс»→ доступные инструменты   │
+│                              задач                  │
 │                                                     │
-│  The model learns these patterns during training,   │
-│  not from explicit rules.                           │
+│  Модель усваивает эти шаблоны во время обучения,    │
+│  а не получает их из явно заданных правил.          │
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
 
-### Extended tool ecosystem
+### Расширенная экосистема инструментов
 
-Beyond the built-in tools listed in the [tools reference](https://code.claude.com/docs/en/tools-reference), Claude Code can use:
+Помимо встроенных инструментов, перечисленных в [справочнике по инструментам](https://code.claude.com/docs/en/tools-reference), Claude Code может использовать:
 
-**MCP Servers** (Model Context Protocol):
-- **Serena**: Symbol-aware code navigation + session memory
-- **grepai**: Semantic search + call graph analysis (Ollama-based)
-- **Context7**: Official library documentation lookup
-- **Sequential**: Structured multi-step reasoning
-- **Playwright**: Browser automation and E2E testing
-- **claude-code-ultimate-guide**: 12 tools: guide search, release tracking, `compare_versions`, security threat lookup (`get_threat`, `list_threats` with 28 CVEs + 655 malicious skills), template search (`search_examples`); install via `npx -y claude-code-ultimate-guide-mcp`
+**MCP-серверы** (Model Context Protocol):
+- **Serena**: навигация по коду с учётом символов + память сессии
+- **grepai**: семантический поиск + анализ графа вызовов (на основе Ollama)
+- **Context7**: поиск по официальной документации библиотек
+- **Sequential**: структурированные многоэтапные рассуждения
+- **Playwright**: автоматизация браузера и E2E-тестирование
+- **claude-code-ultimate-guide**: 12 инструментов: поиск по руководству, отслеживание выпусков, `compare_versions`, поиск угроз безопасности (`get_threat`, `list_threats` с 28 CVE и 655 вредоносными скиллами), поиск шаблонов (`search_examples`); установка с помощью `npx -y claude-code-ultimate-guide-mcp`
 
-**Community Plugins**:
-- **ast-grep**: AST-based structural code search (explicit invocation)
+**Плагины сообщества**:
+- **ast-grep**: структурный поиск по коду на основе AST (явный вызов)
 
-### Search tool selection matrix
+### Матрица выбора инструмента поиска
 
-Claude Code offers multiple ways to search code, each with specific strengths:
+Claude Code предлагает несколько способов поиска по коду, каждый со своими преимуществами:
 
-| Search Need | Native Tool | MCP/Plugin Alternative | When to Escalate |
+| Задача поиска | Встроенный инструмент | Альтернатива MCP/плагин | Когда переходить к более мощному инструменту |
 |-------------|-------------|----------------------|------------------|
-| Exact text | `Grep` (ripgrep) | - | Never (fastest) |
-| Function name | `Grep` | Serena `find_symbol` | Multi-file refactoring |
-| By meaning | - | grepai `search` | Don't know exact text |
-| Call graph | - | grepai `trace_callers` | Dependency analysis |
-| Structural pattern | - | ast-grep | Large migrations (>50k lines) |
-| File structure | - | Serena `get_symbols_overview` | Need symbol context |
+| Точный текст | `Grep` (ripgrep) | — | Никогда (самый быстрый вариант) |
+| Имя функции | `Grep` | Serena `find_symbol` | Рефакторинг в нескольких файлах |
+| По смыслу | — | grepai `search` | Точный текст неизвестен |
+| Граф вызовов | — | grepai `trace_callers` | Анализ зависимостей |
+| Структурный шаблон | — | ast-grep | Крупные миграции (>50 тыс. строк) |
+| Структура файла | — | Serena `get_symbols_overview` | Нужен контекст символов |
 
-**Performance Comparison**:
+**Сравнение производительности**:
 
-| Tool | Speed | Setup | Use Case |
+| Инструмент | Скорость | Настройка | Сценарий использования |
 |------|-------|-------|----------|
-| Grep (ripgrep) | ⚡ ~20ms | ✅ None | 90% of searches |
-| Serena | ⚡ ~100ms | ⚠️ MCP | Refactoring, symbols |
-| grepai | 🐢 ~500ms | ⚠️ Ollama + MCP | Semantic, call graph |
-| ast-grep | 🕐 ~200ms | ⚠️ Plugin | AST patterns, migrations |
+| Grep (ripgrep) | ⚡ ~20 мс | ✅ Не требуется | 90% поисковых задач |
+| Serena | ⚡ ~100 мс | ⚠️ MCP | Рефакторинг, символы |
+| grepai | 🐢 ~500 мс | ⚠️ Ollama + MCP | Семантический поиск, граф вызовов |
+| ast-grep | 🕐 ~200 мс | ⚠️ Плагин | AST-шаблоны, миграции |
 
-**Decision principle**: Start with Grep (fastest), escalate to specialized tools only when needed.
+**Принцип принятия решения**: начинайте с Grep (самый быстрый вариант) и переходите к специализированным инструментам только при необходимости.
 
-> **📖 Deep Dive**: See [Search Tools Mastery](../workflows/search-tools-mastery.md) for comprehensive workflows combining all search tools.
+> **📖 Глубокий разбор**: комплексные рабочие процессы, объединяющие все инструменты поиска, описаны в разделе [Мастерское владение инструментами поиска](../workflows/search-tools-mastery.md).
 
 ---
 
-## 3. Context management internals
+<a id="3-context-management-internals"></a>
+## 3. Внутреннее устройство управления контекстом
 
-**Source category**: Tier 2, Partially Official; limited to the cited observation and method.
-**Sources**:
-- [platform.claude.com/docs](https://platform.claude.com/docs/en/build-with-claude/context-windows) (Tier 1)
-- Observed behavior (Tier 2)
+**Категория источника**: уровень 2, частично официальный; ограничен указанными наблюдением и методом.
+**Источники**:
+- [platform.claude.com/docs](https://platform.claude.com/docs/en/build-with-claude/context-windows) (уровень 1)
+- Наблюдаемое поведение (уровень 2)
 
-Claude Code's context-window size depends on the model, plan and provider. Supported configurations provide 200K or 1M tokens; see [extended context](https://code.claude.com/docs/en/model-config#extended-context).
+Размер контекстного окна Claude Code зависит от модели, тарифного плана и поставщика. Поддерживаемые конфигурации предоставляют 200 тыс. или 1 млн токенов; см. [расширенный контекст](https://code.claude.com/docs/en/model-config#extended-context).
 
-### Context budget breakdown
+### Распределение бюджета контекста
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│             CONTEXT BUDGET (model-dependent)                │
+│          БЮДЖЕТ КОНТЕКСТА (ЗАВИСИТ ОТ МОДЕЛИ)              │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │ System Prompt                            (variable)  │   │
-│  │ • Tool definitions                                   │   │
-│  │ • Safety instructions                                │   │
-│  │ • Behavioral guidelines                              │   │
-│  │ • See detailed breakdown below ↓                     │   │
+│  │ Системный промпт                       (переменный)  │   │
+│  │ • Определения инструментов                           │   │
+│  │ • Инструкции по безопасности                         │   │
+│  │ • Правила поведения                                  │   │
+│  │ • Подробное описание приведено ниже ↓                │   │
 │  ├──────────────────────────────────────────────────────┤   │
-│  │ CLAUDE.md Files and Rules                 (variable)  │   │
-│  │ • Global ~/.claude/CLAUDE.md                         │   │
-│  │ • Project CLAUDE.md or .claude/CLAUDE.md               │   │
-│  │ • Native .claude/rules/ files                         │   │
+│  │ Файлы и правила CLAUDE.md               (переменный)  │   │
+│  │ • Глобальный ~/.claude/CLAUDE.md                      │   │
+│  │ • Проектный CLAUDE.md или .claude/CLAUDE.md           │   │
+│  │ • Встроенные файлы .claude/rules/                     │   │
 │  ├──────────────────────────────────────────────────────┤   │
-│  │ Conversation History                     (variable)  │   │
-│  │ • Your prompts                                       │   │
-│  │ • Claude's responses                                 │   │
-│  │ • Tool call records                                  │   │
+│  │ История беседы                         (переменный)  │   │
+│  │ • Ваши промпты                                       │   │
+│  │ • Ответы Claude                                      │   │
+│  │ • Записи о вызовах инструментов                      │   │
 │  ├──────────────────────────────────────────────────────┤   │
-│  │ Tool Results                             (variable)  │   │
-│  │ • File contents from Read                            │   │
-│  │ • Command outputs from Bash                          │   │
-│  │ • Search results from Grep                           │   │
+│  │ Результаты инструментов                (переменный)  │   │
+│  │ • Содержимое файлов из Read                          │   │
+│  │ • Вывод команд из Bash                               │   │
+│  │ • Результаты поиска из Grep                          │   │
 │  ├──────────────────────────────────────────────────────┤   │
-│  │ Response / compaction allowance          (variable)  │   │
-│  │ • Claude's thinking                                  │   │
-│  │ • Generated code/text                                │   │
+│  │ Резерв для ответа/сжатия контекста     (переменный)  │   │
+│  │ • Рассуждения Claude                                 │   │
+│  │ • Сгенерированный код/текст                          │   │
 │  └──────────────────────────────────────────────────────┘   │
 │                                                             │
-│  Measure the session with /context; no fixed free budget    │
+│  Измеряйте сессию с помощью /context; фиксированного        │
+│  свободного бюджета нет                                     │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### System prompt contents
+<a id="system-prompt-contents"></a>
+### Содержимое системного промпта
 
-**Source category**: Tier 1, Official Anthropic Documentation; bounded by the cited version/date and scope.
-**Sources**:
-- [Claude Code settings: system prompt publication](https://code.claude.com/docs/en/settings#change-a-setting)
-- [How Claude Code works: context](https://code.claude.com/docs/en/how-claude-code-works)
-- [Anthropic System Prompts Release Notes](https://platform.claude.com/docs/en/release-notes/system-prompts/overview)
-- [Anthropic Engineering: Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
+**Категория источника**: уровень 1, официальная документация Anthropic; ограничена указанными версией, датой и областью применения.
+**Источники**:
+- [Настройки Claude Code: публикация системного промпта](https://code.claude.com/docs/en/settings#change-a-setting)
+- [Как работает Claude Code: контекст](https://code.claude.com/docs/en/how-claude-code-works)
+- [Примечания к выпускам системных промптов Anthropic](https://platform.claude.com/docs/en/release-notes/system-prompts/overview)
+- [Anthropic Engineering: лучшие практики Claude Code](https://www.anthropic.com/engineering/claude-code-best-practices)
 
-Claude Code's system prompt is **not published**, according to its settings documentation. Anthropic's released Claude.ai/mobile prompts do not establish the current CLI prompt's text or token size.
+Согласно документации по настройкам, системный промпт Claude Code **не опубликован**. Опубликованные Anthropic промпты Claude.ai и мобильного приложения не подтверждают текст или размер в токенах текущего промпта CLI.
 
-**Documented context components** include instructions, available tool definitions, history and tool results. Tool availability varies by model and configuration. User instructions such as `CLAUDE.md` shape behavior; permission settings control allowed actions. The exact request layout, prompt size and internal cache allocation remain unverified here.
+**Документированные компоненты контекста** включают инструкции, определения доступных инструментов, историю и результаты инструментов. Доступность инструментов зависит от модели и конфигурации. Пользовательские инструкции, такие как `CLAUDE.md`, формируют поведение; настройки прав доступа управляют разрешёнными действиями. Точная структура запроса, размер промпта и внутреннее распределение кеша здесь не подтверждены.
 
-**Important Distinctions**:
-- **Claude.ai/Mobile**: Published prompts available publicly
-- **Anthropic API**: Different default instructions, configurable by developers
-- **Claude Code CLI**: Agentic coding assistant with context-gathering behavior
+**Важные различия**:
+- **Claude.ai/мобильное приложение**: опубликованные промпты доступны широкой публике
+- **Anthropic API**: другие инструкции по умолчанию, настраиваемые разработчиками
+- **Claude Code CLI**: агентный помощник по программированию с поведением, ориентированным на сбор контекста
 
-**Historical community analysis of Claude-family prompts**, not evidence of the current Claude Code prompt:
-- **Simon Willison's Claude 4 Analysis** (May 2025): [Deep-dive into thinking blocks, search rules, safety guardrails](https://simonwillison.net/2025/May/25/claude-4-system-prompt/)
-- **PromptHub Technical Breakdown** (June 2025): [Detailed analysis of prompt engineering patterns](https://www.prompthub.us/blog/an-analysis-of-the-claude-4-system-prompt)
+**Исторические исследования промптов семейства Claude сообществом**, не являющиеся доказательством содержания текущего промпта Claude Code:
+- **Анализ Claude 4 от Simon Willison** (май 2025 года): [глубокий разбор блоков рассуждений, правил поиска и защитных ограничений безопасности](https://simonwillison.net/2025/May/25/claude-4-system-prompt/)
+- **Технический разбор PromptHub** (июнь 2025 года): [подробный анализ схем промпт-инжиниринга](https://www.prompthub.us/blog/an-analysis-of-the-claude-4-system-prompt)
 
-→ **Cross-reference**: For security implications, see [Section 5: Permission & Security Model](#5-permission--security-model)
+→ **Перекрёстная ссылка**: последствия для безопасности рассматриваются в [разделе 5 «Модель прав доступа и безопасности»](#5-permission--security-model)
 
-**Cache scope**: The [API prompt-caching contract](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#cache-storage-and-sharing) separates organizations, with workspace isolation on the Claude API, Claude Platform on AWS and Microsoft Foundry; Bedrock and Google Cloud use organization isolation. This contract does not establish Claude Code's internal cache layout. Fork reuse is documented separately in the [sub-agent reference](https://code.claude.com/docs/en/sub-agents#how-forks-differ-from-other-subagents).
+**Область кеша**: [контракт кеширования промптов API](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#cache-storage-and-sharing) разделяет организации, а в Claude API, Claude Platform на AWS и Microsoft Foundry также изолирует рабочие пространства; Bedrock и Google Cloud используют изоляцию на уровне организации. Этот контракт не подтверждает внутреннюю структуру кеша Claude Code. Повторное использование данных форками отдельно документировано в [справочнике по субагентам](https://code.claude.com/docs/en/sub-agents#how-forks-differ-from-other-subagents).
 
 ---
 
-### Auto-compaction
+<a id="auto-compaction"></a>
+### Автоматическое сжатие контекста
 
-**Source category**: Tier 2, Community-verified with research backing; limited to the cited observation and method.
+**Категория источника**: уровень 2, проверено сообществом и подкреплено исследованиями; ограничено указанными наблюдением и методом.
 
-When context usage exceeds a threshold, Claude Code automatically summarizes older conversation turns:
+Когда использование контекста превышает пороговое значение, Claude Code автоматически создаёт сводку более старых реплик беседы:
 
-| Source | Reported Threshold | Notes |
+| Источник | Заявленный порог | Примечания |
 |--------|-------------------|-------|
-| VS Code extension | ~75% usage (25% remaining) | [GitHub #11819](https://github.com/anthropics/claude-code/issues/11819) (Nov 2025) |
-| CLI version | 1-5% remaining | More conservative than VS Code |
-| PromptLayer analysis | 92% | Historical observation |
-| Steve Kinney | 95% | [Session Management Guide](https://stevekinney.com/courses/ai-development/claude-code-session-management) (Jul 2025) |
-| User-triggered `/compact` | Anytime | Manual control |
+| Расширение VS Code | ~75% использования (остаётся 25%) | [GitHub #11819](https://github.com/anthropics/claude-code/issues/11819) (ноябрь 2025 года) |
+| Версия CLI | остаётся 1–5% | Более консервативный подход, чем в VS Code |
+| Анализ PromptLayer | 92% | Историческое наблюдение |
+| Steve Kinney | 95% | [Руководство по управлению сессиями](https://stevekinney.com/courses/ai-development/claude-code-session-management) (июль 2025 года) |
+| Запуск пользователем `/compact` | В любое время | Ручное управление |
 
-**What happens during compaction:**
+**Что происходит во время сжатия контекста:**
+1. Более ранние реплики диалога суммируются
+2. Результаты работы инструментов сокращаются
+3. Недавний контекст сохраняется полностью
+4. Модель получает сигнал о том, что «контекст был сжат»
 
-1. Older conversation turns are summarized
-2. Tool results are condensed
-3. Recent context is preserved in full
-4. The model receives a "context was compacted" signal
+**Влияние на производительность** (подтверждено исследованиями):
 
-**Performance Impact** (Research-backed):
+Недавние исследования и наблюдения практиков подтверждают **снижение качества при автоматической компакции**:
 
-Recent research and practitioner observations confirm **quality degradation with auto-compaction**:
+- **Производительность LLM при выполнении сложных задач снижается на 50–70%** по мере увеличения контекста с 1K до 32K токенов ([исследование деградации контекста](https://research.trychroma.com/context-rot), июль 2025 г.)
+- **11 из 12 моделей демонстрируют менее 50% своей производительности на коротком контексте** при 32K токенов (бенчмарк NoLiMa)
+- **Автоматическая компакция приводит к потере нюансов и нарушению ссылок** из-за повторяющихся циклов сжатия ([Claude экономит токены, но забывает всё](https://golev.com/post/claude-saves-tokens-forgets-everything/), январь 2026 г.)
+- **Механизм внимания испытывает трудности** из-за нагрузки, связанной с поиском информации в сценариях с большим контекстом
 
-- **LLM performance drops 50-70% on complex tasks** as context grows from 1K to 32K tokens ([Context Rot Research](https://research.trychroma.com/context-rot), Jul 2025)
-- **11 out of 12 models fall below 50% of their short-context performance** at 32K tokens (NoLiMa benchmark)
-- **Auto-compact loses nuance and breaks references** through repeated compression cycles ([Claude Saves Tokens, Forgets Everything](https://golev.com/post/claude-saves-tokens-forgets-everything/), Jan 2026)
-- **Attention mechanism struggles** with retrieval burden in high-context scenarios
+**Консенсус сообщества**: ручная команда `/compact` в логических точках завершения этапов лучше, чем ожидание автоматической компакции.
 
-**Community Consensus**: Manual `/compact` at logical breakpoints > waiting for auto-compact to trigger.
+**Рекомендуемая стратегия** (Lorenz, 2026 г. (исходная публикация в LinkedIn недоступна)):
 
-**Recommended Strategy** (Lorenz, 2026 (original LinkedIn post unavailable)):
-
-| Context % | Action | Rationale |
+| Контекст, % | Действие | Обоснование |
 |-----------|--------|-----------|
-| **70%** | Warning - Plan cleanup | Early awareness |
-| **85%** | Manual handoff recommended | Prevent auto-compact degradation |
-| **95%** | Force handoff | Severe quality degradation |
+| **70%** | Предупреждение — запланировать очистку | Заблаговременное уведомление |
+| **85%** | Рекомендуется ручная передача сеанса | Предотвращение деградации из-за автоматической компакции |
+| **95%** | Принудительная передача сеанса | Серьёзное снижение качества |
 
-**User control**: Use `/compact` manually to trigger summarization at logical breakpoints, or use **session handoffs** (see [Session Handoffs](#session-handoffs)) to preserve intent over compressed history.
+**Управление пользователем**: используйте `/compact`, чтобы вручную запустить суммирование в логических точках завершения этапов, или применяйте **передачу сеансов** (см. [Передача сеансов](#session-handoffs)), чтобы сохранить исходный замысел вместо сжатой истории.
 
-The [Context compaction](./ai-design-patterns.md#context-compaction) card in AI Design Patterns lists what Claude Code re-injects after a compaction and what survives only as the summary.
+В карточке [Компакция контекста](./ai-design-patterns.md#context-compaction) в разделе «Паттерны проектирования ИИ» перечислено, что Claude Code повторно внедряет после компакции, а что сохраняется только в сводке.
 
-### Context preservation strategies
+### Стратегии сохранения контекста
 
-| Strategy | When to Use | How |
+| Стратегия | Когда применять | Как |
 |----------|-------------|-----|
-| Sub-agents | Exploratory tasks | `Agent` tool for a separate context; shared effects require coordination |
-| Manual compact | Proactive cleanup | `/compact` command |
-| Clear session | Fresh start needed | `/clear` command |
-| Specific reads | Know what you need | Read exact files, not directories |
-| CLAUDE.md | Persistent context | Store conventions in memory files |
+| Субагенты | Исследовательские задачи | Инструмент `Agent` для отдельного контекста; общие побочные эффекты требуют координации |
+| Ручная компакция | Проактивная очистка | Команда `/compact` |
+| Очистка сеанса | Требуется начать заново | Команда `/clear` |
+| Точечное чтение | Известно, что именно требуется | Читайте конкретные файлы, а не каталоги |
+| CLAUDE.md | Постоянный контекст | Храните соглашения в файлах памяти |
 
-### Session degradation limits
+### Пределы деградации сеанса
 
-**Source category**: Tier 2, Practitioner studies, arXiv research; limited to the cited observation and method.
+**Категория источника**: уровень 2, исследования практиков и исследования на arXiv; применимо только к приведённым наблюдениям и методике.
 
-Claude Code's effectiveness degrades predictably under certain conditions:
+Эффективность Claude Code предсказуемо снижается при определённых условиях:
 
-| Condition | Observed Threshold | Symptom |
+| Условие | Наблюдаемый порог | Проявление |
 |-----------|-------------------|---------|
-| Conversation turns | **15-25 turns** | Loses track of earlier constraints |
-| Token accumulation | **80-100K tokens** | Ignores requirements stated early in session |
-| Problem scope | **>5 files simultaneously** | Inconsistent changes, missed files |
+| Реплики диалога | **15–25 реплик** | Теряет из виду ограничения, заданные ранее |
+| Накопление токенов | **80–100K токенов** | Игнорирует требования, сформулированные в начале сеанса |
+| Масштаб задачи | **>5 файлов одновременно** | Несогласованные изменения, пропущенные файлы |
 
-**Success rates by scope** (from practitioner studies):
+**Доля успешного выполнения в зависимости от масштаба** (по исследованиям практиков):
 
-| Scope | Success Rate | Example |
+| Масштаб | Доля успеха | Пример |
 |-------|--------------|---------|
-| 1-3 files | ~85% | Fix bug in single module |
-| 4-7 files | ~60% | Refactor feature across components |
-| 8+ files | ~40% | Codebase-wide changes |
+| 1–3 файла | ~85% | Исправление ошибки в одном модуле |
+| 4–7 файлов | ~60% | Рефакторинг функциональности в нескольких компонентах |
+| 8+ файлов | ~40% | Изменения во всей кодовой базе |
 
-**Mitigation strategies**:
+**Стратегии снижения рисков**:
 
-1. **Checkpoint prompts**: "Before continuing, recap the current requirements and constraints."
-2. **Session resets**: Start fresh for new tasks (`/clear`)
-3. **Scope tightly**: Break large tasks into focused sub-tasks
-4. **Use sub-agents**: Delegate exploration to the `Agent` tool to preserve main context
+1. **Контрольные промпты**: «Прежде чем продолжить, кратко повтори текущие требования и ограничения».
+2. **Сбросы сеанса**: начинайте новый сеанс для новых задач (`/clear`)
+3. **Жёстко ограничивайте масштаб**: разбивайте крупные задачи на узкие подзадачи
+4. **Используйте субагентов**: делегируйте исследование инструменту `Agent`, чтобы сохранить основной контекст
 
-### Failure-Triggered context drift
+### Дрейф контекста, вызванный сбоями
 
-A separate degradation mode that does not depend on context size: repeated tool failures. When a tool call fails and Claude retries, error output accumulates in the context window. Stack traces, retry noise, and error messages dilute the original intent. Subsequent attempts follow the error narrative rather than the task goal. The context window is not full, but the signal-to-noise ratio has degraded.
+Существует отдельный режим деградации, который не зависит от размера контекста: повторяющиеся сбои инструментов. Когда вызов инструмента завершается ошибкой и Claude повторяет попытку, сообщения об ошибках накапливаются в контекстном окне. Трассировки стека, шум повторных попыток и сообщения об ошибках размывают исходный замысел. Последующие попытки начинают следовать повествованию об ошибке, а не цели задачи. Контекстное окно ещё не заполнено, но соотношение полезного сигнала и шума уже ухудшилось.
 
-This is distinct from compaction drift. Compaction addresses context *size*; failure re-injection addresses context *quality* within a bounded window.
+Это отличается от дрейфа при компакции. Компакция решает проблему *размера* контекста; повторное внедрение после сбоя решает проблему *качества* контекста в пределах ограниченного окна.
 
-**Pattern**: re-inject the core task instruction on every command failure, not just after `/compact`. A `PostToolUse` hook can prefix retried prompts with a condensed version of the original task and constraints:
+**Паттерн**: повторно внедряйте основную инструкцию задачи при каждом сбое команды, а не только после `/compact`. Хук `PostToolUse` может добавлять к повторным промптам краткую версию исходной задачи и ограничений:
 
 ```bash
-# PostToolUse hook: re-inject intent after failures
+# Хук PostToolUse: повторно внедрить исходный замысел после сбоев
 if [[ "$CLAUDE_TOOL_EXIT_CODE" != "0" ]]; then
-  echo "REMINDER: The current task is: $ORIGINAL_TASK_SUMMARY. Ignore the above error if non-blocking and continue toward that goal."
+  echo "НАПОМИНАНИЕ: текущая задача: $ORIGINAL_TASK_SUMMARY. Если приведённая выше ошибка не блокирует работу, проигнорируй её и продолжай двигаться к этой цели."
 fi
 ```
 
-Source: [Nick Tune, Workflow DSL: Domain-Driven Claude Code Workflows](https://nick-tune.me/blog/2026-03-01-workflow-dsl-domain-driven-claude-code-workflows/) (2026-03-01)
+Источник: [Nick Tune, Workflow DSL: предметно-ориентированные рабочие процессы Claude Code](https://nick-tune.me/blog/2026-03-01-workflow-dsl-domain-driven-claude-code-workflows/) (01.03.2026)
 
 ---
 
-## 4. Sub-agent architecture
+<a id="4-sub-agent-architecture"></a>
+## 4. Архитектура субагентов
 
-**Source category**: Tier 1, Documented behavior; bounded by the cited version/date and scope.
-**Source**: [Claude Code sub-agent documentation](https://code.claude.com/docs/en/sub-agents)
+**Категория источника**: уровень 1, документированное поведение; ограничено указанными версией, датой и областью применения.
+**Источник**: [документация по субагентам Claude Code](https://code.claude.com/docs/en/sub-agents)
 
-Claude Code's `Agent` tool delegates work into a separate context. That boundary does not isolate shared files, services or external actions.
+Инструмент `Agent` в Claude Code делегирует работу в отдельный контекст. Эта граница не изолирует общие файлы, сервисы или внешние действия.
 
-### Isolation model
+### Модель изоляции
 
-This figure describes an ordinary, non-fork sub-agent. Forks inherit the parent's conversation at spawn; `isolation: "worktree"` gives separate Git files, not separate external services. [Fork behavior](https://code.claude.com/docs/en/sub-agents#how-forks-differ-from-other-subagents).
+На этой схеме изображён обычный субагент, не являющийся форком. Форки наследуют родительский диалог на момент создания; `isolation: "worktree"` предоставляет отдельные файлы Git, но не отдельные внешние сервисы. [Поведение форков](https://code.claude.com/docs/en/sub-agents#how-forks-differ-from-other-subagents).
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -625,35 +634,35 @@ This figure describes an ordinary, non-fork sub-agent. Forks inherit the parent'
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Nesting and limits
+### Вложенность и ограничения
 
-Sub-agents can delegate up to three layers below the main conversation by default. The [depth limit](https://code.claude.com/docs/en/sub-agents#let-subagents-spawn-their-own-subagents) can be configured; a sub-agent without the agent tool cannot delegate. Each agent uses its own context and contributes to usage limits, so nested delegation needs explicit task boundaries.
+По умолчанию субагенты могут делегировать задачи на глубину до трёх уровней ниже основного диалога. [Ограничение глубины](https://code.claude.com/docs/en/sub-agents#let-subagents-spawn-their-own-subagents) можно настроить; субагент без инструмента агента не может делегировать задачи. Каждый агент использует собственный контекст и учитывается в лимитах использования, поэтому вложенное делегирование требует явных границ задач.
 
-Forks cannot spawn further forks. Fresh sub-agents may also load applicable instructions and preloaded skills; they receive more than the task string. [Startup context](https://code.claude.com/docs/en/sub-agents#what-loads-at-startup).
+Форки не могут создавать другие форки. Новые субагенты также могут загружать применимые инструкции и предварительно загруженные скиллы; они получают больше данных, чем одна строка задачи. [Контекст при запуске](https://code.claude.com/docs/en/sub-agents#what-loads-at-startup).
 
-### Sub-agent types
+### Типы субагентов
 
-Built-in types and tool restrictions vary by version and configuration. The [current reference](https://code.claude.com/docs/en/sub-agents#built-in-subagents) lists:
+Встроенные типы и ограничения инструментов зависят от версии и конфигурации. В [актуальной справке](https://code.claude.com/docs/en/sub-agents#built-in-subagents) перечислены:
 
-| Type | Purpose | Tools Available |
+| Тип | Назначение | Доступные инструменты |
 |------|---------|-----------------|
-| `Explore` | Codebase exploration | All read-only tools |
-| `Plan` | Research during plan mode | Read-only tools; Write and Edit denied |
-| `general-purpose` | Complex multi-step | Tools available to sub-agents, subject to permissions |
-| Other helpers | Session-specific assistance | Depends on helper and configuration |
+| `Explore` | Исследование кодовой базы | Все инструменты только для чтения |
+| `Plan` | Исследование в режиме планирования | Инструменты только для чтения; Write и Edit запрещены |
+| `general-purpose` | Сложные многоэтапные задачи | Инструменты, доступные субагентам с учётом прав доступа |
+| Другие вспомогательные агенты | Помощь в рамках конкретного сеанса | Зависит от вспомогательного агента и конфигурации |
 
-### When to use sub-agents
+### Когда использовать субагентов
 
-| Use Case | Why Sub-Agent Helps |
+| Сценарий | Чем помогает субагент |
 |----------|---------------------|
-| Searching large codebases | Keeps main context clean |
-| Parallel exploration | Multiple searches simultaneously |
-| High-volume exploration | Intermediate output stays in a separate context; shared effects still need controls |
-| Specialized analysis | Different "mindset" for different tasks |
+| Поиск в крупных кодовых базах | Сохраняет основной контекст чистым |
+| Параллельное исследование | Несколько одновременных поисков |
+| Масштабное исследование | Промежуточные результаты остаются в отдельном контексте; общие побочные эффекты по-прежнему требуют контроля |
+| Специализированный анализ | Разный «образ мышления» для разных задач |
 
-### Hub-and-spoke orchestration
+### Оркестрация по модели «центр и лучи»
 
-A proposed **hub-and-spoke** pattern assigns integration to one coordinator. The following diagram expresses that coordination policy, not a restriction on peer messaging or context inheritance.
+Предлагаемый паттерн **«центр и лучи»** назначает одного координатора ответственным за интеграцию. Следующая схема выражает эту политику координации, а не ограничение на обмен сообщениями между участниками или наследование контекста.
 
 ```
                     ┌─────────────────────┐
@@ -679,40 +688,40 @@ A proposed **hub-and-spoke** pattern assigns integration to one coordinator. The
                      (results flow back to coordinator only)
 ```
 
-**Check the delegation mode.** Fresh sub-agents need explicit task context; forks inherit a snapshot. Neither automatically receives a sibling's later findings. Pass those findings or coordinate through supported messages and shared files. [Startup context and forks](https://code.claude.com/docs/en/sub-agents#what-loads-at-startup).
+**Проверяйте режим делегирования.** Новым субагентам нужно явно передавать контекст задачи; форки наследуют снимок контекста. Ни те ни другие не получают автоматически последующие результаты соседнего агента. Передавайте им эти результаты или координируйте работу с помощью поддерживаемых сообщений и общих файлов. [Контекст при запуске и форки](https://code.claude.com/docs/en/sub-agents#what-loads-at-startup).
 
-**Explicit context passing pattern:**
+**Паттерн явной передачи контекста:**
 
 ```python
-# Teaching pseudocode, not a Claude Code API
-# Independent fresh workers do not automatically share findings
-task_a = delegate_fresh("Analyze auth.py and find the session token logic")
-task_b = delegate_fresh("Find all callers of the session token logic")
+# Учебный псевдокод, а не API Claude Code
+# Независимые новые исполнители не обмениваются результатами автоматически
+task_a = delegate_fresh("Проанализируй auth.py и найди логику токена сеанса")
+task_b = delegate_fresh("Найди все места вызова логики токена сеанса")
 
-# Wait for the result, then supply it to the next fresh worker
+# Дождаться результата, затем передать его следующему новому исполнителю
 result_a = await_result(task_a)
-task_b = delegate_fresh(f"Find all callers of {result_a} across the codebase")
+task_b = delegate_fresh(f"Найди во всей кодовой базе все места вызова {result_a}")
 ```
 
-**Coordinator responsibilities:**
+**Обязанности координатора:**
 
-1. **Decompose**: Break the goal into independent subtasks with clear boundaries
-2. **Pass context explicitly**: Each worker task description must be self-contained
-3. **Aggregate**: Collect text results from all workers, combine into coherent output
-4. **Resolve cross-cutting questions**: Assign integration decisions to the coordinator in this pattern
+1. **Декомпозиция**: разбить цель на независимые подзадачи с чёткими границами
+2. **Явная передача контекста**: описание задачи каждого исполнителя должно быть самодостаточным
+3. **Агрегация**: собрать текстовые результаты всех исполнителей и объединить их в согласованный итог
+4. **Решение сквозных вопросов**: в рамках этого паттерна назначить координатора ответственным за интеграционные решения
 
-In this proposed pattern, route dependencies through the coordinator. Peer communication is also supported when the selected session exposes messaging tools; choose a coordination policy that fits the task.
+В этом предлагаемом паттерне направляйте зависимости через координатора. Прямое взаимодействие между участниками также поддерживается, если выбранный сеанс предоставляет инструменты обмена сообщениями; выбирайте политику координации, соответствующую задаче.
 
 ---
 
-## 5. Permission & security model
+## 5. Модель прав доступа и безопасности
 
-**Source category**: Tier 1, Official; bounded by the cited version/date and scope.
-**Sources**:
+**Категория источника**: уровень 1, официальный источник; ограничено указанными версией, датой и областью применения.
+**Источники**:
 - [code.claude.com/docs/en/hooks](https://code.claude.com/docs/en/hooks)
 - [code.claude.com/docs/en/sandboxing](https://code.claude.com/docs/en/sandboxing)
 
-Claude Code has a layered security model:
+Claude Code использует многоуровневую модель безопасности:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -753,29 +762,29 @@ Claude Code has a layered security model:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Dangerous pattern detection
+### Обнаружение опасных паттернов
 
-**Source category**: Tier 2, Observed but not exhaustive; limited to the cited observation and method.
+**Категория источника**: уровень 2, наблюдаемое, но не исчерпывающее поведение; применимо только к приведённым наблюдениям и методике.
 
-Claude Code appears to flag certain patterns for extra scrutiny:
+По всей видимости, Claude Code отмечает определённые паттерны для дополнительной проверки:
 
-| Pattern | Risk | Behavior |
+| Паттерн | Риск | Поведение |
 |---------|------|----------|
-| `rm -rf` | Destructive deletion | Always prompts |
-| `sudo` | Privilege escalation | Always prompts |
-| `curl \| sh` | Remote code execution | Always prompts |
-| `chmod 777` | Insecure permissions | Always prompts |
-| `git push --force` | History destruction | Always prompts |
-| `DROP TABLE` | Data destruction | Always prompts |
+| `rm -rf` | Разрушительное удаление | Всегда запрашивает подтверждение |
+| `sudo` | Повышение привилегий | Всегда запрашивает подтверждение |
+| `curl \| sh` | Удалённое выполнение кода | Всегда запрашивает подтверждение |
+| `chmod 777` | Небезопасные права доступа | Всегда запрашивает подтверждение |
+| `git push --force` | Уничтожение истории | Всегда запрашивает подтверждение |
+| `DROP TABLE` | Уничтожение данных | Всегда запрашивает подтверждение |
 
-This is not a complete blocklist. Patterns are likely detected through model training rather than explicit rules.
+Это не полный список блокировок. Вероятно, паттерны обнаруживаются благодаря обучению модели, а не явным правилам.
 
-### Native sandbox (v2.1.0+)
+### Нативная песочница (v2.1.0+)
 
-**Source category**: Tier 1, Official; bounded by the cited version/date and scope.
-**Source**: [code.claude.com/docs/en/sandboxing](https://code.claude.com/docs/en/sandboxing)
+**Категория источника**: уровень 1, официальный источник; ограничено указанными версией, датой и областью применения.
+**Источник**: [code.claude.com/docs/en/sandboxing](https://code.claude.com/docs/en/sandboxing)
 
-Claude Code includes built-in **native sandboxing** using OS-level primitives for process-level isolation:
+Claude Code включает встроенную **нативную песочницу**, использующую примитивы уровня операционной системы для изоляции процессов:
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -801,62 +810,62 @@ Claude Code includes built-in **native sandboxing** using OS-level primitives fo
 └──────────────────────────────────────────────────────┘
 ```
 
-**OS Primitives**:
+**Примитивы ОС**:
 
-| Platform | Mechanism | Notes |
+| Платформа | Механизм | Примечания |
 |----------|-----------|-------|
-| **macOS** | Seatbelt (TrustedBSD MAC) | Built-in, kernel-level system call filtering |
-| **Linux/WSL2** | bubblewrap (namespaces + seccomp) | Requires: `sudo apt-get install bubblewrap socat` |
-| **WSL1** | ❌ Not supported | bubblewrap needs kernel features unavailable |
-| **Windows** | ❌ Not supported | Commands run unsandboxed; use WSL2 |
+| **macOS** | Seatbelt (TrustedBSD MAC) | Встроенная фильтрация системных вызовов на уровне ядра |
+| **Linux/WSL2** | bubblewrap (пространства имён + seccomp) | Требуется: `sudo apt-get install bubblewrap socat` |
+| **WSL1** | ❌ Не поддерживается | bubblewrap нужны недоступные возможности ядра |
+| **Windows** | ❌ Не поддерживается | Команды выполняются без песочницы; используйте WSL2 |
 
-**Isolation Model**:
+**Модель изоляции**:
 
-1. **Filesystem**:
-   - **Read**: Entire computer (except denied paths)
-   - **Write**: Current working directory only (configurable)
-   - **Blocked**: Modifications outside CWD, credentials directories (`~/.ssh`, `~/.aws`)
+1. **Файловая система**:
+   - **Чтение**: весь компьютер (кроме запрещённых путей)
+   - **Запись**: только текущий рабочий каталог (настраивается)
+   - **Заблокировано**: изменения за пределами CWD, каталоги с учётными данными (`~/.ssh`, `~/.aws`)
 
-2. **Network**:
-   - **Proxy**: All connections routed through SOCKS5 proxy
-   - **Domain filtering**: Allowlist/denylist mode
-   - **Default blocked**: Private CIDRs, localhost ranges
+2. **Сеть**:
+   - **Прокси**: все соединения направляются через прокси SOCKS5
+   - **Фильтрация доменов**: режим списка разрешённых или запрещённых доменов
+   - **Заблокировано по умолчанию**: частные диапазоны CIDR, диапазоны localhost
 
-3. **Process**:
-   - **Shared kernel**: Vulnerable to kernel exploits (unlike Docker microVM)
-   - **Child processes**: Inherit same sandbox restrictions
-   - **Escape hatch**: `dangerouslyDisableSandbox` parameter for incompatible tools
+3. **Процессы**:
+   - **Общее ядро**: уязвимо для эксплойтов ядра (в отличие от microVM Docker)
+   - **Дочерние процессы**: наследуют те же ограничения песочницы
+   - **Аварийный обход**: параметр `dangerouslyDisableSandbox` для несовместимых инструментов
 
-**Sandbox Modes**:
+**Режимы песочницы**:
 
-- **Auto-allow mode**: Bash commands auto-approved if sandboxed (recommended for daily dev)
-- **Regular permissions mode**: All commands require explicit approval (high-security)
+- **Режим автоматического разрешения**: команды Bash автоматически одобряются, если выполняются в песочнице (рекомендуется для повседневной разработки)
+- **Обычный режим прав доступа**: все команды требуют явного подтверждения (повышенная безопасность)
 
-**Security Trade-offs**:
+**Компромиссы безопасности**:
 
-| Aspect | Native Sandbox | Docker Sandboxes (microVM) |
+| Аспект | Нативная песочница | Песочницы Docker (microVM) |
 |--------|---------------|---------------------------|
-| **Kernel isolation** | ❌ Shared kernel | ✅ Separate kernel per VM |
-| **Setup** | 0 deps (macOS), 2 pkgs (Linux) | Docker Desktop 4.58+ |
-| **Overhead** | Minimal (~1-3% CPU) | Moderate (~5-10% CPU) |
-| **Use case** | Daily dev, trusted code | Untrusted code, max security |
+| **Изоляция ядра** | ❌ Общее ядро | ✅ Отдельное ядро для каждой VM |
+| **Настройка** | 0 зависимостей (macOS), 2 пакета (Linux) | Docker Desktop 4.58+ |
+| **Накладные расходы** | Минимальные (~1–3% CPU) | Умеренные (~5–10% CPU) |
+| **Сценарий использования** | Повседневная разработка, доверенный код | Недоверенный код, максимальная безопасность |
 
-**Security Limitations**:
+**Ограничения безопасности**:
 
-⚠️ **Domain fronting**: CDNs (Cloudflare, Akamai) can bypass domain filtering
-⚠️ **Unix sockets**: Misconfigured `allowUnixSockets` grants privilege escalation
-⚠️ **Filesystem**: Overly broad write permissions enable attacks on `$PATH` directories
+⚠️ **Сокрытие домена (domain fronting)**: CDN (Cloudflare, Akamai) могут обходить фильтрацию доменов  
+⚠️ **Unix-сокеты**: неверно настроенный параметр `allowUnixSockets` позволяет повышать привилегии  
+⚠️ **Файловая система**: чрезмерно широкие права на запись позволяют атаковать каталоги из `$PATH`
 
-**When to use**:
+**Когда использовать**:
 
-- ✅ **Native Sandbox**: Daily development, trusted team, lightweight setup
-- ✅ **Docker Sandboxes**: Untrusted code, kernel exploit protection, Docker-in-Docker needed
+- ✅ **Нативная песочница**: повседневная разработка, доверенная команда, простая настройка
+- ✅ **Песочницы Docker**: недоверенный код, защита от эксплойтов ядра, необходимость Docker-in-Docker
 
-**Deep dive**: See [Native Sandboxing Guide](../security/sandbox-native.md) for complete technical reference, configuration examples, and troubleshooting.
+**Подробное описание**: полную техническую справку, примеры конфигурации и рекомендации по устранению неполадок см. в [руководстве по нативной песочнице](../security/sandbox-native.md).
 
-### Hooks system
+### Система хуков
 
-Hooks allow programmatic control over Claude's actions:
+Хуки позволяют программно управлять действиями Claude:
 
 ```json
 {
@@ -883,16 +892,16 @@ Hooks allow programmatic control over Claude's actions:
 }
 ```
 
-**Hook capabilities:**
+**Возможности хуков:**
 
-| Capability | Supported | How |
+| Возможность | Поддерживается | Как |
 |------------|-----------|-----|
-| Block execution | Yes | Exit code 2 |
-| Modify parameters | Yes | Return modified JSON |
-| Log actions | Yes | Write to file in hook |
-| Async processing | Yes | Set `async: true` in hook config (v2.1.0+) |
+| Блокировка выполнения | Да | Код выхода 2 |
+| Изменение параметров | Да | Возврат изменённого JSON |
+| Журналирование действий | Да | Запись в файл из хука |
+| Асинхронная обработка | Да | Задать `async: true` в конфигурации хука (v2.1.0+) |
 
-**Hook JSON payload** (passed via stdin):
+**Полезная нагрузка JSON для хука** (передаётся через stdin):
 
 ```json
 {
@@ -908,33 +917,35 @@ Hooks allow programmatic control over Claude's actions:
 }
 ```
 
-Common fields sent to all events: `session_id`, `transcript_path`, `cwd`, `permission_mode`, `hook_event_name`. Event-specific fields (e.g., `tool_name`/`tool_input` for PreToolUse) are added on top.
+Общие поля, передаваемые для всех событий: `session_id`, `transcript_path`, `cwd`, `permission_mode`, `hook_event_name`. В дополнение к ним добавляются поля конкретного события (например, `tool_name`/`tool_input` для PreToolUse).
 
-→ **Cross-reference**: See [Section 7 - Hooks](#7-hooks) in the main guide for complete examples.
+→ **Перекрёстная ссылка**: полные примеры см. в [разделе 7 — Хуки](#7-hooks) основного руководства.
 
 ---
 
-## 6. MCP integration
+<a id="6-mcp-integration"></a>
+## 6. Интеграция MCP
 
-**Source category**: Tier 1, Official; bounded by the cited version/date and scope.
-**Source**: [code.claude.com/docs/en/mcp](https://code.claude.com/docs/en/mcp)
+**Категория источника**: уровень 1, официальный источник; ограничено указанными версией, датой и областью применения.
+**Источник**: [code.claude.com/docs/en/mcp](https://code.claude.com/docs/en/mcp)
 
-MCP (Model Context Protocol) servers extend Claude Code with additional tools.
+MCP-серверы (Model Context Protocol) расширяют Claude Code дополнительными инструментами.
 
-### MCP architecture overview
+<a id="mcp-architecture-overview"></a>
+### Обзор архитектуры MCP
 
-> **💡 Visual Guide**: The following diagram illustrates how MCP creates a secure control layer between LLMs and real systems. The LLM layer has **no direct data access** - the MCP Server enforces security policies before tools can interact with databases, APIs, or files.
+> **💡 Наглядное руководство**: следующая схема показывает, как MCP создаёт безопасный уровень управления между LLM и реальными системами. Уровень LLM **не имеет прямого доступа к данным** — MCP-сервер применяет политики безопасности до того, как инструменты смогут взаимодействовать с базами данных, API или файлами.
 
-![MCP Architecture - 7-Layer Security Model](../images/mcp-architecture-diagram.svg)
+![Архитектура MCP — семиуровневая модель безопасности](../images/mcp-architecture-diagram.svg)
 
-*Figure 1: MCP Architecture showing separation between thinking (LLM), control (MCP Server), and execution (Tools). Design inspired by [Dinesh Kumar's LinkedIn visualization](https://www.linkedin.com/posts/dinesh-kumar-6b0528b4_model-context-protocol-mcp-why-it-came-activity-7419969525795782656-VoFh), recreated under Apache-2.0 license.*
+*Рисунок 1. Архитектура MCP, демонстрирующая разделение между мышлением (LLM), управлением (MCP-сервер) и выполнением (инструменты). Дизайн вдохновлён [визуализацией Dinesh Kumar в LinkedIn](https://www.linkedin.com/posts/dinesh-kumar-6b0528b4_model-context-protocol-mcp-why-it-came-activity-7419969525795782656-VoFh) и воссоздан по лицензии Apache-2.0.*
 
-**Key security boundaries**:
-- **Yellow layer (LLM)**: Reasoning only - **No Data Access**
-- **Orange layer (MCP Server)**: Security control point (policies, validation, logs)
-- **Grey layer (Real Systems)**: Protected data - **Hidden From AI**
+**Ключевые границы безопасности**:
+- **Жёлтый уровень (LLM)**: только рассуждение — **нет доступа к данным**
+- **Оранжевый уровень (MCP-сервер)**: точка управления безопасностью (политики, проверка, журналы)
+- **Серый уровень (реальные системы)**: защищённые данные — **скрыты от ИИ**
 
-### How MCP works (technical details)
+### Как работает MCP (технические подробности)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -969,44 +980,44 @@ MCP (Model Context Protocol) servers extend Claude Code with additional tools.
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Key MCP facts
+### Основные сведения о MCP
 
-| Aspect | Behavior |
+| Аспект | Поведение |
 |--------|----------|
-| Protocol | JSON-RPC 2.0 over stdio or HTTP |
-| Tool naming | `mcp__<server>__<tool>` convention |
-| Context sharing | Only via tool parameters and return values |
-| Lifecycle | Server starts on first use, stays alive during session |
-| Permissions | Same system as native tools |
+| Протокол | JSON-RPC 2.0 поверх stdio или HTTP |
+| Именование инструментов | Соглашение `mcp__<server>__<tool>` |
+| Обмен контекстом | Только через параметры инструментов и возвращаемые значения |
+| Жизненный цикл | Сервер запускается при первом использовании и продолжает работать в течение сеанса |
+| Права доступа | Та же система, что и для нативных инструментов |
 
-### What MCP cannot do
+### Что MCP не может делать
 
-| Limitation | Explanation |
+| Ограничение | Объяснение |
 |------------|-------------|
-| Access conversation history | Only sees tool params, not full context |
-| Maintain state across calls | Each call is independent (unless server implements caching) |
-| Modify Claude's system prompt | Tools only, no prompt injection |
-| Bypass permissions | Same security layer as native tools |
+| Получать доступ к истории диалога | Видит только параметры инструмента, а не весь контекст |
+| Сохранять состояние между вызовами | Каждый вызов независим, если сервер не реализует кеширование |
+| Изменять системный промпт Claude | Только инструменты, без промпт-инъекций |
+| Обходить права доступа | Тот же уровень безопасности, что и для нативных инструментов |
 
-→ **Cross-reference**: See [Section 8.6 - MCP Security](#86-mcp-security) for security considerations.
+→ **Перекрёстная ссылка**: рекомендации по безопасности см. в [разделе 8.6 — Безопасность MCP](#86-mcp-security).
 
-### MCP extensions: Apps (SEP-1865)
+<a id="mcp-extensions-apps-sep-1865"></a>
+### Расширения MCP: Apps (SEP-1865)
 
-**Status**: Stable (January 26, 2026)
-**Spec**: [SEP-1865 on GitHub](https://github.com/modelcontextprotocol/ext-apps)
-**Co-authored by**: OpenAI, Anthropic, MCP-UI creators
+**Статус**: стабильно (26 января 2026 г.)
+**Спецификация**: [SEP-1865 на GitHub](https://github.com/modelcontextprotocol/ext-apps)
+**Соавторы**: OpenAI, Anthropic, создатели MCP-UI
 
-#### What are MCP Apps?
+#### Что такое MCP Apps?
 
-MCP Apps is the **first official extension** to the Model Context Protocol, enabling MCP servers to deliver **interactive user interfaces** alongside traditional tool responses.
+MCP Apps — **первое официальное расширение** Model Context Protocol, позволяющее MCP-серверам предоставлять **интерактивные пользовательские интерфейсы** наряду с традиционными ответами инструментов.
+**Решаемая проблема**: традиционные текстовые ответы создают трение в рабочих процессах, требующих исследования. Каждое взаимодействие (сортировка, фильтрация, детализация) требует нового цикла промпта. MCP Apps устраняет этот «контекстный разрыв», отображая интерактивные пользовательские интерфейсы непосредственно в диалоге.
 
-**The problem solved**: Traditional text-based responses create friction for workflows requiring exploration. Each interaction (sort, filter, drill-down) demands a new prompt cycle. MCP Apps eliminates this "context gap" by rendering interactive UIs directly in the conversation.
+#### Техническая архитектура
 
-#### Technical architecture
+**Два основных примитива**:
 
-**Two core primitives**:
-
-1. **Tools with UI metadata**:
+1. **Инструменты с метаданными пользовательского интерфейса**:
    ```json
    {
      "name": "query_database",
@@ -1019,12 +1030,12 @@ MCP Apps is the **first official extension** to the Model Context Protocol, enab
    }
    ```
 
-2. **UI Resources** (`ui://` scheme):
-   - Server-side HTML/JavaScript bundles
-   - Rendered in sandboxed iframes by host
-   - Bidirectional JSON-RPC communication via `postMessage`
+2. **Ресурсы пользовательского интерфейса** (схема `ui://`):
+   - Серверные пакеты HTML/JavaScript
+   - Отображаются хостом в изолированных iframe
+   - Двунаправленное взаимодействие по JSON-RPC через `postMessage`
 
-**Communication flow**:
+**Поток взаимодействия**:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -1053,28 +1064,28 @@ MCP Apps is the **first official extension** to the Model Context Protocol, enab
 └─────────────────────────────────────────────────────────┘
 ```
 
-#### Security model
+#### Модель безопасности
 
-**Multi-layered protection**:
+**Многоуровневая защита**:
 
-| Layer | Protection |
+| Уровень | Защита |
 |-------|------------|
-| **Iframe sandbox** | Restricted permissions (no direct system access) |
-| **Pre-declared templates** | Hosts review HTML/JS before rendering |
-| **Auditable messaging** | All UI-to-host communication via JSON-RPC logs |
-| **User consent** | Optional requirement for UI-initiated tool calls |
-| **Content blocking** | Hosts can reject suspicious resources pre-render |
+| **Песочница iframe** | Ограниченные права доступа (без прямого доступа к системе) |
+| **Заранее объявленные шаблоны** | Хосты проверяют HTML/JS перед отображением |
+| **Аудируемый обмен сообщениями** | Всё взаимодействие между пользовательским интерфейсом и хостом фиксируется в журналах JSON-RPC |
+| **Согласие пользователя** | Необязательное требование для вызовов инструментов, инициированных пользовательским интерфейсом |
+| **Блокировка содержимого** | Хосты могут отклонять подозрительные ресурсы до отображения |
 
-→ **Cross-reference**: See [Section 8.6 - MCP Security](#86-mcp-security) for broader MCP security considerations.
+→ **Перекрёстная ссылка**: более общие аспекты безопасности MCP см. в [разделе 8.6 — Безопасность MCP](#86-mcp-security).
 
 #### SDK: @modelcontextprotocol/ext-apps
 
-**Installation**:
+**Установка**:
 ```bash
 npm install @modelcontextprotocol/ext-apps
 ```
 
-**Core API** (framework-agnostic):
+**Основной API** (не зависит от фреймворка):
 
 ```typescript
 import { App } from '@modelcontextprotocol/ext-apps';
@@ -1107,71 +1118,71 @@ app.openBrowserLink('https://docs.example.com');
 app.sendFollowUpMessage('Applied filters: EU, Active');
 ```
 
-**Standard communication**: All features operate over `postMessage` (no framework lock-in).
+**Стандартное взаимодействие**: все возможности работают через `postMessage` (без привязки к фреймворку).
 
-#### Platform support
+#### Поддержка платформ
 
-| Platform | MCP Apps Support | Notes |
+| Платформа | Поддержка MCP Apps | Примечания |
 |----------|------------------|-------|
-| **Claude Desktop** | ✅ Available now | claude.ai/directory (Pro/Max/Team/Enterprise) |
-| **Claude Cowork** | 🔄 Coming soon | Agentic workflow integration planned |
-| **VS Code** | ✅ Insiders build | [Official blog post](https://code.visualstudio.com/blogs/2026/01/26/mcp-apps-support) |
-| **ChatGPT** | 🔄 Rolling out | Week of Jan 26, 2026 |
-| **Goose** | ✅ Available now | Open-source CLI with UI support |
-| **Claude Code CLI** | ❌ N/A | Terminal text-only (no iframe rendering) |
+| **Claude Desktop** | ✅ Уже доступно | claude.ai/directory (Pro/Max/Team/Enterprise) |
+| **Claude Cowork** | 🔄 Скоро | Планируется интеграция с агентными рабочими процессами |
+| **VS Code** | ✅ Сборка Insiders | [Официальная публикация в блоге](https://code.visualstudio.com/blogs/2026/01/26/mcp-apps-support) |
+| **ChatGPT** | 🔄 Постепенное развёртывание | Неделя с 26 января 2026 года |
+| **Goose** | ✅ Уже доступно | CLI с открытым исходным кодом и поддержкой пользовательского интерфейса |
+| **Claude Code CLI** | ❌ Неприменимо | Только текстовый терминал (без отображения iframe) |
 
-#### Relevance for Claude Code users
+#### Значение для пользователей Claude Code
 
-**Direct usage**: None (CLI is text-only, cannot render iframes)
+**Прямое использование**: отсутствует (CLI работает только с текстом и не может отображать iframe)
 
-**Indirect benefits**:
+**Косвенные преимущества**:
 
-1. **Ecosystem understanding**: MCP Apps represents the future of agentic workflows
-2. **MCP server development**: If building custom MCP servers, Apps is now a design option
-3. **Hybrid workflows**:
-   - Use Claude Desktop to explore data with Apps (dashboards, visualizations)
-   - Switch to Claude Code CLI for implementation (scripting, automation)
-4. **Context for configuration**: MCP servers may advertise UI capabilities in metadata
+1. **Понимание экосистемы**: MCP Apps представляет будущее агентных рабочих процессов
+2. **Разработка MCP-серверов**: при создании собственных MCP-серверов Apps теперь можно рассматривать как один из вариантов проектирования
+3. **Гибридные рабочие процессы**:
+   - Используйте Claude Desktop для исследования данных с помощью Apps (дашборды, визуализации)
+   - Переключайтесь на Claude Code CLI для реализации (написание скриптов, автоматизация)
+4. **Контекст для конфигурации**: MCP-серверы могут заявлять о возможностях пользовательского интерфейса в метаданных
 
-#### Example implementations
+#### Примеры реализаций
 
-**Official example servers** (in [`ext-apps` repository](https://github.com/modelcontextprotocol/ext-apps)):
+**Официальные примеры серверов** (в [репозитории `ext-apps`](https://github.com/modelcontextprotocol/ext-apps)):
 
-- **threejs-server**: 3D visualization and manipulation
-- **map-server**: Interactive geographic data exploration
-- **pdf-server**: Document viewing with inline highlights
-- **system-monitor-server**: Real-time metrics dashboards
-- **sheet-music-server**: Music notation rendering
+- **threejs-server**: трёхмерная визуализация и управление
+- **map-server**: интерактивное исследование географических данных
+- **pdf-server**: просмотр документов со встроенными выделениями
+- **system-monitor-server**: дашборды с метриками в реальном времени
+- **sheet-music-server**: отображение нотной записи
 
-**Production adoption** (January 2026):
+**Внедрение в рабочие продукты** (январь 2026 года):
 
-| Tool | Provider | Capabilities |
+| Инструмент | Поставщик | Возможности |
 |------|----------|--------------|
-| Asana | Asana | Project timelines, task boards |
-| Slack | Salesforce | Message drafting with formatting preview |
-| Figma | Figma | Flowcharts, Gantt charts in FigJam |
-| Amplitude | Amplitude | Analytics charts with interactive filtering |
-| Box | Box | File search, document previews |
-| Canva | Canva | Presentation design with real-time customization |
-| Clay | Clay | Company research, contact discovery |
-| Hex | Hex | Data analysis with interactive queries |
-| monday.com | monday.com | Work management boards |
+| Asana | Asana | Временные шкалы проектов, доски задач |
+| Slack | Salesforce | Подготовка сообщений с предварительным просмотром форматирования |
+| Figma | Figma | Блок-схемы и диаграммы Ганта в FigJam |
+| Amplitude | Amplitude | Аналитические диаграммы с интерактивной фильтрацией |
+| Box | Box | Поиск файлов, предварительный просмотр документов |
+| Canva | Canva | Дизайн презентаций с настройкой в реальном времени |
+| Clay | Clay | Исследование компаний, поиск контактов |
+| Hex | Hex | Анализ данных с интерактивными запросами |
+| monday.com | monday.com | Доски управления работой |
 
-**Coming soon**: Salesforce (Agentforce 360)
+**Скоро**: Salesforce (Agentforce 360)
 
-#### Relationship to prior work
+#### Связь с предшествующими разработками
 
-MCP Apps standardizes patterns pioneered by:
-- **MCP-UI**: Early UI extension for MCP (community project)
-- **OpenAI Apps SDK**: Parallel effort for interactive tools
+MCP Apps стандартизирует подходы, впервые реализованные в:
+- **MCP-UI**: раннее расширение пользовательского интерфейса для MCP (проект сообщества)
+- **OpenAI Apps SDK**: параллельная разработка для интерактивных инструментов
 
-Both frameworks continue to be supported. MCP Apps provides a **unified specification** (SEP-1865) co-authored by maintainers from both ecosystems plus Anthropic and OpenAI.
+Оба фреймворка продолжают поддерживаться. MCP Apps предоставляет **унифицированную спецификацию** (SEP-1865), совместно разработанную сопровождающими обеих экосистем, а также Anthropic и OpenAI.
 
-**Migration path**: Straightforward for existing MCP-UI and Apps SDK implementations.
+**Путь миграции**: несложный для существующих реализаций MCP-UI и Apps SDK.
 
-#### When to use MCP Apps
+#### Когда использовать MCP Apps
 
-**Decision tree for MCP server developers**:
+**Дерево решений для разработчиков MCP-серверов**:
 
 ```
 Building a custom MCP server?
@@ -1182,32 +1193,33 @@ Building a custom MCP server?
 └─ Simple data retrieval or actions only? → Traditional MCP tools (sufficient)
 ```
 
-**Trade-off**: UI complexity and implementation effort vs. user experience improvement.
+**Компромисс**: сложность пользовательского интерфейса и трудозатраты на реализацию в обмен на улучшение пользовательского опыта.
 
-#### Resources
+#### Ресурсы
 
-- **Specification**: [SEP-1865 on GitHub](https://github.com/modelcontextprotocol/ext-apps)
+- **Спецификация**: [SEP-1865 на GitHub](https://github.com/modelcontextprotocol/ext-apps)
 - **SDK**: [`@modelcontextprotocol/ext-apps` (npm)](https://www.npmjs.com/package/@modelcontextprotocol/ext-apps)
-- **Example servers**: [modelcontextprotocol/ext-apps repository](https://github.com/modelcontextprotocol/ext-apps)
-- **Blog post (MCP)**: [MCP Apps announcement](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/)
-- **Blog post (Claude)**: [Interactive tools in Claude](https://claude.com/blog/interactive-tools-in-claude)
-- **VS Code**: [MCP Apps support announcement](https://code.visualstudio.com/blogs/2026/01/26/mcp-apps-support)
+- **Примеры серверов**: [репозиторий modelcontextprotocol/ext-apps](https://github.com/modelcontextprotocol/ext-apps)
+- **Публикация в блоге (MCP)**: [Анонс MCP Apps](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/)
+- **Публикация в блоге (Claude)**: [Интерактивные инструменты в Claude](https://claude.com/blog/interactive-tools-in-claude)
+- **VS Code**: [Анонс поддержки MCP Apps](https://code.visualstudio.com/blogs/2026/01/26/mcp-apps-support)
 
 ---
 
-### MCP tool search (lazy loading)
+<a id="mcp-tool-search-lazy-loading"></a>
+### Поиск инструментов MCP (ленивая загрузка)
 
-**Source category**: Tier 1, Official; bounded by the cited version/date and scope.
-**Source**: [anthropic.com/engineering/advanced-tool-use](https://www.anthropic.com/engineering/advanced-tool-use)
+**Категория источника**: уровень 1, официальный; ограничен указанными версией, датой и областью применения.
+**Источник**: [anthropic.com/engineering/advanced-tool-use](https://www.anthropic.com/engineering/advanced-tool-use)
 
-Since v2.1.7 (January 2026), Claude Code uses **lazy loading** for MCP tool definitions instead of preloading all tools into context. This is powered by Anthropic's [Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use) API feature.
+Начиная с версии v2.1.7 (январь 2026 года) Claude Code использует **ленивую загрузку** определений инструментов MCP вместо предварительной загрузки всех инструментов в контекст. Это работает на основе возможности API [Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use) от Anthropic.
 
-**The problem solved:**
-- MCP tool definitions consume significant context (e.g., GitHub MCP alone: ~46K tokens for 93 tools)
-- Developer Scott Spence documented 66,000+ tokens consumed before typing a single prompt
-- This "context pollution" limited practical MCP adoption
+**Решаемая проблема:**
+- Определения инструментов MCP занимают значительную часть контекста (например, один только GitHub MCP: около 46 тыс. токенов для 93 инструментов)
+- Разработчик Scott Spence задокументировал потребление более 66 000 токенов ещё до ввода первого промпта
+- Такое «загрязнение контекста» ограничивало практическое внедрение MCP
 
-**How Tool Search works:**
+**Как работает поиск инструментов:**
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -1233,16 +1245,16 @@ Since v2.1.7 (January 2026), Claude Code uses **lazy loading** for MCP tool defi
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Measured improvements** (Anthropic benchmarks):
+**Измеренные улучшения** (тесты Anthropic):
 
-| Metric | Before | After | Improvement |
+| Метрика | До | После | Улучшение |
 |--------|--------|-------|-------------|
-| Token overhead (5-server setup) | ~55K | ~8.7K | **85% reduction** |
-| Opus 4 tool selection accuracy | 49% | 74% | +25 points |
-| Opus 4.5 tool selection accuracy | 79.5% | 88.1% | +8.6 points |
-| Opus 4.6 adaptive thinking | N/A | Auto-calibrated | Dynamic depth |
+| Накладные расходы токенов (конфигурация с 5 серверами) | ~55 тыс. | ~8,7 тыс. | **Снижение на 85%** |
+| Точность выбора инструментов Opus 4 | 49% | 74% | +25 п. п. |
+| Точность выбора инструментов Opus 4.5 | 79,5% | 88,1% | +8,6 п. п. |
+| Адаптивное мышление Opus 4.6 | Неприменимо | Автоматическая калибровка | Динамическая глубина |
 
-**Configuration** (v2.1.9+):
+**Конфигурация** (v2.1.9+):
 
 ```bash
 # Environment variable
@@ -1253,39 +1265,40 @@ ENABLE_TOOL_SEARCH=true      # Always enabled
 ENABLE_TOOL_SEARCH=false     # Disabled (eager loading)
 ```
 
-| Threshold | Recommended for |
+| Порог | Рекомендуется для |
 |-----------|-----------------|
-| `auto:20` | Lightweight setups (5-10 tools) |
-| `auto:10` | Balanced default (20-50 tools) |
-| `auto:5` | Power users (100+ tools) |
+| `auto:20` | Лёгких конфигураций (5–10 инструментов) |
+| `auto:10` | Сбалансированной конфигурации по умолчанию (20–50 инструментов) |
+| `auto:5` | Опытных пользователей (более 100 инструментов) |
 
-→ As Simon Willison noted: "Context pollution is why I rarely used MCP. Now that it's solved, there's no reason not to hook up dozens or even hundreds of MCPs to Claude Code." (via [X/Twitter, January 14, 2026](https://twitter.com/simonw))
+→ Как отметил Simon Willison: «Из-за загрязнения контекста я редко использовал MCP. Теперь, когда эта проблема решена, нет причин не подключить к Claude Code десятки или даже сотни MCP». (через [X/Twitter, 14 января 2026 года](https://twitter.com/simonw))
 
 ---
 
-## 7. Advanced tool use patterns (API)
+<a id="7-advanced-tool-use-patterns-api"></a>
+## 7. Продвинутые паттерны использования инструментов (API)
 
-**Source category**: Tier 1, Official Anthropic Engineering; bounded by the cited version/date and scope.
-**Source**: [Anthropic Engineering: Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use) | [Programmatic Tool Calling Docs](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
+**Категория источника**: уровень 1, официальный материал Anthropic Engineering; ограничен указанными версией, датой и областью применения.
+**Источник**: [Anthropic Engineering: Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use) | [Документация по программному вызову инструментов](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
 
-Four API-level features released as generally available on February 18, 2026 (with Opus/Sonnet 4.6). These are relevant to developers building agents on the Anthropic API or Agent SDK. They are not available directly in the Claude Code CLI.
+Четыре возможности уровня API, ставшие общедоступными 18 февраля 2026 года (вместе с Opus/Sonnet 4.6). Они актуальны для разработчиков, создающих агентов на базе Anthropic API или Agent SDK. Непосредственно в Claude Code CLI они недоступны.
 
-| Feature | Problem Solved | Availability |
+| Возможность | Решаемая проблема | Доступность |
 |---------|---------------|--------------|
-| Programmatic Tool Calling (PTC) | Agent loops burn tokens on round trips | API + Foundry |
-| Dynamic Filtering | Web search bloats context with noise | API + Foundry |
-| Tool Search Tool | Too many tool definitions bloat context | API + Foundry |
-| Tool Use Examples | Schema alone can't express usage patterns | API + Foundry |
+| Программный вызов инструментов (PTC) | Циклы агентов расходуют токены на обмен запросами и ответами | API + Foundry |
+| Динамическая фильтрация | Веб-поиск раздувает контекст информационным шумом | API + Foundry |
+| Инструмент поиска инструментов | Слишком большое количество определений инструментов раздувает контекст | API + Foundry |
+| Примеры использования инструментов | Одной схемы недостаточно для выражения паттернов использования | API + Foundry |
 
-**Strategic layering**: address your biggest bottleneck first:
-- Context bloated by tool definitions → Tool Search Tool
-- Large intermediate results → Programmatic Tool Calling
-- Web research returning noise → Dynamic Filtering
-- Parameter errors despite correct schema → Tool Use Examples
+**Стратегия по уровням**: сначала устраните самое серьёзное узкое место:
+- Контекст раздут определениями инструментов → инструмент поиска инструментов
+- Большие промежуточные результаты → программный вызов инструментов
+- Веб-исследования возвращают информационный шум → динамическая фильтрация
+- Ошибки параметров при корректной схеме → примеры использования инструментов
 
-### Programmatic tool calling (PTC)
+### Программный вызов инструментов (PTC)
 
-**The paradigm shift**: instead of calling tools one at a time with a full model round trip each, Claude writes Python code that orchestrates all tool calls internally. Only the final `stdout` enters the context window.
+**Смена парадигмы**: вместо последовательного вызова инструментов с полным циклом обращения к модели для каждого из них Claude пишет код на Python, который управляет всеми вызовами инструментов внутри. В контекстное окно попадает только итоговый `stdout`.
 
 ```
 Traditional: prompt → Claude → tool 1 → response 1 → Claude → tool 2 → response 2 → Claude → answer
@@ -1295,7 +1308,7 @@ PTC:         prompt → Claude → writes Python → code calls tool 1, 2, 3 →
              (3 tools = 1 inference pass, only final output in context)
 ```
 
-**Configuration**: mark tools callable from the code execution sandbox with `allowed_callers`:
+**Конфигурация**: пометьте инструменты, которые можно вызывать из песочницы выполнения кода, с помощью `allowed_callers`:
 
 ```json
 {
@@ -1315,27 +1328,27 @@ PTC:         prompt → Claude → writes Python → code calls tool 1, 2, 3 →
 }
 ```
 
-| `allowed_callers` value | Behavior |
+| Значение `allowed_callers` | Поведение |
 |-------------------------|----------|
-| omitted / `["direct"]` | Traditional calling only |
-| `["code_execution_20250825"]` | Callable from Python sandbox only |
-| `["direct", "code_execution_20250825"]` | Both modes, not recommended (confuses Claude) |
+| отсутствует / `["direct"]` | Только традиционный вызов |
+| `["code_execution_20250825"]` | Вызов только из песочницы Python |
+| `["direct", "code_execution_20250825"]` | Оба режима, не рекомендуется (сбивает Claude с толку) |
 
-**Patterns** (all run in 1 inference pass):
-- Batch processing: loop over N items, aggregate, print summary
-- Early termination: break as soon as success criteria are met
-- Conditional tool selection: pick lightweight vs heavy tool based on intermediate result
-- Data filtering: reduce what Claude sees (`errors = [l for l in logs if "ERROR" in l]`)
+**Паттерны** (все выполняются за один проход вывода):
+- Пакетная обработка: перебрать N элементов в цикле, агрегировать результаты, вывести сводку
+- Досрочное завершение: прервать выполнение сразу после достижения критериев успеха
+- Условный выбор инструмента: выбрать лёгкий или ресурсоёмкий инструмент в зависимости от промежуточного результата
+- Фильтрация данных: сократить объём данных, которые видит Claude (`errors = [l for l in logs if "ERROR" in l]`)
 
-**Token efficiency**: tool results from programmatic calls never enter Claude's context; only final `stdout` does. 10 programmatic tool calls ≈ 1/10th the context tokens of 10 direct calls. The ~37% overall token reduction claim is community-reported (Shayan Tabe's analysis) and not officially confirmed by Anthropic.
+**Эффективность использования токенов**: результаты программных вызовов инструментов никогда не попадают в контекст Claude; туда входит только итоговый `stdout`. 10 программных вызовов инструментов расходуют примерно в 10 раз меньше токенов контекста, чем 10 прямых вызовов. Утверждение об общем сокращении расхода токенов примерно на 37% основано на анализе участника сообщества Shayan Tabe и официально не подтверждено Anthropic.
 
-**Constraints**: API and Foundry only (not Bedrock/Vertex). No MCP tools, no web search/fetch, no `strict: true` tools. Container lifetime ~4.5 minutes. Not covered by Zero Data Retention.
+**Ограничения**: только API и Foundry (не Bedrock/Vertex). MCP-инструменты, веб-поиск и получение веб-страниц, а также инструменты с `strict: true` не поддерживаются. Время жизни контейнера — около 4,5 минуты. Не подпадает под действие Zero Data Retention.
 
-### Dynamic filtering for web search/fetch
+### Динамическая фильтрация для веб-поиска и получения веб-страниц
 
-Web search and fetch tools dump full HTML into context: navigation, ads, boilerplate included. Dynamic Filtering lets Claude write Python to pre-process and filter results before they enter its context window.
+Инструменты веб-поиска и получения веб-страниц помещают в контекст полный HTML: включая навигацию, рекламу и шаблонный текст. Динамическая фильтрация позволяет Claude писать код на Python для предварительной обработки и фильтрации результатов до их попадания в контекстное окно.
 
-**Configuration**: use updated tool type versions with a beta header:
+**Конфигурация**: используйте обновлённые версии типов инструментов с бета-заголовком:
 
 ```json
 {
@@ -1346,20 +1359,20 @@ Web search and fetch tools dump full HTML into context: navigation, ads, boilerp
 }
 ```
 
-Header required: `anthropic-beta: code-execution-web-tools-2026-02-09`. Filtering is enabled by default when using these tool type versions with Sonnet 4.6 or Opus 4.6.
+Обязательный заголовок: `anthropic-beta: code-execution-web-tools-2026-02-09`. При использовании этих версий типов инструментов с Sonnet 4.6 или Opus 4.6 фильтрация включена по умолчанию.
 
-**Official benchmark results** (Anthropic, BrowseComp dataset):
+**Результаты официальных тестов** (Anthropic, набор данных BrowseComp):
 
-| Model | Without Filtering | With Filtering | Improvement |
+| Модель | Без фильтрации | С фильтрацией | Улучшение |
 |-------|-------------------|----------------|-------------|
-| Sonnet 4.6 | 33.3% | 46.6% | +13.3 pp |
-| Opus 4.6 | 45.3% | 61.6% | +16.3 pp |
+| Sonnet 4.6 | 33,3% | 46,6% | +13,3 п. п. |
+| Opus 4.6 | 45,3% | 61,6% | +16,3 п. п. |
 
-Average input token reduction: ~24%. Best suited for multi-step research, citation verification, and extracting specific data points from large pages.
+Среднее сокращение входных токенов: около 24%. Лучше всего подходит для многоэтапных исследований, проверки цитат и извлечения конкретных данных с больших страниц.
 
-### Tool use examples
+### Примеры использования инструментов
 
-JSON schemas define structure but can't express when to include optional parameters, which combinations make sense, or format conventions. Add `input_examples` to tool definitions to show concrete usage patterns:
+Схемы JSON определяют структуру, но не могут выразить, когда следует включать необязательные параметры, какие их сочетания имеют смысл или какие соглашения по форматированию нужно соблюдать. Добавьте `input_examples` в определения инструментов, чтобы продемонстрировать конкретные паттерны использования:
 
 ```json
 {
@@ -1373,29 +1386,30 @@ JSON schemas define structure but can't express when to include optional paramet
 }
 ```
 
-Accuracy on complex parameter handling: 72% → 90% in Anthropic's benchmarks. Use 1-5 realistic examples per tool, covering minimal, partial, and full specifications.
+Точность при обработке сложных параметров в тестах Anthropic выросла с 72% до 90%. Используйте от 1 до 5 реалистичных примеров для каждого инструмента, охватывая минимальную, частичную и полную спецификации.
 
-### Claude Code relevance
+### Значение для Claude Code
 
-| Feature | Claude Code CLI | Action for CLI users |
+| Возможность | Claude Code CLI | Действие для пользователей CLI |
 |---------|----------------|---------------------|
-| Tool Search (MCP lazy loading) | Built-in since v2.1.7 as MCPSearch auto mode | Tune `ENABLE_TOOL_SEARCH=auto:N` (documented in §6 above) |
-| Tool Use Examples | Not configurable from CLI | Relevant for custom MCP server authors; add `input_examples` to tool schemas |
-| Programmatic Tool Calling | Not available in CLI | Relevant for Agent SDK developers building custom agents |
-| Dynamic Filtering | Not available in CLI | Relevant for Agent SDK users doing web research pipelines |
+| Поиск инструментов (ленивая загрузка MCP) | Встроен начиная с v2.1.7 в виде автоматического режима MCPSearch | Настройте `ENABLE_TOOL_SEARCH=auto:N` (описано выше в §6) |
+| Примеры использования инструментов | Не настраиваются из CLI | Актуально для авторов собственных MCP-серверов; добавьте `input_examples` в схемы инструментов |
+| Программный вызов инструментов | Недоступен в CLI | Актуально для разработчиков Agent SDK, создающих собственных агентов |
+| Динамическая фильтрация | Недоступна в CLI | Актуально для пользователей Agent SDK, создающих конвейеры веб-исследований |
 
 ---
 
-## 8. The edit tool: How it actually works
+<a id="8-the-edit-tool-how-it-actually-works"></a>
+## 8. Инструмент редактирования: как он работает на самом деле
 
-**Source category**: Tier 2, Verified through behavior; limited to the cited observation and method.
-**Sources**:
-- Observed behavior
-- [github.com/cline/cline/issues/2909](https://github.com/cline/cline/issues/2909) (similar implementation)
+**Категория источника**: уровень 2, проверено по поведению; ограничено указанными наблюдениями и методом.
+**Источники**:
+- Наблюдаемое поведение
+- [github.com/cline/cline/issues/2909](https://github.com/cline/cline/issues/2909) (аналогичная реализация)
 
-The Edit tool is more sophisticated than it appears.
+Инструмент Edit устроен сложнее, чем кажется.
 
-### Edit algorithm
+### Алгоритм Edit
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -1428,258 +1442,259 @@ The Edit tool is more sophisticated than it appears.
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Fuzzy matching details
+### Подробности нечёткого сопоставления
 
-When exact match fails, the Edit tool attempts:
+Если точное совпадение не найдено, инструмент Edit предпринимает следующие действия:
 
-1. **Whitespace normalization**: Ignore trailing spaces, normalize indentation
-2. **Line ending normalization**: Handle CRLF vs LF differences
-3. **Context expansion**: Use surrounding lines to locate the right spot
+1. **Нормализация пробельных символов**: игнорирует пробелы в конце строк, нормализует отступы
+2. **Нормализация окончаний строк**: учитывает различия между CRLF и LF
+3. **Расширение контекста**: использует окружающие строки для поиска нужного места
 
-If fuzzy matching also fails, the tool returns an error asking Claude to verify the old_string.
+Если нечёткое сопоставление также не удаётся, инструмент возвращает ошибку с просьбой к Claude проверить old_string.
 
-### Edit validation
+### Проверки Edit
 
-Before applying changes, the Edit tool:
+Перед применением изменений инструмент Edit выполняет следующие проверки:
 
-| Check | Purpose |
+| Проверка | Назначение |
 |-------|---------|
-| File exists | Prevent creating files via Edit |
-| old_string found | Ensure we're editing the right place |
-| Single match | old_string must be unique (or use `replace_all`) |
-| New content differs | Prevent no-op edits |
+| Файл существует | Не допустить создание файлов через Edit |
+| old_string найдена | Убедиться, что редактируется нужное место |
+| Единственное совпадение | old_string должна быть уникальной (иначе следует использовать `replace_all`) |
+| Новое содержимое отличается | Не допустить редактирование без фактических изменений |
 
-### When edit fails
+### Когда Edit завершается с ошибкой
 
-| Error | Cause | Claude's Response |
+| Ошибка | Причина | Реакция Claude |
 |-------|-------|-------------------|
-| "old_string not found" | Content changed since last read | Re-reads file, tries again |
-| "Multiple matches" | old_string isn't unique | Uses more context lines |
-| "File not found" | Wrong path | Searches for correct path |
+| "old_string not found" | Содержимое изменилось с момента последнего чтения | Повторно читает файл и пробует ещё раз |
+| "Multiple matches" | old_string не уникальна | Использует больше строк контекста |
+| "File not found" | Неверный путь | Ищет правильный путь |
+<a id="9-session-persistence"></a>
+## 9. Сохранение сессий
 
----
+**Категория источника**: уровень 1, официальный; ограничено указанной версией/датой и областью применения.
+**Источник**: [code.claude.com/docs](https://code.claude.com/docs/en/setup)
 
-## 9. Session persistence
+Сессии можно возобновлять между сеансами работы в терминале.
 
-**Source category**: Tier 1, Official; bounded by the cited version/date and scope.
-**Source**: [code.claude.com/docs](https://code.claude.com/docs/en/setup)
+### Механизмы возобновления
 
-Sessions can be resumed across terminal sessions.
-
-### Resume mechanisms
-
-| Command | Behavior |
+| Команда | Поведение |
 |---------|----------|
-| `claude --continue` / `claude -c` | Resume most recent session |
-| `claude --resume <id>` / `claude -r <id>` | Resume specific session by ID |
+| `claude --continue` / `claude -c` | Возобновить последнюю сессию |
+| `claude --resume <id>` / `claude -r <id>` | Возобновить конкретную сессию по ID |
 
-### What gets persisted
+### Что сохраняется
 
-| Persisted | Not Persisted |
+| Сохраняется | Не сохраняется |
 |-----------|---------------|
-| Conversation history | Live tool state |
-| Tool call results | Pending operations |
-| Session ID | File locks |
-| Working directory context | Environment variables |
+| История диалога | Текущее состояние инструментов |
+| Результаты вызовов инструментов | Ожидающие выполнения операции |
+| ID сессии | Блокировки файлов |
+| Контекст рабочего каталога | Переменные окружения |
 
-### Storage format
+### Формат хранения
 
-**Source category**: Tier 3, Inferred; unverified explanation.
+**Категория источника**: уровень 3, вывод; объяснение не проверено.
 
-Sessions appear to be stored as JSON/JSONL files in `~/.claude/` but:
+По всей видимости, сессии хранятся в виде файлов JSON/JSONL в `~/.claude/`, однако:
 
-- Format is not publicly documented
-- Not intended as a stable API
-- May change between versions
+- Формат не задокументирован публично
+- Он не предназначен для использования в качестве стабильного API
+- Он может меняться между версиями
 
-**Do not rely on session file format** for external tooling.
+**Не полагайтесь на формат файлов сессий** во внешних инструментах.
 
 ---
 
-## 10. Philosophy: Less scaffolding, more model
+<a id="10-philosophy-less-scaffolding-more-model"></a>
+## 10. Философия: меньше обвязки, больше возможностей модели
 
-**Source category**: Tier 1, Official; bounded by the cited version/date and scope.
-**Source**: Daniela Amodei (Anthropic Co-founder & President) - Public statements
+**Категория источника**: уровень 1, официальный; ограничено указанной версией/датой и областью применения.
+**Источник**: Daniela Amodei (сооснователь и президент Anthropic) — публичные заявления
 
-The core philosophy behind Claude Code:
+Основная философия Claude Code:
 
-> "Do more with less. Smart architecture choices, better training efficiency, and focused problem-solving can compete with raw scale."
+> «Делайте больше с меньшими затратами. Продуманные архитектурные решения, более эффективное обучение и сосредоточенность на решении задач позволяют конкурировать с грубым масштабированием».
 
-### What this means in practice
+### Что это означает на практике
 
-| Traditional Approach | Claude Code Approach |
+| Традиционный подход | Подход Claude Code |
 |---------------------|---------------------|
-| Intent classifier → Router → Specialist | Model-driven actions subject to permission controls |
-| RAG with embeddings | Grep + Glob (regex search) |
-| DAG task orchestration | Central agentic loop; optional workflows and delegation |
-| Tool-specific planners | Model-driven tool selection |
-| Complex state machines | Conversation as state |
-| Prompt engineering frameworks | Trust the model |
+| Классификатор намерений → маршрутизатор → специалист | Действия под управлением модели с учётом средств контроля прав доступа |
+| RAG с эмбеддингами | Grep + Glob (поиск по регулярным выражениям) |
+| Оркестрация задач с помощью DAG | Центральный агентный цикл; необязательные рабочие процессы и делегирование |
+| Планировщики для отдельных инструментов | Выбор инструментов моделью |
+| Сложные конечные автоматы | Диалог как состояние |
+| Фреймворки для промпт-инжиниринга | Доверие модели |
 
-### Why it works
+### Почему это работает
 
-1. **Model capability**: Claude 4+ is capable enough to handle routing decisions
-2. **Reduced latency**: Fewer components = faster response
-3. **Simpler debugging**: When something fails, there's one place to look
-4. **Better generalization**: No hand-coded rules to break on edge cases
+1. **Возможности модели**: Claude 4+ достаточно функционален, чтобы самостоятельно принимать решения о маршрутизации
+2. **Сниженная задержка**: меньше компонентов — быстрее ответ
+3. **Более простая отладка**: когда что-то выходит из строя, искать причину нужно только в одном месте
+4. **Более качественное обобщение**: нет написанных вручную правил, которые ломаются в пограничных случаях
 
-### The Trade-offs
+### Компромиссы
 
-| Advantage | Disadvantage |
+| Преимущество | Недостаток |
 |-----------|--------------|
-| Simplicity | Less fine-grained control |
-| Flexibility | Harder to enforce strict behaviors |
-| Fewer bugs | Model errors affect everything |
-| Fast iteration | Requires good model quality |
+| Простота | Менее детальный контроль |
+| Гибкость | Сложнее обеспечить строгое соблюдение заданного поведения |
+| Меньше ошибок | Ошибки модели влияют на всё |
+| Быстрые итерации | Требуется высокое качество модели |
 
-### Community validation
+### Подтверждение сообществом
 
-The "native capabilities first" approach is increasingly validated by external practitioners. Embedded engineering teams (including former Cursor power users) converge on Agent Skills standard over external orchestration frameworks, demonstrating the viability of trusting Claude's native reasoning over adding scaffolding layers.
+Подход «сначала нативные возможности» получает всё больше подтверждений от сторонних практиков. Команды инженеров встраиваемых систем (в том числе бывшие опытные пользователи Cursor) сходятся на использовании стандарта Agent Skills вместо внешних фреймворков оркестрации, демонстрируя жизнеспособность подхода, при котором нативным рассуждениям Claude доверяют больше, чем дополнительным слоям обвязки.
 
-**Example**: [Gur Sannikov](https://www.linkedin.com/posts/gursannikov_claudecode-embeddedengineering-aiagents-activity-7423851983331328001-DrFb) (embedded engineering) adopted ADR-driven workflows using only native Claude Code capabilities (hooks, skills, Task Tool) without external frameworks, validating the architectural philosophy documented in this guide.
+**Пример**: [Gur Sannikov](https://www.linkedin.com/posts/gursannikov_claudecode-embeddedengineering-aiagents-activity-7423851983331328001-DrFb) (разработка встраиваемых систем) внедрил рабочие процессы на основе ADR, используя только нативные возможности Claude Code (хуки, скиллы, Task Tool), без внешних фреймворков, тем самым подтвердив архитектурную философию, описанную в этом руководстве.
 
-This convergence suggests that the "less scaffolding, more model" approach scales beyond initial expectations, even for complex engineering domains like embedded systems development.
+Такое сближение подходов указывает на то, что принцип «меньше обвязки, больше возможностей модели» масштабируется лучше первоначальных ожиданий даже в сложных инженерных областях, таких как разработка встраиваемых систем.
 
 ---
 
-## 11. Claude Code vs alternatives
+<a id="11-claude-code-vs-alternatives"></a>
+## 11. Claude Code в сравнении с альтернативами
 
-**Source category**: Tier 2, Based on March 2026 fact-checked data; limited to the cited observation and method.
-**Sources**: Official documentation, Perplexity research March 2026, vendor changelogs
+**Категория источника**: уровень 2, основано на данных за март 2026 года, прошедших проверку фактов; ограничено указанными наблюдениями и методом.
+**Источники**: официальная документация, исследование Perplexity за март 2026 года, журналы изменений поставщиков
 
-| Dimension | Claude Code | GitHub Copilot | Cursor | Amazon Q Developer |
+| Характеристика | Claude Code | GitHub Copilot | Cursor | Amazon Q Developer |
 |-----------|-------------|----------------|--------|-------------------|
-| **Architecture** | while(tool) loop | IDE agent + cloud coding agent | Event-driven + cloud | AWS-integrated agents |
-| **Execution** | Local terminal | Local (agent mode) + cloud VMs | Local + cloud | Cloud/local hybrid |
-| **Model** | Claude (single provider) | GPT, Claude, Codex (selectable) | Multiple (adaptive) | Amazon Titan + others |
-| **Context** | Model and configuration dependent (200K or 1M tokens) | Full codebase (agent mode) | Codebase-aware (Composer) | Varies (AWS-scoped) |
-| **Transparency** | High (visible reasoning) | Medium | Medium | Low |
-| **Customization** | CLAUDE.md + hooks + MCP | AGENTS.md, MCP (GA), custom agents | MCP Apps, .cursorrules | MCP (native), AWS integration |
-| **MCP Support** | Native | Yes (GA, auto-approve) | Yes (MCP Apps v2.6) | Yes (native) |
-| **Pricing** | Pro $20 / Max $100-200 | Free / Pro $10 / Pro+ $39 / Biz $19/seat | Free / Pro $20 / Biz $40/seat | Free / Pro $19/seat / Enterprise |
+| **Архитектура** | цикл while(tool) | Агент IDE + облачный агент разработки | Событийная + облачная | Агенты с интеграцией AWS |
+| **Выполнение** | Локальный терминал | Локально (режим агента) + облачные ВМ | Локально + облако | Гибрид облака и локальной среды |
+| **Модель** | Claude (один поставщик) | GPT, Claude, Codex (на выбор) | Несколько моделей (адаптивный выбор) | Amazon Titan + другие |
+| **Контекст** | Зависит от модели и конфигурации (200 тыс. или 1 млн токенов) | Вся кодовая база (режим агента) | С учётом кодовой базы (Composer) | Варьируется (ограничено AWS) |
+| **Прозрачность** | Высокая (видимые рассуждения) | Средняя | Средняя | Низкая |
+| **Настройка** | CLAUDE.md + хуки + MCP | AGENTS.md, MCP (GA), пользовательские агенты | MCP Apps, .cursorrules | MCP (нативно), интеграция с AWS |
+| **Поддержка MCP** | Нативная | Да (GA, автоматическое одобрение) | Да (MCP Apps v2.6) | Да (нативная) |
+| **Цена** | Pro $20 / Max $100–200 | Free / Pro $10 / Pro+ $39 / Biz $19 за место | Free / Pro $20 / Biz $40 за место | Free / Pro $19 за место / Enterprise |
 
-### When to choose Claude Code
+### Когда стоит выбрать Claude Code
 
-| Scenario | Claude Code | Alternative |
+| Сценарий | Claude Code | Альтернатива |
 |----------|-------------|-------------|
-| Deep codebase exploration | Excellent | Good |
-| Terminal-native workflow | Excellent | Limited |
-| Custom automation (hooks) | Excellent | Limited |
-| Team standardization | Good (CLAUDE.md) | Varies |
-| IDE integration | Limited (VS Code ext) | Cursor/Copilot better |
-| Enterprise compliance | Via Anthropic enterprise | Varies |
+| Глубокое исследование кодовой базы | Отлично | Хорошо |
+| Рабочий процесс, ориентированный на терминал | Отлично | Ограниченно |
+| Пользовательская автоматизация (хуки) | Отлично | Ограниченно |
+| Стандартизация в команде | Хорошо (CLAUDE.md) | Варьируется |
+| Интеграция с IDE | Ограниченно (расширение VS Code) | Cursor/Copilot лучше |
+| Соответствие корпоративным требованиям | Через корпоративные решения Anthropic | Варьируется |
 
 ---
 
-## 12. Sources & references
+## 12. Источники и ссылки
 
-### Tier 1 - official Anthropic
+### Уровень 1 — официальные материалы Anthropic
 
-| Source | URL | Topics |
+| Источник | URL | Темы |
 |--------|-----|--------|
-| Engineering Blog | anthropic.com/engineering/claude-code-best-practices | Master loop, philosophy |
-| Setup Docs | code.claude.com/docs/en/setup | Install, auth, release channels |
-| Commands Reference | code.claude.com/docs/en/commands | **Source of truth for every built-in slash command**, aliases, bundled skills and workflows |
-| CLI Reference | code.claude.com/docs/en/cli-reference | Launch-time flags and subcommands |
-| Context Windows | platform.claude.com/docs/en/build-with-claude/context-windows | Token limits |
-| Hooks Reference | code.claude.com/docs/en/hooks | Hook system |
-| Hooks Guide | code.claude.com/docs/en/hooks-guide | Hook examples |
-| MCP Docs | code.claude.com/docs/en/mcp | MCP integration |
-| Sandboxing | code.claude.com/docs/en/sandboxing | Security model |
-| llms.txt (index) | code.claude.com/docs/llms.txt | LLM-optimized doc index, ~65 pages |
-| llms-full.txt | code.claude.com/docs/llms-full.txt | Full documentation (~98 KB text) |
+| Инженерный блог | anthropic.com/engineering/claude-code-best-practices | Основной цикл, философия |
+| Документация по настройке | code.claude.com/docs/en/setup | Установка, аутентификация, каналы выпуска |
+| Справочник команд | code.claude.com/docs/en/commands | **Первоисточник сведений о каждой встроенной слэш-команде**, псевдонимах, встроенных скиллах и рабочих процессах |
+| Справочник CLI | code.claude.com/docs/en/cli-reference | Флаги и подкоманды, задаваемые при запуске |
+| Контекстные окна | platform.claude.com/docs/en/build-with-claude/context-windows | Ограничения по токенам |
+| Справочник хуков | code.claude.com/docs/en/hooks | Система хуков |
+| Руководство по хукам | code.claude.com/docs/en/hooks-guide | Примеры хуков |
+| Документация MCP | code.claude.com/docs/en/mcp | Интеграция MCP |
+| Песочница | code.claude.com/docs/en/sandboxing | Модель безопасности |
+| llms.txt (индекс) | code.claude.com/docs/llms.txt | Оптимизированный для LLM индекс документации, около 65 страниц |
+| llms-full.txt | code.claude.com/docs/llms-full.txt | Полная документация (около 98 КБ текста) |
 
-### Tier 2 - verified analysis
+### Уровень 2 — проверенный анализ
 
-| Source | URL | Topics |
+| Источник | URL | Темы |
 |--------|-----|--------|
-| PromptLayer Analysis | blog.promptlayer.com/claude-code-behind-the-scenes-of-the-master-agent-loop/ | Internal architecture |
-| Steve Kinney Course | stevekinney.com/courses/ai-development/claude-code-* | Permissions, sessions |
+| Анализ PromptLayer | blog.promptlayer.com/claude-code-behind-the-scenes-of-the-master-agent-loop/ | Внутренняя архитектура |
+| Курс Steve Kinney | stevekinney.com/courses/ai-development/claude-code-* | Права доступа, сессии |
 
-### Tier 3 - community resources
+### Уровень 3 — ресурсы сообщества
 
-| Source | Topics |
+| Источник | Темы |
 |--------|--------|
-| GitHub Issues (anthropics/claude-code) | Edge cases, bugs, feature discussions |
-| Reddit r/ClaudeAI | User experiences, workarounds |
-| YouTube tutorials | Visual walkthroughs |
+| Обсуждения GitHub (anthropics/claude-code) | Пограничные случаи, ошибки, обсуждение функций |
+| Reddit r/ClaudeAI | Опыт пользователей, обходные решения |
+| Руководства на YouTube | Наглядные пошаговые разборы |
 
 ---
 
-## 13. Appendix: What we don't know
+<a id="13-appendix-what-we-dont-know"></a>
+## 13. Приложение: чего мы не знаем
 
-Transparency about gaps in our understanding:
+Открыто перечислим пробелы в нашем понимании:
 
-### Unknown or unconfirmed
+### Неизвестно или не подтверждено
 
-| Topic | What We Don't Know | Confidence in Current Understanding |
+| Тема | Чего мы не знаем | Уверенность в текущем понимании |
 |-------|-------------------|-------------------------------------|
-| **Exact compaction threshold** | Is it 75%? 85%? 92%? Varies by model? | 40% |
-| **System prompt contents** | Full text not public, varies by model version | 30% |
-| **Token counting method** | Exact tokenizer, overhead for tool schemas | 50% |
-| **Model fallback** | Does Claude Code fallback if a model fails? | 20% |
-| **Internal caching** | Is there result caching between sessions? | 20% |
-| **Rate limiting logic** | How rate limits are applied per-tool | 40% |
+| **Точный порог компакции** | 75%? 85%? 92%? Зависит от модели? | 40% |
+| **Содержимое системного промпта** | Полный текст не опубликован, зависит от версии модели | 30% |
+| **Метод подсчёта токенов** | Точный токенизатор, накладные расходы на схемы инструментов | 50% |
+| **Резервная модель** | Переключается ли Claude Code на резервную модель при сбое основной? | 20% |
+| **Внутреннее кэширование** | Кэшируются ли результаты между сессиями? | 20% |
+| **Логика ограничения частоты запросов** | Как лимиты запросов применяются к каждому инструменту | 40% |
 
-### Explicitly undocumented
+### Намеренно не задокументировано
 
-These are intentionally not documented by Anthropic:
+Anthropic намеренно не документирует следующее:
 
-- Session file format (internal implementation detail)
-- System prompt variations between models
-- Internal component names/architecture
-- Token usage breakdown per component
-- Exact permission evaluation order
+- Формат файлов сессий (внутренняя деталь реализации)
+- Различия системного промпта между моделями
+- Названия и архитектуру внутренних компонентов
+- Распределение расхода токенов по компонентам
+- Точный порядок проверки прав доступа
 
-### How to stay updated
+### Как оставаться в курсе
 
-1. **Official changelog**: Watch anthropic.com/changelog
-2. **GitHub releases**: github.com/anthropics/claude-code/releases
-3. **Community Discord**: Various Claude-focused servers
-4. **This guide**: Updated periodically based on verified information
-
----
-
-## Contributing
-
-Found an error? Have verified new information? Contributions welcome:
-
-1. **For official facts**: Cite the Anthropic source
-2. **For observations**: Describe how you verified the behavior
-3. **For corrections**: Explain what's wrong and why
+1. **Официальный журнал изменений**: следите за anthropic.com/changelog
+2. **Релизы GitHub**: github.com/anthropics/claude-code/releases
+3. **Discord-сообщества**: различные серверы, посвящённые Claude
+4. **Это руководство**: периодически обновляется на основе проверенной информации
 
 ---
 
-**Last updated**: February 2026
-**Claude Code version**: v2.1.34
-**Document version**: 1.1.0
+## Участие в проекте
+
+Нашли ошибку? У вас есть новая проверенная информация? Будем рады вашему вкладу:
+
+1. **Для официальных фактов**: укажите источник Anthropic
+2. **Для наблюдений**: опишите, как вы проверили поведение
+3. **Для исправлений**: объясните, что неверно и почему
 
 ---
 
-## Anthropic API patterns for architects
+**Последнее обновление**: февраль 2026 года
+**Версия Claude Code**: v2.1.34
+**Версия документа**: 1.1.0
 
-Three API-level features that architects must understand for production systems: the Message Batches API for cost-optimized bulk processing, `tool_choice` for guaranteed structured output, and strict-mode JSON schema enforcement.
+---
+
+## Паттерны Anthropic API для архитекторов
+
+Три функции уровня API, которые архитекторы должны понимать при проектировании промышленных систем: Message Batches API для экономичной массовой обработки, `tool_choice` для гарантированного структурированного вывода и принудительное соблюдение JSON-схемы в строгом режиме.
 
 ---
 
 ### Message Batches API
 
-The Batches API submits up to 100 messages in a single HTTP request and processes them asynchronously within a 24-hour window. The cost is 50% of the synchronous rate: same quality, half the price, at the cost of latency.
+Batches API позволяет отправить до 100 сообщений в одном HTTP-запросе и обрабатывает их асинхронно в течение 24 часов. Стоимость составляет 50% от тарифа синхронных запросов: то же качество за половину цены, но с дополнительной задержкой.
 
-**When to use it:**
+**Когда его использовать:**
 
-| Use case | Sync API | Streaming | Batch API |
+| Сценарий использования | Синхронный API | Потоковая передача | Batch API |
 |---|---|---|---|
-| Interactive chat | yes | yes | no |
-| Real-time analysis | yes | yes | no |
-| Bulk document processing | no | no | yes (50% cheaper) |
-| Multi-turn tool loops | yes | yes | no (not supported) |
-| Nightly classification pipeline | no | no | yes |
-| Large-scale data extraction | no | no | yes |
+| Интерактивный чат | да | да | нет |
+| Анализ в реальном времени | да | да | нет |
+| Массовая обработка документов | нет | нет | да (на 50% дешевле) |
+| Многоходовые циклы с инструментами | да | да | нет (не поддерживается) |
+| Ночной конвейер классификации | нет | нет | да |
+| Крупномасштабное извлечение данных | нет | нет | да |
 
-The Batches API does not support multi-turn conversations or `tool_use` continuation across turns. Each request in a batch is a single stateless call.
+Batches API не поддерживает многоходовые диалоги или продолжение `tool_use` между ходами. Каждый запрос в пакете представляет собой одиночный вызов без сохранения состояния.
 
-**Submit, poll, retrieve:**
+**Отправка, опрос состояния, получение результатов:**
 
 ```python
 import anthropic
@@ -1703,12 +1718,12 @@ batch = client.messages.batches.create(
     ]
 )
 
-# Poll until done (processing_status: "in_progress" | "ended")
+# Опрос до завершения (processing_status: "in_progress" | "ended")
 while batch.processing_status == "in_progress":
     time.sleep(60)
     batch = client.messages.batches.retrieve(batch.id)
 
-# Stream results — each entry has a custom_id and a result
+# Потоковая обработка результатов — у каждой записи есть custom_id и result
 for result in client.messages.batches.results(batch.id):
     match result.type:
         case "succeeded":
@@ -1720,40 +1735,40 @@ for result in client.messages.batches.results(batch.id):
             requeue(result.custom_id)
 ```
 
-Results stay available for 29 days after the batch ends, then are deleted automatically.
+Результаты остаются доступными в течение 29 дней после завершения пакета, а затем автоматически удаляются.
 
-**Error handling at scale:**
+**Обработка ошибок в больших масштабах:**
 
-Per-request errors do not fail the entire batch. A batch with 100 requests where 3 fail still returns 97 successful results. The pattern for resilient pipelines:
+Ошибки отдельных запросов не приводят к сбою всего пакета. Если из 100 запросов в пакете 3 завершатся ошибкой, он всё равно вернёт 97 успешных результатов. Паттерн для отказоустойчивых конвейеров:
 
-1. Process all `succeeded` results immediately.
-2. Collect `errored` custom_ids for retry with exponential backoff.
-3. Treat `expired` as a soft failure: the request never ran, so requeue it.
+1. Немедленно обработайте все результаты со статусом `succeeded`.
+2. Соберите custom_id со статусом `errored` для повторной попытки с экспоненциальной задержкой.
+3. Рассматривайте `expired` как некритический сбой: запрос не выполнялся, поэтому поставьте его в очередь заново.
 
-**Retry economics:**
+**Экономика повторных попыток:**
 
-Retrying individual failed items synchronously costs 2x the batch rate. If your error rate is below 5%, retrying synchronously is still net-cheaper than splitting batches further. Above 10% error rate, investigate the prompt before retrying at all.
+Повторное синхронное выполнение отдельных неудачных элементов стоит вдвое дороже пакетного тарифа. Если доля ошибок ниже 5%, синхронные повторные попытки всё равно обходятся дешевле, чем дополнительное дробление пакетов. Если доля ошибок превышает 10%, прежде чем что-либо повторять, исследуйте промпт.
 
 ---
 
-### tool_choice: Controlling when tools fire
+### tool_choice: управление вызовом инструментов
 
-`tool_choice` governs whether and which tools the model can call. Four modes:
+`tool_choice` определяет, может ли модель вызывать инструменты и какие именно. Доступны четыре режима:
 
-| Value | Behavior |
+| Значение | Поведение |
 |---|---|
-| `{"type": "auto"}` | Model decides; may or may not call tools (default) |
-| `{"type": "any"}` | Model must call at least one tool from the provided list |
-| `{"type": "tool", "name": "X"}` | Model must call tool `X` specifically |
-| `{"type": "none"}` | No tool calls allowed; model responds in prose |
+| `{"type": "auto"}` | Модель решает сама; она может вызвать инструменты, а может и не вызывать их (по умолчанию) |
+| `{"type": "any"}` | Модель должна вызвать хотя бы один инструмент из предоставленного списка |
+| `{"type": "tool", "name": "X"}` | Модель должна вызвать именно инструмент `X` |
+| `{"type": "none"}` | Вызовы инструментов запрещены; модель отвечает обычным текстом |
 
-The `any` and specific-tool modes request a tool call where supported. Inspect `stop_reason` and the returned blocks; a refusal or output limit is not proof that the model ignored an instruction.
+Режимы `any` и конкретного инструмента запрашивают вызов инструмента там, где это поддерживается. Проверяйте `stop_reason` и возвращённые блоки; отказ или достижение ограничения на объём вывода не доказывают, что модель проигнорировала инструкцию.
 
-**Forcing a tool is model-dependent.** Check thinking compatibility before using `any` or a named tool. Do not infer success from the requested choice alone: handle refusals, output limits, and the actual response blocks. For schema-constrained JSON, use the dedicated format below.
+**Принудительный вызов инструмента зависит от модели.** Перед использованием `any` или именованного инструмента проверьте совместимость с режимом рассуждений. Не делайте вывод об успехе исключительно на основании запрошенного выбора: обрабатывайте отказы, ограничения на объём вывода и фактические блоки ответа. Для JSON с ограничениями схемы используйте специальный формат ниже.
 
-### Structured Outputs: strict Mode
+### Структурированный вывод: строгий режим
 
-Structured outputs are generally available. Use `output_config.format` for JSON responses, or `strict: true` at the tool-definition level for validated tool arguments. The old beta header and `output_format` examples are obsolete. [Official structured outputs documentation](https://platform.claude.com/docs/en/build-with-claude/structured-outputs).
+Структурированный вывод общедоступен. Используйте `output_config.format` для ответов в формате JSON или `strict: true` на уровне определения инструмента для проверки аргументов инструмента. Старый бета-заголовок и примеры с `output_format` устарели. [Официальная документация по структурированному выводу](https://platform.claude.com/docs/en/build-with-claude/structured-outputs).
 
 ```python
 import json
@@ -1781,21 +1796,21 @@ text = next(block.text for block in response.content if block.type == "text")
 fields = json.loads(text)
 ```
 
-For tools, `strict` sits alongside `name`, `description`, and `input_schema`, not inside the schema. Schema conformance does not establish semantic accuracy. Validate extracted values against the document and handle refusals or truncated output before consuming the result.
+Для инструментов `strict` располагается рядом с `name`, `description` и `input_schema`, а не внутри схемы. Соответствие схеме не гарантирует семантическую точность. Проверяйте извлечённые значения по документу и обрабатывайте отказы или усечённый вывод до использования результата.
 
-**Nullable fields prevent hallucination of defaults:**
+**Допускающие null поля предотвращают галлюцинацию значений по умолчанию:**
 
-Without nullable, the model must fill every required field and will invent a value rather than leave it empty. Nullable fields give the model an explicit out:
+Если null не разрешён, модель обязана заполнить каждое обязательное поле и скорее придумает значение, чем оставит его пустым. Допускающие null поля предоставляют модели явную возможность не указывать значение:
 
 ```json
 "vendor_name": {"type": ["string", "null"]}
 ```
 
-The model returns `null` when the field cannot be found, rather than guessing.
+Если поле найти не удаётся, модель возвращает `null`, а не пытается угадать значение.
 
-**Extensible enums with companion fields:**
+**Расширяемые перечисления с сопутствующими полями:**
 
-Closed enums break when inputs don't fit any category. The solution: add `"other"` as the last enum value and a companion detail field:
+Закрытые перечисления перестают работать, когда входные данные не соответствуют ни одной категории. Решение: добавить `"other"` последним значением перечисления и сопутствующее поле с подробностями:
 
 ```json
 {
@@ -1805,31 +1820,31 @@ Closed enums break when inputs don't fit any category. The solution: add `"other
     },
     "document_type_detail": {
         "type": ["string", "null"],
-        "description": "Populate when document_type is 'other'; describe the actual document type"
+        "description": "Заполняйте, когда document_type имеет значение 'other'; опишите фактический тип документа"
     }
 }
 ```
 
-This preserves the type-safety of the enum for the 95% case while capturing the 5% gracefully.
+Так сохраняется типобезопасность перечисления для 95% случаев, а остальные 5% корректно учитываются.
 
-**`detected_pattern` for false-positive analysis:**
+**`detected_pattern` для анализа ложных срабатываний:**
 
-In classification pipelines, a `detected_pattern` field surfaces the evidence the model used. This turns opaque classifications into debuggable decisions:
+В конвейерах классификации поле `detected_pattern` показывает доказательство, на которое опиралась модель. Это превращает непрозрачную классификацию в решение, которое можно отлаживать:
 
 ```json
 {
     "is_complaint": {"type": "boolean"},
     "detected_pattern": {
         "type": ["string", "null"],
-        "description": "Quote the specific phrase or pattern that triggered the classification"
+        "description": "Процитируйте конкретную фразу или паттерн, послужившие основанием для классификации"
     },
     "confidence": {"type": "number"}
 }
 ```
 
-When `is_complaint: true` with `detected_pattern: "your service is terrible"`, a human reviewer can validate the classification in seconds. When `detected_pattern: null` and `confidence: 0.6`, that is a signal to escalate for manual review rather than auto-process.
+При `is_complaint: true` и `detected_pattern: "your service is terrible"` проверяющий человек сможет подтвердить классификацию за несколько секунд. Если же `detected_pattern: null` и `confidence: 0.6`, это сигнал передать результат на ручную проверку, а не обрабатывать его автоматически.
 
-## Go further
+## Дополнительные материалы
 
-- [Examples](../../examples/README.md) - ready-to-use Claude Code templates
-- [Workflows](../workflows/README.md) - end-to-end workflow guides
+- [Примеры](../../examples/README.md) — готовые к использованию шаблоны Claude Code
+- [Рабочие процессы](../workflows/README.md) — комплексные руководства по рабочим процессам

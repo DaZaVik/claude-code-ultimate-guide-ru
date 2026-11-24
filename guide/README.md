@@ -1,206 +1,206 @@
 ---
-title: "Guide Documentation"
-description: "Index of all core documentation files for mastering Claude Code"
+title: "Документация руководства"
+description: "Указатель всех основных файлов документации для освоения Claude Code"
 tags: [guide, reference]
 ---
 
-# Guide documentation
+# Документация руководства
 
-Core documentation for mastering Claude Code, organized by topic.
-
----
-
-## Getting started
-
-| File | Description | Time |
-|------|-------------|------|
-| [**learning-path/**](./learning-path/README.md) | **Structured 7-module learning path** for beginners: Installation, Core Loop, Memory, Agents, Skills, Hooks, Advanced Patterns | 8-11 hours |
-| [core/ai-concept-boundaries.md](./core/ai-concept-boundaries.md) | Seven practical concept distinctions, repository examples, and seven comprehension scenarios; selective Lexigraph adaptation with attribution | Self-paced |
-| [learning-path/01-installation.md](./learning-path/01-installation.md) | Module 01: Install Claude Code and verify it works | 15 min |
-| [learning-path/02-core-loop.md](./learning-path/02-core-loop.md) | Module 02: Understand the interaction loop and context | 45 min |
-| [learning-path/03-memory.md](./learning-path/03-memory.md) | Module 03: Create CLAUDE.md and configure memory | 1 hour |
-| [learning-path/04-agents.md](./learning-path/04-agents.md) | Module 04: Create specialized agents | 1.5 hours |
-| [learning-path/05-skills.md](./learning-path/05-skills.md) | Module 05: Build reusable skills | 1.5 hours |
-| [learning-path/06-hooks.md](./learning-path/06-hooks.md) | Module 06: Create automation hooks | 1 hour |
-| [learning-path/07-advanced.md](./learning-path/07-advanced.md) | Module 07: Multi-agent orchestration | 2-3 hours |
+Основная документация для освоения Claude Code, организованная по темам.
 
 ---
 
-## Core reference
+## Начало работы
 
-| File | Description | Time |
-|------|-------------|------|
-| [ultimate-guide.md](./ultimate-guide.md) | Complete reference covering all Claude Code features | ~3 hours |
-| [ultimate-guide.fr.md](./ultimate-guide.fr.md) | French translation of the complete reference guide | ~3 hours |
-| [core/translations.md](./core/translations.md) | **Translations and Language Governance**: verified attribution, source commits, measured lag, and official versus community status | 5 min |
-| [cowork.md](./cowork.md) | Claude Cowork: agentic desktop summary for non-technical knowledge workers | 10 min |
-| [cheatsheet.md](./cheatsheet.md) | 1-page printable quick reference | 5 min |
-| [core/architecture.md](./core/architecture.md) | How Claude Code works internally (master loop, tools, context) | 25 min |
-| [core/computer-use.md](./core/computer-use.md) | **Computer Use**: permission boundary, fallback order, safe operating procedure, and verification limits | 12 min |
-| [core/agent-harness.md](./core/agent-harness.md) | **Agent Harness Engineering**: runtime components, loop horizons, security, evaluation, and outer-loop harness optimization | 35 min |
-| [core/loop-graph-engineering.md](./core/loop-graph-engineering.md) | **Loop & Graph Engineering**: bounded feedback, executable workflow graphs, durable state, recovery, and judgment allocation | 25 min |
-| [core/ai-design-patterns.md](./core/ai-design-patterns.md) | **AI Design Patterns**: GoF, integration, and resilience patterns mapped to Claude Code mechanisms, with failure modes, checks, native agent patterns, and anti-patterns | 20 min |
-| [core/tools-reference.md](./core/tools-reference.md) | **Complete tools reference**: all 40 built-in tools, permission rule formats, per-tool behaviors (Bash timeouts, Edit read-before-edit, Glob cap, WebFetch lossy), and how-to for Monitor, Workflow, agent teams, Cron, Tasks API | 20 min |
-| [core/hooks-events-reference.md](./core/hooks-events-reference.md) | **Complete hooks reference**: all 33 hook events, matcher fields, input schemas, decision control formats, and timeout defaults, with copy-paste JSON examples | 15 min |
-| [core/settings-reference.md](./core/settings-reference.md) | **Complete settings.json reference**: every confirmed setting and environment variable | 15 min |
-| [core/methodologies.md](./core/methodologies.md) | 15 development methodologies reference (TDD, SDD, BDD, etc.) | 20 min |
-| [core/visual-reference.md](./core/visual-reference.md) | Visual cheatsheet: ASCII diagrams for key concepts | 5 min |
-| [core/claude-code-releases.md](./core/claude-code-releases.md) | Official release history (condensed) | 10 min |
-| [core/known-issues.md](./core/known-issues.md) | **Critical bugs tracker**: security issues, token consumption, verified community reports | 15 min |
-| [core/context-engineering.md](./core/context-engineering.md) | **Context Engineering**: token budget, modular architecture, team assembly, ACE pipeline, quality measurement | 25 min |
-| [core/memory-systems.md](./core/memory-systems.md) | **Memory Systems**: native stack (CLAUDE.md, Auto Memory, Auto Dream), cross-session tools (claude-mem, agentmemory, ICM), team sharing, multi-agent patterns, architecture, risks, decision flowchart | 30 min |
-| [core/glossary.md](./core/glossary.md) | **Glossary**: Claude Code terminology and adjacent agent concepts (41 terms, paragraph format, with links to guide sections) | 5 min |
-| [core/community-patterns.md](./core/community-patterns.md) | **Community Patterns**: ~130 community-coined patterns, workflow terms, AI engineering concepts, and quick-reference definitions | 10 min |
-| [core/skill-design-patterns.md](./core/skill-design-patterns.md) | **Skill Design Patterns**: architectural patterns for robust, token-efficient skills with multi-agent pipelines | 20 min |
-| [core/credits.md](./core/credits.md) | Open-source projects and engineering teams whose work informed specific patterns in this guide | 5 min |
-| [diagrams/](./diagrams/) | **Visual Diagrams Series**: 41 Mermaid interactive diagrams for model selection, agent lifecycle, security, multi-agent patterns | 15 min |
+| Файл | Описание | Время |
+|------|----------|-------|
+| [**learning-path/**](./learning-path/README.md) | **Структурированный учебный путь из 7 модулей** для начинающих: установка, основной цикл, память, агенты, скиллы, хуки, продвинутые паттерны | 8–11 часов |
+| [core/ai-concept-boundaries.md](./core/ai-concept-boundaries.md) | Семь практических разграничений понятий, примеры из репозитория и семь сценариев для проверки понимания; выборочная адаптация Lexigraph с указанием авторства | В своём темпе |
+| [learning-path/01-installation.md](./learning-path/01-installation.md) | Модуль 01: установка Claude Code и проверка его работы | 15 мин |
+| [learning-path/02-core-loop.md](./learning-path/02-core-loop.md) | Модуль 02: понимание цикла взаимодействия и контекста | 45 мин |
+| [learning-path/03-memory.md](./learning-path/03-memory.md) | Модуль 03: создание `CLAUDE.md` и настройка памяти | 1 час |
+| [learning-path/04-agents.md](./learning-path/04-agents.md) | Модуль 04: создание специализированных агентов | 1,5 часа |
+| [learning-path/05-skills.md](./learning-path/05-skills.md) | Модуль 05: создание переиспользуемых скиллов | 1,5 часа |
+| [learning-path/06-hooks.md](./learning-path/06-hooks.md) | Модуль 06: создание хуков автоматизации | 1 час |
+| [learning-path/07-advanced.md](./learning-path/07-advanced.md) | Модуль 07: оркестрация нескольких агентов | 2–3 часа |
 
 ---
 
-## Visual diagrams
+## Основной справочник
 
-**48 interactive Mermaid diagrams** across 12 thematic files, with GitHub-native Mermaid rendering and an ASCII fallback for every diagram. See [diagrams/README.md](./diagrams/README.md) for the full navigation index and use-case guides.
-
-| File | Diagrams | Topics |
-|------|----------|--------|
-| [diagrams/01-foundations.md](./diagrams/01-foundations.md) | 4 | 4-layer model, workflow pipeline, decision tree, permission modes |
-| [diagrams/02-context-and-sessions.md](./diagrams/02-context-and-sessions.md) | 4 | Context zones, memory hierarchy, session teleportation, fresh context |
-| [diagrams/03-configuration-system.md](./diagrams/03-configuration-system.md) | 4 | Config precedence, skills vs commands vs agents, agent lifecycle, hooks |
-| [diagrams/04-architecture-internals.md](./diagrams/04-architecture-internals.md) | 4 | Master loop, tool categories, system prompt assembly, sub-agent isolation |
-| [diagrams/05-mcp-ecosystem.md](./diagrams/05-mcp-ecosystem.md) | 4 | MCP ecosystem map, MCP architecture, rug pull attack, config hierarchy |
-| [diagrams/06-development-workflows.md](./diagrams/06-development-workflows.md) | 5 | TDD cycle, spec-first pipeline, plan-driven, iterative refinement, AI fluency paths |
-| [diagrams/07-multi-agent-patterns.md](./diagrams/07-multi-agent-patterns.md) | 5 | Agent topologies, worktrees, dual-instance, horizontal scaling, decision matrix |
-| [diagrams/08-security-and-production.md](./diagrams/08-security-and-production.md) | 4 | 3-layer defense, sandbox decision, verification paradox, CI/CD pipeline |
-| [diagrams/09-cost-and-optimization.md](./diagrams/09-cost-and-optimization.md) | 4 | Model selection, cost optimization, subscription tiers, token reduction |
-| [diagrams/10-adoption-and-learning.md](./diagrams/10-adoption-and-learning.md) | 3 | Onboarding paths, UVAL protocol, trust calibration |
-| [diagrams/11-context-engineering.md](./diagrams/11-context-engineering.md) | 4 | 3-layer context system, adherence degradation, modular architecture, rule placement |
-| [diagrams/12-enterprise-governance.md](./diagrams/12-enterprise-governance.md) | 3 | Governance risk tiers, MCP approval workflow, data classification |
-
----
-
-## Security
-
-| File | Description | Time |
-|------|-------------|------|
-| [security/security-hardening.md](./security/security-hardening.md) | Security threats, MCP vetting, injection defense | 25 min |
-| [security/sandbox-isolation.md](./security/sandbox-isolation.md) | Docker Sandboxes, cloud alternatives, safe autonomy workflows | 10 min |
-| [security/sandbox-native.md](./security/sandbox-native.md) | Native Claude Code sandbox: configuration and security model | 10 min |
-| [security/production-safety.md](./security/production-safety.md) | Production safety: guardrails, review gates, rollback strategies | 15 min |
-| [security/data-privacy.md](./security/data-privacy.md) | Data retention and privacy guide | 10 min |
-| [security/agentic-pentesting.md](./security/agentic-pentesting.md) | DarkMoon and Strix: execution scope, exploit evidence, model data exposure, and evaluation protocol | Reference |
-| [security/enterprise-governance.md](./security/enterprise-governance.md) | **Org-level governance**: usage charters, MCP approval workflow, guardrail tiers (Starter/Standard/Strict/Regulated), compliance | 25 min |
+| Файл | Описание | Время |
+|------|----------|-------|
+| [ultimate-guide.md](./ultimate-guide.md) | Полный справочник по всем возможностям Claude Code | ~3 часа |
+| [ultimate-guide.fr.md](./ultimate-guide.fr.md) | Французский перевод полного справочного руководства | ~3 часа |
+| [core/translations.md](./core/translations.md) | **Переводы и управление языковыми версиями**: проверенное указание авторства, исходные коммиты, измеренная задержка и официальный либо общественный статус | 5 мин |
+| [cowork.md](./cowork.md) | Claude Cowork: обзор агентного настольного приложения для нетехнических специалистов, работающих со знаниями | 10 мин |
+| [cheatsheet.md](./cheatsheet.md) | Одностраничная краткая справка для печати | 5 мин |
+| [core/architecture.md](./core/architecture.md) | Внутреннее устройство Claude Code (главный цикл, инструменты, контекст) | 25 мин |
+| [core/computer-use.md](./core/computer-use.md) | **Управление компьютером**: границы разрешений, порядок резервных вариантов, безопасная рабочая процедура и ограничения проверки | 12 мин |
+| [core/agent-harness.md](./core/agent-harness.md) | **Инженерия обвязки агента (Agent Harness Engineering)**: компоненты среды выполнения, горизонты циклов, безопасность, оценка и оптимизация харнесса внешнего цикла | 35 мин |
+| [core/loop-graph-engineering.md](./core/loop-graph-engineering.md) | **Инженерия циклов и графов**: ограниченная обратная связь, исполняемые графы рабочих процессов, устойчивое состояние, восстановление и распределение задач, требующих суждения | 25 мин |
+| [core/ai-design-patterns.md](./core/ai-design-patterns.md) | **Паттерны проектирования ИИ**: паттерны GoF, интеграции и отказоустойчивости, сопоставленные с механизмами Claude Code, включая режимы отказа, проверки, нативные агентные паттерны и антипаттерны | 20 мин |
+| [core/tools-reference.md](./core/tools-reference.md) | **Полный справочник инструментов**: все 40 встроенных инструментов, форматы правил разрешений, особенности отдельных инструментов (тайм-ауты Bash, чтение перед редактированием в Edit, ограничение Glob, потеря данных в WebFetch) и инструкции по использованию Monitor, Workflow, команд агентов, Cron и Tasks API | 20 мин |
+| [core/hooks-events-reference.md](./core/hooks-events-reference.md) | **Полный справочник хуков**: все 33 события хуков, поля сопоставления, входные схемы, форматы управления решениями и стандартные тайм-ауты, а также готовые для копирования примеры JSON | 15 мин |
+| [core/settings-reference.md](./core/settings-reference.md) | **Полный справочник по `settings.json`**: все подтверждённые настройки и переменные окружения | 15 мин |
+| [core/methodologies.md](./core/methodologies.md) | Справочник по 15 методологиям разработки (TDD, SDD, BDD и т. д.) | 20 мин |
+| [core/visual-reference.md](./core/visual-reference.md) | Визуальная шпаргалка: ASCII-диаграммы основных понятий | 5 мин |
+| [core/claude-code-releases.md](./core/claude-code-releases.md) | Официальная история выпусков (сокращённая) | 10 мин |
+| [core/known-issues.md](./core/known-issues.md) | **Трекер критических ошибок**: проблемы безопасности, расход токенов, проверенные сообщения сообщества | 15 мин |
+| [core/context-engineering.md](./core/context-engineering.md) | **Инженерия контекста**: бюджет токенов, модульная архитектура, формирование команды, конвейер ACE, измерение качества | 25 мин |
+| [core/memory-systems.md](./core/memory-systems.md) | **Системы памяти**: нативный стек (`CLAUDE.md`, Auto Memory, Auto Dream), межсессионные инструменты (claude-mem, agentmemory, ICM), совместное использование в команде, мультиагентные паттерны, архитектура, риски и блок-схема принятия решений | 30 мин |
+| [core/glossary.md](./core/glossary.md) | **Глоссарий**: терминология Claude Code и смежные понятия об агентах (41 термин в формате абзацев, со ссылками на разделы руководства) | 5 мин |
+| [core/community-patterns.md](./core/community-patterns.md) | **Паттерны сообщества**: около 130 созданных сообществом паттернов, терминов рабочих процессов, понятий инженерии ИИ и кратких определений | 10 мин |
+| [core/skill-design-patterns.md](./core/skill-design-patterns.md) | **Паттерны проектирования скиллов**: архитектурные паттерны для надёжных и экономных по токенам скиллов с мультиагентными конвейерами | 20 мин |
+| [core/credits.md](./core/credits.md) | Проекты с открытым исходным кодом и инженерные команды, чья работа послужила основой для конкретных паттернов этого руководства | 5 мин |
+| [diagrams/](./diagrams/) | **Серия визуальных диаграмм**: 41 интерактивная диаграмма Mermaid по выбору модели, жизненному циклу агента, безопасности и мультиагентным паттернам | 15 мин |
 
 ---
 
-## Ecosystem
+## Визуальные диаграммы
 
-| File | Description | Time |
-|------|-------------|------|
-| [ecosystem/ai-ecosystem.md](./ecosystem/ai-ecosystem.md) | Complementary AI tools (Perplexity, Gemini, Kimi, NotebookLM, TTS), plus the Mistral Large 4 API candidate | 30 min |
-| [ecosystem/plugin-distribution.md](./ecosystem/plugin-distribution.md) | **Plugin distribution**: package boundaries, marketplace trust, recommendation hints, and release checks | 15 min |
-| [ecosystem/agentic-tools.md](./ecosystem/agentic-tools.md) | **Agent tools comparison**: Hermes Agent, Codex CLI, Aider, Devin, SWE-agent, CrewAI, LangGraph, AutoGen, decision framework | 20 min |
-| [ecosystem/mcp-vs-cli.md](./ecosystem/mcp-vs-cli.md) | **MCP vs CLI decision guide**: when to use MCP servers vs CLI tools in Claude Code workflows, tradeoffs and decision dimensions | 15 min |
-| [ecosystem/claude-code-guide-mcp.md](./ecosystem/claude-code-guide-mcp.md) | **Guide MCP technical reference**: installation by client, published and candidate capabilities, architecture, network and privacy boundaries, offline behavior, troubleshooting, and dated metrics | 12 min |
-| [ecosystem/agent-harness-landscape.md](./ecosystem/agent-harness-landscape.md) | **Agent Harness Map**: strict runtimes, orchestrators, adjacent projects, and a sourced research layer for harness optimizers and meta-harnesses | 10 min |
-| [ecosystem/mcp-servers-ecosystem.md](./ecosystem/mcp-servers-ecosystem.md) | **Community MCP servers**: 8 validated servers (Playwright, Semgrep, Kubernetes, etc.) with production configs | 25 min |
-| [ecosystem/third-party-tools.md](./ecosystem/third-party-tools.md) | **Community tools**: GUIs, TUIs, config managers, token trackers; [desktop workspace comparison](./ecosystem/third-party-tools.md#desktop-agent-workspace-comparison) | 15 min |
-| [ecosystem/context-engineering-tools.md](./ecosystem/context-engineering-tools.md) | **Context & token optimization**: output compression (RTK, to which the guide author contributed early on; Headroom), prompt compression (LLMLingua), AI gateways (Edgee, Portkey), RAG, LLMOps | 20 min |
-| [ecosystem/remarkable-ai.md](./ecosystem/remarkable-ai.md) | Remarkable AI usage patterns and power-user techniques | 10 min |
-| [ecosystem/practitioner-insights.md](./ecosystem/practitioner-insights.md) | **Practitioner field reports**: 75 paraphrased insights from IFTTD, Devoxx, Dev With AI Meetup, ByteByteGo, Stanford Online, and Pavan Belagatti's 2026 video corpus, organized by theme (context engineering, agentic patterns, LLM evaluation, agent security, DevX and adoption) | 20 min |
-| [ecosystem/team-knowledge-base.md](./ecosystem/team-knowledge-base.md) | **Team knowledge infrastructure**: 3-tier framework (static Markdown vault, MCP connectors for live systems, RAG at scale), RAG threshold (~100-1000 docs), Atlassian/Notion/GitBook MCP, Onyx/LlamaCloud/Ragie, plugin distribution, Code+Cowork bridge | 18 min |
-| [ecosystem/local-vs-cloud-inference.md](./ecosystem/local-vs-cloud-inference.md) | **Local vs cloud economics**: 10 comparable hardware builds (llmfit-sized), OVH/AWS/Lambda/RunPod GPU rental pricing, 1-year TCO projections, Claude vs GPT-5.6 cloud throughput, decision framework | 20 min |
-| [ecosystem/ai-executive-agents.md](./ecosystem/ai-executive-agents.md) | **AI executive agents**: OpenExecutive deep dive, open-source alternatives (Become CEO, OneManCompany, crewAI) with verified GitHub stats, a routing table by role (CFO, CMO, CHRO, General Counsel, board), augmentation-vs-replacement and Synthetic Director governance angle | 12 min |
+**48 интерактивных диаграмм Mermaid** в 12 тематических файлах, с нативным отображением Mermaid на GitHub и резервным вариантом в ASCII для каждой диаграммы. Полный навигационный указатель и руководства по вариантам использования см. в [diagrams/README.md](./diagrams/README.md).
 
----
-
-## Roles & adoption
-
-| File | Description | Time |
-|------|-------------|------|
-| [roles/ai-roles.md](./roles/ai-roles.md) | Evidence-bounded map of AI role families, specializations, tiny-team convergence, and career paths | 25 min |
-| [roles/adoption-approaches.md](./roles/adoption-approaches.md) | Implementation strategies for teams | 15 min |
-| [roles/learning-with-ai.md](./roles/learning-with-ai.md) | Guide for juniors on using AI without losing skills | 15 min |
-| [roles/agent-evaluation.md](./roles/agent-evaluation.md) | **Agent quality metrics**: Measuring custom agent effectiveness with hooks, tests, and feedback loops | 20 min |
+| Файл | Диаграммы | Темы |
+|------|-----------|------|
+| [diagrams/01-foundations.md](./diagrams/01-foundations.md) | 4 | Четырёхуровневая модель, конвейер рабочего процесса, дерево решений, режимы разрешений |
+| [diagrams/02-context-and-sessions.md](./diagrams/02-context-and-sessions.md) | 4 | Зоны контекста, иерархия памяти, перенос между сессиями, свежий контекст |
+| [diagrams/03-configuration-system.md](./diagrams/03-configuration-system.md) | 4 | Приоритет конфигураций, скиллы и команды и агенты, жизненный цикл агента, хуки |
+| [diagrams/04-architecture-internals.md](./diagrams/04-architecture-internals.md) | 4 | Главный цикл, категории инструментов, сборка системного промпта, изоляция субагентов |
+| [diagrams/05-mcp-ecosystem.md](./diagrams/05-mcp-ecosystem.md) | 4 | Карта экосистемы MCP, архитектура MCP, атака с внезапной подменой, иерархия конфигураций |
+| [diagrams/06-development-workflows.md](./diagrams/06-development-workflows.md) | 5 | Цикл TDD, конвейер «сначала спецификация», разработка на основе плана, итеративное улучшение, пути освоения ИИ |
+| [diagrams/07-multi-agent-patterns.md](./diagrams/07-multi-agent-patterns.md) | 5 | Топологии агентов, worktree, два экземпляра, горизонтальное масштабирование, матрица решений |
+| [diagrams/08-security-and-production.md](./diagrams/08-security-and-production.md) | 4 | Трёхуровневая защита, решение об использовании песочницы, парадокс проверки, конвейер CI/CD |
+| [diagrams/09-cost-and-optimization.md](./diagrams/09-cost-and-optimization.md) | 4 | Выбор модели, оптимизация затрат, уровни подписки, сокращение токенов |
+| [diagrams/10-adoption-and-learning.md](./diagrams/10-adoption-and-learning.md) | 3 | Пути адаптации, протокол UVAL, калибровка доверия |
+| [diagrams/11-context-engineering.md](./diagrams/11-context-engineering.md) | 4 | Трёхуровневая система контекста, ухудшение соблюдения инструкций, модульная архитектура, размещение правил |
+| [diagrams/12-enterprise-governance.md](./diagrams/12-enterprise-governance.md) | 3 | Уровни риска в управлении, рабочий процесс утверждения MCP, классификация данных |
 
 ---
 
-## Operations
+## Безопасность
 
-| File | Description | Time |
-|------|-------------|------|
-| [ops/devops-sre.md](./ops/devops-sre.md) | FIRE framework for infrastructure diagnosis and incident response | 30 min |
-| [ops/observability.md](./ops/observability.md) | Session monitoring and cost tracking | 15 min |
-| [ops/api-gateway.md](./ops/api-gateway.md) | **API gateways**: separate Claude apps gateway behavior from third-party proxy controls such as LiteLLM and Portkey | 15 min |
-| [ops/ai-traceability.md](./ops/ai-traceability.md) | AI attribution, disclosure policies, git-ai, compliance | 20 min |
-| [ops/team-metrics.md](./ops/team-metrics.md) | **Team metrics for AI-augmented engineering**: DORA, SPACE, DX Core 4, AI-specific signals, by team size (5–25 people) | 20 min |
-| [ops/ai-unit-economics.md](./ops/ai-unit-economics.md) | **AI unit economics**: per-task cost decomposition, real cost levers (routing, sub-agent isolation, exit criteria), autonomous agent break-even point, team budget governance | 15 min |
-| [ops/subscription-strategy.md](./ops/subscription-strategy.md) | **Subscription strategy at team scale**: Claude, Codex, Copilot, Gemini, Cursor, and Mistral portfolio exercise; API gateway controls; personal-plan contract gaps; and scenario-based self-hosting economics | 20 min |
-| [ops/ai-finops.md](./ops/ai-finops.md) | **AI FinOps (section entry point)**: three cost regimes (subscription quota, metered tokens, owned capacity), the Inform-Optimize-Operate loop applied to agents, and a map of every cost lever with what it does not solve | 12 min |
-| [ops/llm-market-snapshot.md](./ops/llm-market-snapshot.md) | **LLM market snapshot (2026-09-30, Mistral Large 4 added 2026-10-06)**: source-checked prices, subscription quotas, regional processing, benchmarks, and one hypothetical agent workload | 20 min |
+| Файл | Описание | Время |
+|------|----------|-------|
+| [security/security-hardening.md](./security/security-hardening.md) | Угрозы безопасности, проверка MCP, защита от инъекций | 25 мин |
+| [security/sandbox-isolation.md](./security/sandbox-isolation.md) | Песочницы Docker, облачные альтернативы, рабочие процессы безопасной автономной работы | 10 мин |
+| [security/sandbox-native.md](./security/sandbox-native.md) | Нативная песочница Claude Code: конфигурация и модель безопасности | 10 мин |
+| [security/production-safety.md](./security/production-safety.md) | Безопасность в продакшене: защитные ограничения, этапы проверки, стратегии отката | 15 мин |
+| [security/data-privacy.md](./security/data-privacy.md) | Руководство по хранению данных и конфиденциальности | 10 мин |
+| [security/agentic-pentesting.md](./security/agentic-pentesting.md) | DarkMoon и Strix: область выполнения, доказательства эксплуатации, раскрытие данных модели и протокол оценки | Справочник |
+| [security/enterprise-governance.md](./security/enterprise-governance.md) | **Управление на уровне организации**: регламенты использования, рабочий процесс утверждения MCP, уровни защитных ограничений (Starter/Standard/Strict/Regulated), соответствие требованиям | 25 мин |
 
 ---
 
-## Workflows
+## Экосистема
 
-Hands-on guides for effective development patterns:
-
-| File | Description |
-|------|-------------|
-| [workflows/tdd-with-claude.md](./workflows/tdd-with-claude.md) | Test-Driven Development with Claude |
-| [workflows/spec-first.md](./workflows/spec-first.md) | Spec-First Development (SDD) |
-| [workflows/plan-driven.md](./workflows/plan-driven.md) | Using /plan mode effectively |
-| [workflows/iterative-refinement.md](./workflows/iterative-refinement.md) | Iterative improvement loops |
-| [workflows/best-of-n.md](./workflows/best-of-n.md) | Generate independent candidates, select with a frozen rubric, verify, and preserve the proof log |
-| [workflows/tts-setup.md](./workflows/tts-setup.md) | Add text-to-speech narration to Claude Code (18 min) |
-| [workflows/task-management.md](./workflows/task-management.md) | Multi-session task tracking, TodoWrite migration |
-| [workflows/agent-teams.md](./workflows/agent-teams.md) | Orchestrating multi-agent teams for complex tasks |
-| [workflows/agent-teams-quick-start.md](./workflows/agent-teams-quick-start.md) | Quick start guide for agent team patterns |
-| [workflows/agentic-software-factories.md](./workflows/agentic-software-factories.md) | Orientation map: from a single session to a software factory, and when a closed platform actually wins |
-| [../examples/workflows/bounded-loop-contract.md](../examples/workflows/bounded-loop-contract.md) | Runnable bounded-loop contract with a separate verifier interface, an attempt budget, evidence, and escalation |
-| [workflows/dynamic-workflows.md](./workflows/dynamic-workflows.md) | JavaScript-orchestrated multi-agent pipelines: deterministic control flow, parallel fan-out, automatic resume |
-| [workflows/dual-instance-planning.md](./workflows/dual-instance-planning.md) | Dual-instance planning: Opus plans, Sonnet executes |
-| [workflows/event-driven-agents.md](./workflows/event-driven-agents.md) | Event-driven agent coordination patterns |
-| [workflows/monitor-event-delegation.md](./workflows/monitor-event-delegation.md) | Monitor command/WebSocket, plugin monitors, Channels, Routines, and safe Codex delegation |
-| [workflows/github-actions.md](./workflows/github-actions.md) | Step-by-step claude-code-action setup: PR review on mention, automatic review on push, issue triage |
-| [workflows/reviewable-agent-changes.md](./workflows/reviewable-agent-changes.md) | Rationale beside the diff: what an agent note records per hunk, git notes storage and rewrites, stale notes, feedback typed as a question or a change, tested template | 15 min |
-| [workflows/code-review.md](./workflows/code-review.md) | Automated multi-agent PR review for Teams and Enterprise: setup, triggers, REVIEW.md configuration, cost management |
-| [workflows/ai-assisted-open-source-contributions.md](./workflows/ai-assisted-open-source-contributions.md) | Contribution policy, reproduction, author understanding, verification evidence and maintainer follow-up |
-| [workflows/production-reliability.md](./workflows/production-reliability.md) | Production reliability patterns: escalation design, circuit breakers, structured error propagation, graceful degradation |
-| [workflows/support-csm-agent.md](./workflows/support-csm-agent.md) | Internal support/CSM agent: ticket triage, DB diagnosis, CRM via MCP |
-| [workflows/plan-pipeline.md](./workflows/plan-pipeline.md) | End-to-end plan pipeline: start, validate, execute |
-| [workflows/design-to-code.md](./workflows/design-to-code.md) | Convert Figma/wireframes to working code |
-| [workflows/exploration-workflow.md](./workflows/exploration-workflow.md) | Systematically explore unfamiliar codebases |
-| [workflows/pdf-generation.md](./workflows/pdf-generation.md) | Generate professional PDFs with Quarto/Typst |
-| [workflows/search-tools-mastery.md](./workflows/search-tools-mastery.md) | Master rg, grepai, Serena, ast-grep combined workflows |
-| [workflows/skeleton-projects.md](./workflows/skeleton-projects.md) | Use battle-tested repos as scaffolding for new projects |
-| [workflows/talk-pipeline.md](./workflows/talk-pipeline.md) | 6-stage talk preparation: raw material to slides |
-| [workflows/team-ai-instructions.md](./workflows/team-ai-instructions.md) | Scale CLAUDE.md across multi-developer teams |
+| Файл | Описание | Время |
+|------|----------|-------|
+| [ecosystem/ai-ecosystem.md](./ecosystem/ai-ecosystem.md) | Дополняющие инструменты ИИ (Perplexity, Gemini, Kimi, NotebookLM, TTS), а также кандидат Mistral Large 4 API | 30 мин |
+| [ecosystem/plugin-distribution.md](./ecosystem/plugin-distribution.md) | **Распространение плагинов**: границы пакетов, доверие к маркетплейсу, подсказки для рекомендаций и проверки выпусков | 15 мин |
+| [ecosystem/agentic-tools.md](./ecosystem/agentic-tools.md) | **Сравнение агентных инструментов**: Hermes Agent, Codex CLI, Aider, Devin, SWE-agent, CrewAI, LangGraph, AutoGen и система принятия решений | 20 мин |
+| [ecosystem/mcp-vs-cli.md](./ecosystem/mcp-vs-cli.md) | **Руководство по выбору между MCP и CLI**: когда в рабочих процессах Claude Code использовать MCP-серверы, а когда инструменты CLI, включая компромиссы и критерии выбора | 15 мин |
+| [ecosystem/claude-code-guide-mcp.md](./ecosystem/claude-code-guide-mcp.md) | **Технический справочник по MCP руководства**: установка для разных клиентов, опубликованные и кандидатные возможности, архитектура, границы сети и конфиденциальности, автономная работа, устранение неполадок и датированные метрики | 12 мин |
+| [ecosystem/agent-harness-landscape.md](./ecosystem/agent-harness-landscape.md) | **Карта обвязок агентов**: строгие среды выполнения, оркестраторы, смежные проекты и основанный на источниках исследовательский слой для оптимизаторов харнессов и метахарнессов | 10 мин |
+| [ecosystem/mcp-servers-ecosystem.md](./ecosystem/mcp-servers-ecosystem.md) | **MCP-серверы сообщества**: 8 проверенных серверов (Playwright, Semgrep, Kubernetes и другие) с конфигурациями для продакшена | 25 мин |
+| [ecosystem/third-party-tools.md](./ecosystem/third-party-tools.md) | **Инструменты сообщества**: GUI, TUI, менеджеры конфигураций, трекеры токенов; [сравнение настольных рабочих пространств для агентов](./ecosystem/third-party-tools.md#desktop-agent-workspace-comparison) | 15 мин |
+| [ecosystem/context-engineering-tools.md](./ecosystem/context-engineering-tools.md) | **Оптимизация контекста и токенов**: сжатие вывода (RTK, в ранней разработке которого участвовал автор руководства; Headroom), сжатие промптов (LLMLingua), шлюзы ИИ (Edgee, Portkey), RAG, LLMOps | 20 мин |
+| [ecosystem/remarkable-ai.md](./ecosystem/remarkable-ai.md) | Паттерны использования Remarkable AI и приёмы для опытных пользователей | 10 мин |
+| [ecosystem/practitioner-insights.md](./ecosystem/practitioner-insights.md) | **Практические отчёты специалистов**: 75 перефразированных выводов из IFTTD, Devoxx, Dev With AI Meetup, ByteByteGo, Stanford Online и корпуса видео Pavan Belagatti за 2026 год, сгруппированных по темам (инженерия контекста, агентные паттерны, оценка LLM, безопасность агентов, DevX и внедрение) | 20 мин |
+| [ecosystem/team-knowledge-base.md](./ecosystem/team-knowledge-base.md) | **Командная инфраструктура знаний**: трёхуровневая система (статическое хранилище Markdown, MCP-коннекторы для действующих систем, RAG в масштабе), порог RAG (~100–1000 документов), MCP для Atlassian/Notion/GitBook, Onyx/LlamaCloud/Ragie, распространение плагинов, связка Code+Cowork | 18 мин |
+| [ecosystem/local-vs-cloud-inference.md](./ecosystem/local-vs-cloud-inference.md) | **Экономика локального и облачного инференса**: 10 сопоставимых конфигураций оборудования (размерности llmfit), цены аренды GPU в OVH/AWS/Lambda/RunPod, прогнозы совокупной стоимости владения за один год, пропускная способность Claude и GPT-5.6 в облаке, система принятия решений | 20 мин |
+| [ecosystem/ai-executive-agents.md](./ecosystem/ai-executive-agents.md) | **ИИ-агенты руководителей**: подробный разбор OpenExecutive, альтернативы с открытым исходным кодом (Become CEO, OneManCompany, crewAI) с проверенной статистикой GitHub, таблица маршрутизации по ролям (CFO, CMO, CHRO, главный юрисконсульт, совет директоров), соотношение усиления и замены, а также аспект управления Synthetic Director | 12 мин |
 
 ---
 
-## Cowork documentation
+## Роли и внедрение
 
-For knowledge workers using Claude Cowork (agentic desktop):
-
-| Resource | Description |
-|----------|-------------|
-| **[Cowork Hub](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/README.md)** | Complete Cowork documentation |
-| [Getting Started](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/guide/01-getting-started.md) | Setup and first workflow |
-| [Capabilities](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/guide/02-capabilities.md) | What Cowork can/cannot do |
-| [Security Guide](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/guide/03-security.md) | Safe usage practices |
-| [Prompt Library](https://github.com/FlorianBruniaux/claude-cowork-guide/tree/main/prompts) | 50+ ready-to-use prompts |
-| [Cheatsheet](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/reference/cheatsheet.md) | 1-page quick reference |
+| Файл | Описание | Время |
+|------|----------|-------|
+| [roles/ai-roles.md](./roles/ai-roles.md) | Ограниченная доказательствами карта семейств ролей ИИ, специализаций, сближения ролей в небольших командах и карьерных траекторий | 25 мин |
+| [roles/adoption-approaches.md](./roles/adoption-approaches.md) | Стратегии внедрения для команд | 15 мин |
+| [roles/learning-with-ai.md](./roles/learning-with-ai.md) | Руководство для начинающих специалистов по использованию ИИ без утраты навыков | 15 мин |
+| [roles/agent-evaluation.md](./roles/agent-evaluation.md) | **Метрики качества агентов**: измерение эффективности пользовательских агентов с помощью хуков, тестов и циклов обратной связи | 20 мин |
 
 ---
 
-## Recommended reading order
+## Эксплуатация
 
-1. **New users**: Start with Quick Start section in `ultimate-guide.md`
-2. **Daily reference**: Print `cheatsheet.md`
-3. **Team leads**: Read `roles/adoption-approaches.md` for rollout strategies
-4. **Security focus**: `security/security-hardening.md` then `security/sandbox-isolation.md`
-5. **Deep architecture**: `core/architecture.md` then `diagrams/`
+| Файл | Описание | Время |
+|------|----------|-------|
+| [ops/devops-sre.md](./ops/devops-sre.md) | Система FIRE для диагностики инфраструктуры и реагирования на инциденты | 30 мин |
+| [ops/observability.md](./ops/observability.md) | Мониторинг сессий и отслеживание затрат | 15 мин |
+| [ops/api-gateway.md](./ops/api-gateway.md) | **Шлюзы API**: отделение поведения шлюзов приложений Claude от средств управления сторонних прокси, таких как LiteLLM и Portkey | 15 мин |
+| [ops/ai-traceability.md](./ops/ai-traceability.md) | Указание вклада ИИ, политики раскрытия информации, git-ai, соответствие требованиям | 20 мин |
+| [ops/team-metrics.md](./ops/team-metrics.md) | **Командные метрики для разработки с применением ИИ**: DORA, SPACE, DX Core 4, специфичные для ИИ сигналы с разбивкой по размеру команды (5–25 человек) | 20 мин |
+| [ops/ai-unit-economics.md](./ops/ai-unit-economics.md) | **Юнит-экономика ИИ**: разложение стоимости каждой задачи, реальные рычаги управления затратами (маршрутизация, изоляция субагентов, критерии завершения), точка безубыточности автономного агента, управление командным бюджетом | 15 мин |
+| [ops/subscription-strategy.md](./ops/subscription-strategy.md) | **Стратегия подписок в масштабе команды**: упражнение по формированию портфеля Claude, Codex, Copilot, Gemini, Cursor и Mistral; средства управления шлюзом API; пробелы в договорах персональных тарифов; экономика самостоятельного хостинга на основе сценариев | 20 мин |
+| [ops/ai-finops.md](./ops/ai-finops.md) | **AI FinOps (точка входа в раздел)**: три режима затрат (квота подписки, тарифицируемые токены, собственные мощности), цикл Inform-Optimize-Operate применительно к агентам и карта всех рычагов управления затратами с указанием того, какие проблемы они не решают | 12 мин |
+| [ops/llm-market-snapshot.md](./ops/llm-market-snapshot.md) | **Обзор рынка LLM (30.09.2026, Mistral Large 4 добавлена 06.10.2026)**: цены, проверенные по источникам, квоты подписок, региональная обработка, бенчмарки и одна гипотетическая агентная рабочая нагрузка | 20 мин |
 
 ---
 
-*Back to [main README](../README.md)*
+## Рабочие процессы
+
+Практические руководства по эффективным паттернам разработки:
+
+| Файл | Описание |
+|------|----------|
+| [workflows/tdd-with-claude.md](./workflows/tdd-with-claude.md) | Разработка через тестирование с Claude |
+| [workflows/spec-first.md](./workflows/spec-first.md) | Разработка «сначала спецификация» (SDD) |
+| [workflows/plan-driven.md](./workflows/plan-driven.md) | Эффективное использование режима `/plan` |
+| [workflows/iterative-refinement.md](./workflows/iterative-refinement.md) | Циклы итеративного улучшения |
+| [workflows/best-of-n.md](./workflows/best-of-n.md) | Создание независимых вариантов, выбор по зафиксированной системе критериев, проверка и сохранение журнала доказательств |
+| [workflows/tts-setup.md](./workflows/tts-setup.md) | Добавление голосового воспроизведения текста в Claude Code (18 мин) |
+| [workflows/task-management.md](./workflows/task-management.md) | Отслеживание задач между сессиями, миграция TodoWrite |
+| [workflows/agent-teams.md](./workflows/agent-teams.md) | Оркестрация мультиагентных команд для сложных задач |
+| [workflows/agent-teams-quick-start.md](./workflows/agent-teams-quick-start.md) | Краткое руководство по началу работы с паттернами команд агентов |
+| [workflows/agentic-software-factories.md](./workflows/agentic-software-factories.md) | Ориентировочная карта: от одной сессии до фабрики программного обеспечения и условия, при которых закрытая платформа действительно выигрывает |
+| [../examples/workflows/bounded-loop-contract.md](../examples/workflows/bounded-loop-contract.md) | Исполняемый контракт ограниченного цикла с отдельным интерфейсом проверяющего, бюджетом попыток, доказательствами и эскалацией |
+| [workflows/dynamic-workflows.md](./workflows/dynamic-workflows.md) | Мультиагентные конвейеры под оркестрацией JavaScript: детерминированный поток управления, параллельное разветвление, автоматическое возобновление |
+| [workflows/dual-instance-planning.md](./workflows/dual-instance-planning.md) | Планирование с двумя экземплярами: Opus планирует, Sonnet выполняет |
+| [workflows/event-driven-agents.md](./workflows/event-driven-agents.md) | Паттерны событийной координации агентов |
+| [workflows/monitor-event-delegation.md](./workflows/monitor-event-delegation.md) | Команда Monitor/WebSocket, мониторы плагинов, Channels, Routines и безопасное делегирование Codex |
+| [workflows/github-actions.md](./workflows/github-actions.md) | Пошаговая настройка claude-code-action: проверка PR по упоминанию, автоматическая проверка при отправке изменений, сортировка задач |
+| [workflows/reviewable-agent-changes.md](./workflows/reviewable-agent-changes.md) | Обоснование рядом с изменениями: что записывает примечание агента для каждого фрагмента, хранение и перезапись git notes, устаревшие примечания, обратная связь в виде вопроса или изменения, протестированный шаблон | 15 мин |
+| [workflows/code-review.md](./workflows/code-review.md) | Автоматизированная мультиагентная проверка PR для Teams и Enterprise: настройка, триггеры, конфигурация `REVIEW.md`, управление затратами |
+| [workflows/ai-assisted-open-source-contributions.md](./workflows/ai-assisted-open-source-contributions.md) | Политика внесения вклада, воспроизведение, понимание автором, доказательства проверки и последующая коммуникация с сопровождающими |
+| [workflows/production-reliability.md](./workflows/production-reliability.md) | Паттерны надёжности в продакшене: проектирование эскалации, автоматические выключатели, структурированная передача ошибок, плавная деградация |
+| [workflows/support-csm-agent.md](./workflows/support-csm-agent.md) | Внутренний агент поддержки/CSM: сортировка обращений, диагностика БД, работа с CRM через MCP |
+| [workflows/plan-pipeline.md](./workflows/plan-pipeline.md) | Сквозной конвейер плана: запуск, проверка, выполнение |
+| [workflows/design-to-code.md](./workflows/design-to-code.md) | Преобразование макетов Figma и вайрфреймов в работающий код |
+| [workflows/exploration-workflow.md](./workflows/exploration-workflow.md) | Систематическое изучение незнакомых кодовых баз |
+| [workflows/pdf-generation.md](./workflows/pdf-generation.md) | Создание профессиональных PDF с помощью Quarto/Typst |
+| [workflows/search-tools-mastery.md](./workflows/search-tools-mastery.md) | Освоение комбинированных рабочих процессов с rg, grepai, Serena и ast-grep |
+| [workflows/skeleton-projects.md](./workflows/skeleton-projects.md) | Использование проверенных в работе репозиториев как основы для новых проектов |
+| [workflows/talk-pipeline.md](./workflows/talk-pipeline.md) | Шесть этапов подготовки выступления: от исходного материала до слайдов |
+| [workflows/team-ai-instructions.md](./workflows/team-ai-instructions.md) | Масштабирование `CLAUDE.md` на команды из нескольких разработчиков |
+
+---
+
+## Документация Cowork
+
+Для специалистов, работающих со знаниями и использующих Claude Cowork (агентное настольное приложение):
+
+| Ресурс | Описание |
+|--------|----------|
+| **[Центр Cowork](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/README.md)** | Полная документация Cowork |
+| [Начало работы](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/guide/01-getting-started.md) | Настройка и первый рабочий процесс |
+| [Возможности](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/guide/02-capabilities.md) | Что Cowork может и чего не может делать |
+| [Руководство по безопасности](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/guide/03-security.md) | Практики безопасного использования |
+| [Библиотека промптов](https://github.com/FlorianBruniaux/claude-cowork-guide/tree/main/prompts) | Более 50 готовых к использованию промптов |
+| [Шпаргалка](https://github.com/FlorianBruniaux/claude-cowork-guide/blob/main/reference/cheatsheet.md) | Одностраничная краткая справка |
+
+---
+
+## Рекомендуемый порядок чтения
+
+1. **Новые пользователи**: начните с раздела «Быстрый старт» в `ultimate-guide.md`
+2. **Справочник на каждый день**: распечатайте `cheatsheet.md`
+3. **Руководители команд**: прочитайте `roles/adoption-approaches.md`, чтобы ознакомиться со стратегиями внедрения
+4. **Акцент на безопасности**: сначала `security/security-hardening.md`, затем `security/sandbox-isolation.md`
+5. **Глубокое изучение архитектуры**: сначала `core/architecture.md`, затем `diagrams/`
+
+---
+
+*Вернуться к [основному README](../README.md)*

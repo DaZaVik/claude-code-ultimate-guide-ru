@@ -1,129 +1,138 @@
 ---
-title: "AI Concept Boundaries"
-description: "Seven practical distinctions for Claude Code, from context and memory to model architecture, size, modality, and task labels."
+title: "Границы понятий в области ИИ"
+description: "Семь практических различий для Claude Code: от контекста и памяти до архитектуры, размера и модальности модели, а также обозначений задач."
 tags: [guide, concepts, learning]
 ---
 
-# AI concept boundaries
+# Границы понятий в области ИИ
 
-When a system forgets a preference, calls the wrong tool, or passes a test, identify which component owns that behavior before changing the model or adding instructions. These seven distinctions give you a question to ask, an example, and a route to the detailed reference.
+Когда система забывает предпочтение, вызывает не тот инструмент или проходит тест, прежде чем менять модель или добавлять инструкции, определите, какой компонент отвечает за это поведение. Эти семь различий дают вам вопрос, который следует задать, пример и путь к подробному справочному материалу.
 
-The comparison format and selected distinctions are adapted from Anthony Capirchio's [Lexigraph](https://www.lexigraph.org), published by The Operating Shift under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Explanations and exercises are rewritten for repository work, with product-specific limits added. [Sources and adaptation](#sources-and-adaptation) records the scope.
+Формат сравнений и некоторые различия адаптированы из [Lexigraph](https://www.lexigraph.org) Энтони Капиркьо, опубликованного The Operating Shift по лицензии [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Объяснения и упражнения переписаны применительно к работе с репозиториями, а также дополнены ограничениями, характерными для конкретных продуктов. Область адаптации зафиксирована в разделе [Источники и адаптация](#sources-and-adaptation).
 
-## Context, context window, and memory
+<a id="context-context-window-and-memory"></a>
+## Контекст, контекстное окно и память
 
-**Context** is the information supplied for the current model call: messages, instructions, tool descriptions, retrieved material, and tool results. The **context window** is the model's capacity for that information and generation, subject to its input/output limits. **Memory** is information retained so the system can retrieve or load it into a later context.
+**Контекст** — это информация, переданная при текущем вызове модели: сообщения, инструкции, описания инструментов, извлечённые материалы и результаты работы инструментов. **Контекстное окно** — это объём такой информации и генерации, который может вместить модель с учётом ограничений на входные и выходные данные. **Память** — это сохранённая информация, которую система может извлечь или загрузить в последующий контекст.
 
-Ask **what is available now, what could fit, and what will be retained?** A preference written in `CLAUDE.md` can be loaded in another session. A test log seen in one session is current context; it does not thereby become a durable project instruction. A larger window does not decide which logs or preferences the runtime will include.
+Спросите: **что доступно сейчас, что может поместиться и что будет сохранено?** Предпочтение, записанное в `CLAUDE.md`, можно загрузить в другом сеансе. Журнал тестирования, просмотренный в одном сеансе, является частью текущего контекста; от этого он не становится постоянной инструкцией проекта. Увеличенное контекстное окно не определяет, какие журналы или предпочтения среда выполнения включит в контекст.
 
-Closing a chat is not a reliable memory test: a product may save and resume the conversation. Check the stored artifact, loading rules, and new session's available context. Storage, retrieval, and model training are separate operations. Text-only examples also simplify multimodal contexts, which can include images and other supported inputs.
+Закрытие чата не является надёжной проверкой памяти: продукт может сохранить и возобновить разговор. Проверьте сохранённый артефакт, правила загрузки и контекст, доступный новому сеансу. Хранение, извлечение и обучение модели — отдельные операции. Примеры, содержащие только текст, также упрощают мультимодальные контексты, которые могут включать изображения и другие поддерживаемые входные данные.
 
-Continue with [Context Engineering](./context-engineering.md) and [Memory Systems](./memory-systems.md).
+Продолжите чтение в разделах [Инженерия контекста](./context-engineering.md) и [Системы памяти](./memory-systems.md).
 
-## Model, product, and harness
+<a id="model-product-and-harness"></a>
+## Модель, продукт и харнесс
 
-A **model** generates outputs from its inputs. A **product** combines a model with an interface and operating behavior. A **runtime harness** assembles context, mediates tools and permissions, manages state, and runs the agent loop. A **repository harness** supplies project-specific instructions, setup, and verification gates.
+**Модель** генерирует выходные данные на основе входных. **Продукт** объединяет модель с интерфейсом и рабочей логикой. **Харнесс среды выполнения (runtime harness)** формирует контекст, управляет взаимодействием с инструментами и правами доступа, управляет состоянием и выполняет цикл агента. **Харнесс репозитория** предоставляет инструкции, настройки и контрольные этапы проверки, относящиеся к конкретному проекту.
 
-Ask **which component could change the behavior, and how would you isolate its effect?** If an agent edits the wrong generated file because the repository has no source-of-truth instruction, improving that instruction is a candidate intervention. If the instruction was supplied correctly but misunderstood, model behavior is also a candidate. Inspect the trace before assigning the cause.
+Спросите: **какой компонент мог изменить поведение и как изолировать его влияние?** Если агент редактирует не тот сгенерированный файл, потому что в репозитории нет инструкции об источнике истины, возможным решением будет улучшение этой инструкции. Если инструкция была передана правильно, но понята неверно, причиной также может быть поведение модели. Прежде чем устанавливать причину, изучите трассировку.
 
-Switching models can change tool choices, reasoning, and instruction following. Switching harnesses can change what the model sees and is allowed to do. Evaluate the actual combination; neither swap alone diagnoses the fault. Lexigraph's model/harness/agent/organisation floors help locate concepts, while this guide's operating layers distinguish runtime, repository, and orchestration responsibilities.
+Смена модели может изменить выбор инструментов, ход рассуждений и соблюдение инструкций. Смена харнесса может изменить то, что видит модель и что ей разрешено делать. Оценивайте фактическое сочетание компонентов; замена только одного из них не позволяет диагностировать неисправность. Уровни модели, харнесса, агента и организации в Lexigraph помогают локализовать понятия, тогда как операционные уровни этого руководства разграничивают обязанности среды выполнения, репозитория и оркестрации.
 
-Continue with [Four Layers, Four Responsibilities](./agent-harness.md#0-four-layers-four-responsibilities) and the [Harness Glossary](./glossary.md).
+Продолжите чтение в разделе [Четыре уровня, четыре зоны ответственности](./agent-harness.md#0-four-layers-four-responsibilities) и [Глоссарии харнесса](./glossary.md).
 
-## Assistant, workflow, and agent
+<a id="assistant-workflow-and-agent"></a>
+## Ассистент, рабочий процесс и агент
 
-An **assistant** describes a user-facing role. A **workflow** defines steps and branches in advance. An **agent** lets a model select actions within an iterative process that observes results and works toward an objective. One product can combine all three.
+**Ассистент** описывает роль, обращённую к пользователю. **Рабочий процесс** заранее определяет шаги и ветвления. **Агент** позволяет модели выбирать действия в рамках итеративного процесса, который наблюдает за результатами и движется к цели. Один продукт может сочетать все три сущности.
 
-Ask **who chooses the next action at this point?** A pipeline that runs the formatter, tests, and report in a fixed order is a workflow. Claude choosing which file to inspect after a failing test is an agent decision. A workflow can invoke that agent at one step and still control the surrounding sequence.
+Спросите: **кто в этот момент выбирает следующее действие?** Конвейер, который в фиксированном порядке запускает форматтер, тесты и формирование отчёта, — это рабочий процесс. Решение Claude о том, какой файл изучить после сбоя теста, — это решение агента. Рабочий процесс может вызывать такого агента на одном из этапов и при этом по-прежнему контролировать окружающую последовательность.
 
-An approval pause does not turn an agent into a non-agent. Conversely, running unattended does not make a fixed script an agent. The name "assistant" alone says nothing about whether the underlying system uses an agent loop. Identify the actual decision boundary, stopping rule, and permission scope.
+Пауза для получения одобрения не превращает агента в неагентную систему. И наоборот, работа без присмотра не превращает фиксированный скрипт в агента. Само по себе название «ассистент» ничего не говорит о том, использует ли базовая система цикл агента. Определите фактическую границу принятия решений, правило остановки и область прав доступа.
 
-Continue with [Loop & Graph Engineering](./loop-graph-engineering.md) and [Architecture](./architecture.md).
+Продолжите чтение в разделах [Проектирование циклов и графов](./loop-graph-engineering.md) и [Архитектура](./architecture.md).
 
-## Tool and MCP
+<a id="tool-and-mcp"></a>
+## Инструмент и MCP
 
-A **tool** exposes an operation to the agent, with inputs and a result. **MCP** standardizes communication between a host and servers that expose tools, resources, or prompts. The protocol connects capabilities; it does not establish that a particular service is trustworthy or that its operations are authorized.
+**Инструмент** предоставляет агенту операцию с входными данными и результатом. **MCP** стандартизирует взаимодействие между хостом и серверами, которые предоставляют инструменты, ресурсы или промпты. Протокол соединяет возможности; он не гарантирует, что конкретная служба заслуживает доверия или что её операции разрешены.
 
-Ask **what operation is exposed, who executes it, and under whose credentials?** A local file reader and an MCP server that reads an issue are both capabilities the agent can use. The server may execute remotely, and the host decides how its exposed tools enter the agent's session. Inspect credentials and side effects for each operation, even when the transport is familiar.
+Спросите: **какая операция предоставляется, кто её выполняет и чьи учётные данные используются?** Локальное средство чтения файлов и MCP-сервер, читающий задачу, — это возможности, которыми может пользоваться агент. Сервер может выполнять операцию удалённо, а хост решает, как предоставленные им инструменты попадут в сеанс агента. Проверяйте учётные данные и побочные эффекты каждой операции, даже если используется знакомый транспорт.
 
-A connected tool need not be allowed to run without approval. A successful connection also says nothing about the correctness of its results or the instructions embedded in returned content.
+Подключённому инструменту необязательно разрешать работу без одобрения. Успешное подключение также ничего не говорит о правильности его результатов или инструкций, встроенных в возвращаемое содержимое.
 
-Continue with [Tools Reference](./tools-reference.md), [MCP Integration](../ultimate-guide.md#8-mcp-servers), and the [MCP server ecosystem](../ecosystem/mcp-servers-ecosystem.md).
+Продолжите чтение в разделах [Справочник по инструментам](./tools-reference.md), [Интеграция MCP](../ultimate-guide.md#8-mcp-servers) и [Экосистема MCP-серверов](../ecosystem/mcp-servers-ecosystem.md).
 
-## Instructions, permissions, and sandbox
+<a id="instructions-permissions-and-sandbox"></a>
+## Инструкции, права доступа и песочница
 
-**Instructions** tell the model how to behave. **Permissions** determine which tool requests may execute or require approval. A **sandbox** restricts access at the execution environment boundary, according to its configuration. These controls have different owners and failure modes.
+**Инструкции** указывают модели, как себя вести. **Права доступа** определяют, какие запросы на использование инструментов могут быть выполнены, а какие требуют одобрения. **Песочница** ограничивает доступ на границе среды выполнения в соответствии со своей конфигурацией. У этих механизмов разные владельцы и режимы отказа.
 
-Ask **what stops the action if the model requests it anyway?** "Do not read credentials" in `CLAUDE.md` is a behavioral instruction. An enforced read restriction is an access control. A network restriction limits reachable destinations. Test the relevant control with synthetic data in a disposable environment, including both an allowed operation and a prohibited one.
+Спросите: **что остановит действие, если модель всё равно его запросит?** Фраза «Не читай учётные данные» в `CLAUDE.md` — это поведенческая инструкция. Принудительно применяемый запрет на чтение — это контроль доступа. Сетевое ограничение определяет, какие адреса доступны. Проверьте соответствующий механизм на синтетических данных в одноразовой среде, протестировав как разрешённую, так и запрещённую операцию.
 
-A separate Git worktree separates working files and branches; it is not a filesystem or network sandbox. Sandbox coverage and escape paths depend on the runtime, platform, tools, and configuration. Instructions still matter, but a written prohibition is not evidence of enforcement.
+Отдельный Git worktree разделяет рабочие файлы и ветки; это не файловая или сетевая песочница. Охват песочницы и способы выхода за её пределы зависят от среды выполнения, платформы, инструментов и конфигурации. Инструкции по-прежнему важны, но письменный запрет не доказывает, что он принудительно соблюдается.
 
-Continue with [Native Sandbox](../security/sandbox-native.md), [Sandbox Isolation](../security/sandbox-isolation.md), and [Production Safety](../security/production-safety.md).
+Продолжите чтение в разделах [Встроенная песочница](../security/sandbox-native.md), [Изоляция песочницы](../security/sandbox-isolation.md) и [Безопасность в продакшене](../security/production-safety.md).
 
-## Evaluation and production evidence
+<a id="evaluation-and-production-evidence"></a>
+## Оценка и данные из продакшена
 
-An **evaluation** measures a specified system on selected cases, using defined criteria and judges. **Production evidence** comes from observed use in the deployed environment. A passing evaluation establishes results for its cases and conditions; production observations also remain bounded by what was measured.
+**Оценка (evaluation)** измеряет заданную систему на выбранных примерах с использованием определённых критериев и средств оценивания. **Данные из продакшена** поступают из наблюдаемого использования в развёрнутой среде. Успешное прохождение оценки подтверждает результаты только для её примеров и условий; наблюдения в продакшене также ограничены тем, что именно измерялось.
 
-Ask **what was tested, against which criterion, and what remains outside that observation?** A patch can pass a unit test while a live integration fails because of credentials, permissions, or a different response schema. A mocked provider check establishes behavior against the mock, not a successful call to the real provider.
+Спросите: **что было протестировано, по какому критерию и что остаётся за пределами этого наблюдения?** Патч может пройти модульный тест, тогда как реальная интеграция завершится сбоем из-за учётных данных, прав доступа или другой схемы ответа. Проверка с имитацией провайдера подтверждает поведение относительно этой имитации, а не успешный вызов настоящего провайдера.
 
-Evaluate the path as well as the final answer: unauthorized side effects, retries, cost, and recovery can change whether a task counts as successful. Vocabulary questions test recognition of concepts. They do not establish coding ability, security enforcement, or safe operation of an agent.
+Оценивайте не только окончательный ответ, но и путь к нему: несанкционированные побочные эффекты, повторные попытки, стоимость и восстановление могут повлиять на то, считается ли задача успешно выполненной. Вопросы на знание терминов проверяют распознавание понятий. Они не подтверждают умение программировать, принудительное соблюдение требований безопасности или безопасную работу агента.
 
-Continue with [Agent Evaluation](../roles/agent-evaluation.md) and the [Best-of-N verification workflow](../workflows/best-of-n.md).
+Продолжите чтение в разделах [Оценка агентов](../roles/agent-evaluation.md) и [Рабочий процесс проверки Best-of-N](../workflows/best-of-n.md).
 
-## Architecture, size class, modality, and task
+<a id="architecture-size-class-modality-and-task"></a>
+## Архитектура, класс размера, модальность и задача
 
-Model names mix several **axes**. A **model class** such as a large language model (LLM) says what kind of system it is: a language model trained on large text corpora. An **architecture** describes the internal design: a dense decoder transformer runs all its parameters for each token, while a mixture-of-experts (MoE) model routes each token to a few expert sub-networks. A **size class** such as a small language model (SLM) is a loose label for a model small enough for constrained hardware. An **input modality** describes what the model accepts: a vision-language model (VLM) takes images as well as text. A **training objective** describes how the model learned: masked language modeling (MLM) predicts hidden tokens from both sides. A **task or product label** describes what the system is for: "large action model" (LAM) and image segmentation, as in the Segment Anything Model (SAM). A **representation unit** describes what the model predicts: a large concept model (LCM) predicts sentence embeddings instead of tokens.
+Названия моделей смешивают несколько **осей**. **Класс модели**, например большая языковая модель (LLM), указывает, к какому типу относится система: это языковая модель, обученная на больших текстовых корпусах. **Архитектура** описывает внутреннее устройство: плотный декодирующий трансформер использует все свои параметры для каждого токена, а модель на основе смеси экспертов (MoE) направляет каждый токен в несколько экспертных подсетей. **Класс размера**, например малая языковая модель (SLM), — это нечёткое обозначение модели, достаточно небольшой для работы на ограниченном оборудовании. **Модальность входных данных** описывает, что принимает модель: визуально-языковая модель (VLM) получает не только текст, но и изображения. **Цель обучения** описывает, как обучалась модель: моделирование маскированного языка (MLM) предсказывает скрытые токены с учётом контекста с обеих сторон. **Обозначение задачи или продукта** описывает предназначение системы: «большая модель действий» (LAM) и сегментация изображений, как в Segment Anything Model (SAM). **Единица представления** описывает, что предсказывает модель: большая концептуальная модель (LCM) предсказывает эмбеддинги предложений вместо токенов.
 
-Ask **which axis does this term describe, and does it change anything you configure or observe in Claude Code?** A post that lists eight model "architectures" side by side mixes axes. MoE, SLM, and VLM are not alternatives: one model can be a small, MoE, vision-language model. Two axes show up in your sessions: input modality, through image context cost, and architecture, when you choose local models.
+Спросите: **какую ось описывает этот термин и меняет ли он что-либо в настройках или наблюдаемом поведении Claude Code?** Публикация, в которой рядом перечислены восемь «архитектур» моделей, смешивает разные оси. MoE, SLM и VLM не являются взаимоисключающими вариантами: одна модель одновременно может быть малой визуально-языковой моделью с MoE. В ваших сеансах проявляются две оси: модальность входных данных — через стоимость изображений в контексте — и архитектура, когда вы выбираете локальные модели.
 
-[![Eight terms, seven axes: LLM is a model class, MoE an architecture, SLM a size class, VLM an input modality, MLM a training objective, LAM and SAM task or product labels, and LCM a representation unit. One model can be small, MoE and vision-language at once.](../images/model-axes/model-axes-en-gemini.webp)](../images/model-axes/model-axes-en-gemini.webp)
+[![Восемь терминов, семь осей: LLM — класс модели, MoE — архитектура, SLM — класс размера, VLM — модальность входных данных, MLM — цель обучения, LAM и SAM — обозначения задач или продуктов, а LCM — единица представления. Одна модель одновременно может быть малой визуально-языковой моделью с MoE.](../images/model-axes/model-axes-en-gemini.webp)](../images/model-axes/model-axes-en-gemini.webp)
 
-*The eight terms sit on seven different axes, so they are not alternatives to choose between. Open the image for full size. [Image provenance](../images/model-axes/README.md).*
+*Восемь терминов относятся к семи разным осям, поэтому это не варианты, между которыми нужно выбирать. Откройте изображение, чтобы посмотреть его в полном размере. [Происхождение изображения](../images/model-axes/README.md).*
 
-| Term | Axis | What changes for a Claude Code user | Read next |
+| Термин | Ось | Что меняется для пользователя Claude Code | Что читать дальше |
 |------|------|-------------------------------------|-----------|
-| LLM | Model class: a language model trained on large text corpora, typically a transformer that generates one token at a time | Claude's underlying model is autoregressive, so output is generated token by token ([Anthropic glossary](https://platform.claude.com/docs/en/about-claude/glossary)) | [Context Engineering](./context-engineering.md) |
-| MoE | Architecture: expert feed-forward blocks chosen per token by a router | Anthropic does not document Claude's architecture, so do not assume either way. It matters when you pick local models: memory follows total parameters, compute follows active ones ([Mixtral](https://arxiv.org/html/2401.04088)) | [Local vs cloud inference](../ecosystem/local-vs-cloud-inference.md#what-actually-fits-named-models) |
-| SLM | Size class: the Phi-3 report sets no threshold and describes its model by parameter count and on-device deployability ([Phi-3 report](https://ar5iv.labs.arxiv.org/html/2404.14219)) | Matters for local deployment. Quantization is a separate technique that lowers weight precision; llama.cpp applies it to models from 8B to 405B parameters ([llama.cpp](https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md)) | [Local vs cloud inference](../ecosystem/local-vs-cloud-inference.md#what-actually-fits-named-models) |
-| VLM | Modality: in LLaVA's design, a vision encoder, a projection, and a language model ([LLaVA](https://arxiv.org/abs/2304.08485)); Anthropic does not describe Claude's vision pipeline | Screenshots and images consume context tokens ([Anthropic vision docs](https://platform.claude.com/docs/en/build-with-claude/vision)) | [Images and screenshots](../ultimate-guide.md#working-with-images-and-screenshots) |
-| MLM | Training objective: predict masked tokens, used to pre-train encoder models such as [BERT](https://arxiv.org/abs/1810.04805) | Not how Claude generates text. It is a pre-training objective, not a product feature | None |
-| LAM | Task or product label with competing meanings: a product concept ([Rabbit r1](https://en.wikipedia.org/wiki/Rabbit_r1)) and language models tuned for function calling ([xLAM](https://arxiv.org/abs/2409.03215)) | In Claude Code, actions come from tool use in the agent loop, bounded by permissions | [Computer use](./computer-use.md), [The master loop](../diagrams/04-architecture-internals.md#the-master-loop) |
-| LCM | Representation unit: sentence-level SONAR representations, continuous embeddings in most variants and discrete units in the quantized one ([LCM paper](https://arxiv.org/html/2412.08821)) | No direct Claude Code use | None |
-| SAM | Task or product label: promptable image segmentation ([SAM paper](https://arxiv.org/abs/2304.02643)) | No direct Claude Code use | None |
+| LLM | Класс модели: языковая модель, обученная на больших текстовых корпусах; обычно это трансформер, генерирующий по одному токену за раз | Базовая модель Claude авторегрессионная, поэтому выходные данные генерируются токен за токеном ([глоссарий Anthropic](https://platform.claude.com/docs/en/about-claude/glossary)) | [Инженерия контекста](./context-engineering.md) |
+| MoE | Архитектура: экспертные блоки прямого распространения, которые маршрутизатор выбирает для каждого токена | Anthropic не документирует архитектуру Claude, поэтому не следует делать предположений ни в ту, ни в другую сторону. Это важно при выборе локальных моделей: требования к памяти зависят от общего числа параметров, а объём вычислений — от числа активных параметров ([Mixtral](https://arxiv.org/html/2401.04088)) | [Локальный и облачный инференс](../ecosystem/local-vs-cloud-inference.md#what-actually-fits-named-models) |
+| SLM | Класс размера: отчёт о Phi-3 не задаёт порогового значения и описывает модель через количество параметров и возможность развёртывания на устройстве ([отчёт о Phi-3](https://ar5iv.labs.arxiv.org/html/2404.14219)) | Важно для локального развёртывания. Квантизация — отдельная техника, снижающая точность представления весов; llama.cpp применяет её к моделям с числом параметров от 8B до 405B ([llama.cpp](https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md)) | [Локальный и облачный инференс](../ecosystem/local-vs-cloud-inference.md#what-actually-fits-named-models) |
+| VLM | Модальность: в архитектуре LLaVA используются визуальный энкодер, проекция и языковая модель ([LLaVA](https://arxiv.org/abs/2304.08485)); Anthropic не описывает конвейер обработки изображений в Claude | Скриншоты и изображения расходуют токены контекста ([документация Anthropic по зрению](https://platform.claude.com/docs/en/build-with-claude/vision)) | [Изображения и скриншоты](../ultimate-guide.md#working-with-images-and-screenshots) |
+| MLM | Цель обучения: предсказание маскированных токенов, используемое для предварительного обучения моделей-энкодеров, таких как [BERT](https://arxiv.org/abs/1810.04805) | Claude генерирует текст не таким образом. Это цель предварительного обучения, а не функция продукта | Нет |
+| LAM | Обозначение задачи или продукта с несколькими конкурирующими значениями: концепция продукта ([Rabbit r1](https://en.wikipedia.org/wiki/Rabbit_r1)) и языковые модели, дообученные для вызова функций ([xLAM](https://arxiv.org/abs/2409.03215)) | В Claude Code действия выполняются посредством использования инструментов в цикле агента и ограничиваются правами доступа | [Управление компьютером](./computer-use.md), [Главный цикл](../diagrams/04-architecture-internals.md#the-master-loop) |
+| LCM | Единица представления: представления SONAR на уровне предложений, в большинстве вариантов — непрерывные эмбеддинги, а в квантизированном варианте — дискретные единицы ([статья о LCM](https://arxiv.org/html/2412.08821)) | Не имеет прямого применения в Claude Code | Нет |
+| SAM | Обозначение задачи или продукта: сегментация изображений по промпту ([статья о SAM](https://arxiv.org/abs/2304.02643)) | Не имеет прямого применения в Claude Code | Нет |
 
-These labels are not exclusive categories, and the table simplifies each one. Vendor labels such as LAM lack a shared specification, so ask what the system does and which components it contains. Token costs for images and the supported image sizes depend on the model and can change, so check the vision documentation for current figures.
+Эти обозначения не являются взаимоисключающими категориями, а таблица упрощает каждое из них. У обозначений производителей, таких как LAM, нет общей спецификации, поэтому спрашивайте, что делает система и из каких компонентов она состоит. Стоимость изображений в токенах и поддерживаемые размеры изображений зависят от модели и могут меняться, поэтому актуальные значения следует проверять в документации по зрению.
 
-Continue with [Local vs cloud inference](../ecosystem/local-vs-cloud-inference.md) and [Three model pipelines](../diagrams/04-architecture-internals.md#three-model-pipelines-dense-moe-and-vlm).
+Продолжите чтение в разделах [Локальный и облачный инференс](../ecosystem/local-vs-cloud-inference.md) и [Три конвейера моделей](../diagrams/04-architecture-internals.md#three-model-pipelines-dense-moe-and-vlm).
 
-## Check your understanding
+<a id="check-your-understanding"></a>
+## Проверьте своё понимание
 
-These seven original scenarios check the distinctions above. They are reading exercises, not a validated assessment or a measurement of practical proficiency. Explain your answer before opening the correction.
+Эти семь оригинальных сценариев проверяют понимание приведённых выше различий. Это упражнения по прочитанному, а не валидированная оценка или измерение практической квалификации. Объясните свой ответ, прежде чем открывать исправления.
 
-1. You enlarge the context window, start a new session, and a coding preference is still missing. What must you inspect?
-2. A model switch makes a previously working tool sequence fail. Can you conclude that the harness is correct because its code did not change?
-3. A fixed CI pipeline invokes an agent to investigate a failure, then pauses for review. Which parts are workflow, agent, and human judgment?
-4. An MCP server connects successfully. Does that authorize its tool to send an email?
-5. An agent works in a separate Git worktree. Does that prevent it from reading a sibling directory or reaching the network?
-6. A mocked integration test and all vocabulary exercises pass. What can you report about production readiness?
-7. A teammate proposes replacing Claude with "a LAM instead of an LLM" to get tool execution. What should you ask first?
+1. Вы увеличили контекстное окно, начали новый сеанс, но предпочтение по написанию кода по-прежнему отсутствует. Что необходимо проверить?
+2. После смены модели ранее работавшая последовательность использования инструментов начала завершаться сбоем. Можно ли заключить, что харнесс работает правильно, поскольку его код не изменился?
+3. Фиксированный CI-конвейер вызывает агента для расследования сбоя, а затем приостанавливается для проверки. Какие части относятся к рабочему процессу, агенту и человеческому суждению?
+4. MCP-сервер успешно подключился. Разрешает ли это его инструменту отправить электронное письмо?
+5. Агент работает в отдельном Git worktree. Мешает ли это ему читать соседний каталог или обращаться к сети?
+6. Имитационный интеграционный тест и все упражнения на знание терминов пройдены. Что можно сообщить о готовности к продакшену?
+7. Коллега предлагает заменить Claude на «LAM вместо LLM», чтобы получить выполнение действий посредством инструментов. Что следует спросить в первую очередь?
 
 <details>
-<summary>Corrections and what to inspect next</summary>
+<summary>Исправления и что проверить дальше</summary>
 
-1. Inspect whether the preference was stored, where it lives, and whether the new session loaded it. Window capacity is separate from persistence and selection. Revisit [context and memory](#context-context-window-and-memory).
-2. No. The model-harness combination changed. Inspect the supplied schemas, tool requests, execution results, and failure traces before assigning responsibility. Revisit [model and harness](#model-product-and-harness).
-3. The fixed pipeline is the workflow, the model's adaptive investigation is the agent loop, and the reviewer supplies the approval judgment. The pause preserves an authority boundary. Revisit [workflow and agent](#assistant-workflow-and-agent).
-4. No. Connectivity, operation availability, credentials, and authorization are separate checks. Sending requires the applicable permissions and user authorization. Revisit [tool and MCP](#tool-and-mcp).
-5. No. A worktree does not itself restrict operating-system access. Inspect the actual filesystem, network, and credential restrictions. Revisit [execution controls](#instructions-permissions-and-sandbox).
-6. Report the mock behavior and conceptual understanding checks that passed. Live-provider behavior and deployed operation remain unverified by those checks. Revisit [evaluation evidence](#evaluation-and-production-evidence).
-7. Ask which axis "LAM" describes. The label has competing meanings and no shared architecture. In Claude Code, actions come from tool use and permissions in the harness, so check which tools and permissions the harness grants. Revisit [model axes](#architecture-size-class-modality-and-task).
+1. Проверьте, было ли предпочтение сохранено, где оно находится и загрузил ли его новый сеанс. Вместимость окна не связана с сохранением и выбором информации. Вернитесь к разделу [о контексте и памяти](#context-context-window-and-memory).
+2. Нет. Изменилось сочетание модели и харнесса. Прежде чем назначать ответственного, изучите переданные схемы, запросы к инструментам, результаты выполнения и трассировки сбоев. Вернитесь к разделу [о модели и харнессе](#model-product-and-harness).
+3. Фиксированный конвейер — это рабочий процесс, адаптивное расследование модели — цикл агента, а рецензент выносит решение об одобрении. Пауза сохраняет границу полномочий. Вернитесь к разделу [о рабочем процессе и агенте](#assistant-workflow-and-agent).
+4. Нет. Подключение, доступность операции, учётные данные и авторизация — отдельные проверки. Для отправки требуются соответствующие права доступа и разрешение пользователя. Вернитесь к разделу [об инструментах и MCP](#tool-and-mcp).
+5. Нет. Worktree сам по себе не ограничивает доступ на уровне операционной системы. Проверьте фактические ограничения файловой системы, сети и учётных данных. Вернитесь к разделу [о средствах управления выполнением](#instructions-permissions-and-sandbox).
+6. Сообщите о пройденных проверках поведения на имитации и понимания понятий. Эти проверки не подтверждают поведение с реальным провайдером и работу развёрнутой системы. Вернитесь к разделу [о данных оценки](#evaluation-and-production-evidence).
+7. Спросите, какую ось описывает «LAM». У этого обозначения есть несколько конкурирующих значений и нет общей архитектуры. В Claude Code действия выполняются через использование инструментов и права доступа в харнессе, поэтому проверьте, какие инструменты и права доступа предоставляет харнесс. Вернитесь к разделу [об осях модели](#architecture-size-class-modality-and-task).
 
 </details>
 
-## Sources and adaptation
+<a id="sources-and-adaptation"></a>
+## Источники и адаптация
 
-- **Attribution:** Anthony Capirchio / The Operating Shift, [Lexigraph corpus v1.0.0](https://github.com/TheOperatingShift/lexigraph-corpus), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Selected distinctions and the definition/comparison/exercise teaching structure are adapted; wording and repository examples are rewritten here, and all exercises are written for this guide. Product-dependent generalizations are qualified. This attribution does not imply endorsement.
-- **Lexigraph reading:** [Context or Memory](https://www.lexigraph.org/en/vs/context-memory/), [Model or Product](https://www.lexigraph.org/en/vs/model-product/), and [Workflow or Agent](https://www.lexigraph.org/en/vs/workflow-agent/). The English and French corpus can support further learning; its four floors are a teaching taxonomy, not an implementation specification.
-- **Product references:** Anthropic's [How Claude Code works](https://code.claude.com/docs/en/how-claude-code-works), [Memory](https://code.claude.com/docs/en/memory), [Permissions](https://code.claude.com/docs/en/permissions), and [Sandboxing](https://code.claude.com/docs/en/sandboxing). Protocol roles are described in the [MCP architecture](https://modelcontextprotocol.io/docs/learn/architecture).
-- **Seventh distinction:** The architecture, size class, modality, and task section and its exercise are original to this guide and are not adapted from Lexigraph. Sources are linked in its table.
-- **Reuse limits:** See the [Lexigraph evaluation](../../docs/resource-evaluations/lexigraph-ai-lexicon.md) for export gaps, answer-position bias, and the reasons for selective adaptation. No source quiz bank, infographic, or site code is imported into this page.
+- **Атрибуция:** Энтони Капиркьо / The Operating Shift, [корпус Lexigraph v1.0.0](https://github.com/TheOperatingShift/lexigraph-corpus), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Адаптированы отдельные различия и обучающая структура «определение — сравнение — упражнение»; формулировки и примеры, относящиеся к репозиториям, здесь переписаны, а все упражнения созданы специально для этого руководства. Обобщения, зависящие от продукта, сопровождаются оговорками. Эта атрибуция не означает одобрения.
+- **Материалы Lexigraph:** [Контекст или память](https://www.lexigraph.org/en/vs/context-memory/), [Модель или продукт](https://www.lexigraph.org/en/vs/model-product/) и [Рабочий процесс или агент](https://www.lexigraph.org/en/vs/workflow-agent/). Английский и французский корпуса могут использоваться для дальнейшего обучения; их четыре уровня — это учебная таксономия, а не спецификация реализации.
+- **Справочные материалы по продукту:** материалы Anthropic [Как работает Claude Code](https://code.claude.com/docs/en/how-claude-code-works), [Память](https://code.claude.com/docs/en/memory), [Права доступа](https://code.claude.com/docs/en/permissions) и [Песочница](https://code.claude.com/docs/en/sandboxing). Роли в протоколе описаны в разделе [Архитектура MCP](https://modelcontextprotocol.io/docs/learn/architecture).
+- **Седьмое различие:** раздел об архитектуре, классе размера, модальности и задаче, а также соответствующее упражнение созданы специально для этого руководства и не адаптированы из Lexigraph. Источники приведены в таблице этого раздела.
+- **Ограничения повторного использования:** сведения о пробелах в экспорте, смещении из-за позиции ответа и причинах выборочной адаптации приведены в разделе [Оценка Lexigraph](../../docs/resource-evaluations/lexigraph-ai-lexicon.md). На эту страницу не импортированы ни банк вопросов из источника, ни инфографика, ни код сайта.
